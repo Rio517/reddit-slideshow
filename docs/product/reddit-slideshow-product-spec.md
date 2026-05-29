@@ -51,7 +51,7 @@ When the queue nears the end, the extension fetches the next listing page using 
 
 If a post has multiple media items, such as a Reddit gallery, each media item becomes its own slide while preserving the post-level context.
 
-The queue is **media-only by definition.** Text/self posts, outbound article links, stickied/announcement posts, and promoted/ad posts are dropped from the queue, not shown as placeholder slides — a linear auto-advancing slideshow that lands on non-media breaks the lean-back experience. Placeholder slides are reserved for the rare case of a *resolution failure on something that should have rendered* (e.g. a blocked Redgifs clip). This "skip anything not renderable" behavior is core to v1, not a configurable filter. Because most of a listing page can be non-media, pagination must be triggered on *posts scanned*, not *slides produced*, so a sparse page does not cause back-to-back fetches.
+The queue is **media-only by definition.** Text/self posts, outbound article links, stickied/announcement posts, and promoted/ad posts are dropped from the queue, not shown as placeholder slides — a linear auto-advancing slideshow that lands on non-media breaks the lean-back experience. Placeholder slides are reserved for the rare case of a _resolution failure on something that should have rendered_ (e.g. a blocked Redgifs clip). This "skip anything not renderable" behavior is core to v1, not a configurable filter. Because most of a listing page can be non-media, pagination must be triggered on _posts scanned_, not _slides produced_, so a sparse page does not cause back-to-back fetches.
 
 ## Media Support
 
@@ -95,16 +95,15 @@ Other external hosts are out of v1 unless they are simple direct media links. Th
 
 ## Permissions
 
-The extension needs access to old Reddit pages, Reddit JSON/media hosts, and selected external providers. Preferred first pass:
+v1 is `old.reddit.com`-only, so install-time host permissions are scoped to the Reddit hosts the extension actually fetches:
 
-- `old.reddit.com`
-- `www.reddit.com`
-- `i.redd.it`
-- `v.redd.it`
-- `redgifs.com`
-- `www.redgifs.com`
+- `https://old.reddit.com/*` — listing pages and listing JSON.
+- `https://i.redd.it/*` — direct image media.
+- `https://v.redd.it/*` — Reddit-hosted video media.
 
-External provider permissions may be optional if the implementation can keep install-time permissions narrower.
+Plus the `storage` API permission for settings.
+
+`www.reddit.com` is intentionally not requested: v1 reads the current old Reddit context only. Redgifs needs **no** host permission because it plays through a first-party iframe (a page element, not an extension-initiated fetch); an optional `api.redgifs.com` permission would only be added later for best-effort aspect-ratio metadata, and playback must not depend on it. Any additional provider host stays out of install-time permissions and is requested optionally if and when it is needed.
 
 ## Error Handling
 

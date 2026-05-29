@@ -9,6 +9,7 @@
 **Tech Stack:** WXT, Vite, Vitest (+ `WxtVitest()` fake-browser, happy-dom), JavaScript ES modules with JSDoc + `checkJs` type-checking, ESLint flat config + `eslint-plugin-no-unsanitized`, Prettier, `web-ext lint` on the built output.
 
 **Decisions baked in (see [ADR 0005](../../adr/0005-manifest-v3-event-page-and-wxt-build.md)):**
+
 - MV3 + event page + `action`; use WXT so shared modules are bundled instead of relying on browser-specific content-script module loading.
 - Host scope is **`old.reddit.com` only** for v1 — `www.reddit.com` is not in permissions or `SUPPORTED_HOSTS`.
 - `options` consumes `lib/settings.js` via a single `getSettings()`/`saveSettings()` path — no duplicated defaults.
@@ -74,6 +75,7 @@ Responsibilities:
 ## Task 1: WXT Project And Tooling Baseline
 
 **Files:**
+
 - Create: `package.json`, `wxt.config.ts`, `tsconfig.json`, `vitest.config.js`, `eslint.config.js`, `.prettierrc.json`
 - Modify: `.gitignore`
 
@@ -264,6 +266,7 @@ Expected: commit succeeds.
 ## Task 2: Shared Settings Module
 
 **Files:**
+
 - Create: `lib/settings.js`, `tests/unit/settings.test.js`
 
 - [ ] **Step 1: Write the failing test**
@@ -286,11 +289,15 @@ describe("normalizeSettings", () => {
   });
 
   it("accepts supported timer values", () => {
-    expect(normalizeSettings({ imageTimerSeconds: 10 }).imageTimerSeconds).toBe(10);
+    expect(normalizeSettings({ imageTimerSeconds: 10 }).imageTimerSeconds).toBe(
+      10,
+    );
   });
 
   it("falls back when timer value is unsupported", () => {
-    expect(normalizeSettings({ imageTimerSeconds: 999 }).imageTimerSeconds).toBe(5);
+    expect(
+      normalizeSettings({ imageTimerSeconds: 999 }).imageTimerSeconds,
+    ).toBe(5);
   });
 
   it("normalizes startMuted to a boolean", () => {
@@ -309,7 +316,11 @@ describe("getSettings / saveSettings", () => {
   });
 
   it("round-trips saved settings through normalization", async () => {
-    await saveSettings({ imageTimerSeconds: 10, autoplay: false, startMuted: false });
+    await saveSettings({
+      imageTimerSeconds: 10,
+      autoplay: false,
+      startMuted: false,
+    });
     expect(await getSettings()).toEqual({
       imageTimerSeconds: 10,
       startMuted: false,
@@ -408,6 +419,7 @@ Expected: commit succeeds.
 ## Task 3: Extension Entrypoints Skeleton
 
 **Files:**
+
 - Create: `entrypoints/background.js`, `entrypoints/content.js`, `entrypoints/options/index.html`, `entrypoints/options/main.js`, `assets/overlay.css`
 
 - [ ] **Step 1: Create `entrypoints/background.js`**
@@ -480,7 +492,12 @@ export default defineContentScript({
   place-items: center;
   color: #f8fafc;
   background: rgba(7, 10, 15, 0.96);
-  font: 16px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font:
+    16px/1.4 system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 }
 
 #reddit-slideshow-root[hidden] {
@@ -580,6 +597,7 @@ Expected: commit succeeds.
 ## Task 4: Offline Fixture Documentation And Samples
 
 **Files:**
+
 - Create: `docs/development/offline-fixtures.md`, `tests/fixtures/old-reddit/subreddit-page.html`, `tests/fixtures/reddit-json/subreddit-direct-images.json`
 
 - [ ] **Step 1: Create fixture documentation**
@@ -628,19 +646,33 @@ Create `tests/fixtures/old-reddit/subreddit-page.html`:
   </head>
   <body class="listing-page">
     <div id="siteTable" class="sitetable linklisting">
-      <div class="thing link" data-fullname="t3_alpha" data-url="https://i.redd.it/alpha.jpg">
+      <div
+        class="thing link"
+        data-fullname="t3_alpha"
+        data-url="https://i.redd.it/alpha.jpg"
+      >
         <p class="title">
-          <a class="title may-blank" href="https://i.redd.it/alpha.jpg">Ultra high resolution landscape</a>
+          <a class="title may-blank" href="https://i.redd.it/alpha.jpg"
+            >Ultra high resolution landscape</a
+          >
         </p>
       </div>
-      <div class="thing link" data-fullname="t3_beta" data-url="https://old.reddit.com/gallery/beta">
+      <div
+        class="thing link"
+        data-fullname="t3_beta"
+        data-url="https://old.reddit.com/gallery/beta"
+      >
         <p class="title">
-          <a class="title may-blank" href="https://old.reddit.com/gallery/beta">Two image gallery</a>
+          <a class="title may-blank" href="https://old.reddit.com/gallery/beta"
+            >Two image gallery</a
+          >
         </p>
       </div>
     </div>
     <span class="next-button">
-      <a href="https://old.reddit.com/r/example/?count=25&amp;after=t3_beta">next</a>
+      <a href="https://old.reddit.com/r/example/?count=25&amp;after=t3_beta"
+        >next</a
+      >
     </span>
   </body>
 </html>
@@ -726,6 +758,7 @@ Expected: commit succeeds.
 ## Task 5: Reddit URL Conversion
 
 **Files:**
+
 - Create: `lib/reddit-url.js`, `tests/unit/reddit-url.test.js`
 
 - [ ] **Step 1: Write the failing test**
@@ -750,9 +783,9 @@ describe("toListingJsonUrl", () => {
   });
 
   it("adds after pagination when provided", () => {
-    expect(toListingJsonUrl("https://old.reddit.com/r/pics/", { after: "t3_alpha" })).toBe(
-      "https://old.reddit.com/r/pics/.json?raw_json=1&after=t3_alpha",
-    );
+    expect(
+      toListingJsonUrl("https://old.reddit.com/r/pics/", { after: "t3_alpha" }),
+    ).toBe("https://old.reddit.com/r/pics/.json?raw_json=1&after=t3_alpha");
   });
 
   it("handles a URL with no trailing slash", () => {
@@ -856,6 +889,7 @@ Expected: commit succeeds.
 ## Task 6: Direct Image Slide Normalization
 
 **Files:**
+
 - Create: `lib/slides.js`, `tests/unit/slides.test.js`
 
 - [ ] **Step 1: Write the failing test**
@@ -1002,7 +1036,8 @@ function mimeTypeFromUrl(url) {
   const pathname = new URL(url).pathname.toLowerCase();
   if (pathname.endsWith(".avif")) return "image/avif";
   if (pathname.endsWith(".gif")) return "image/gif";
-  if (pathname.endsWith(".jpg") || pathname.endsWith(".jpeg")) return "image/jpeg";
+  if (pathname.endsWith(".jpg") || pathname.endsWith(".jpeg"))
+    return "image/jpeg";
   if (pathname.endsWith(".png")) return "image/png";
   if (pathname.endsWith(".webp")) return "image/webp";
   return undefined;
@@ -1019,7 +1054,9 @@ function filenameHint(post, url) {
     .replace(/[^\p{L}\p{N}]+/gu, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 80);
-  return slug ? `${post.name}-${slug}.${extension}` : `${post.name}.${extension}`;
+  return slug
+    ? `${post.name}-${slug}.${extension}`
+    : `${post.name}.${extension}`;
 }
 ```
 
@@ -1057,13 +1094,14 @@ Expected: commit succeeds.
 ## Task 7: Verification And Handoff
 
 **Files:**
+
 - Modify: `docs/development/offline-fixtures.md`
 
 - [ ] **Step 1: Add coverage + commands section**
 
 Append to `docs/development/offline-fixtures.md`:
 
-```markdown
+````markdown
 ## Current Fixture Coverage
 
 - `subreddit-page.html`: minimal old Reddit listing HTML with direct image and gallery-shaped posts.
@@ -1078,7 +1116,7 @@ npm test
 npm run build
 npm run webext:lint
 \```
-```
+````
 
 (Remove the backslashes before the inner code fence when pasting.)
 
@@ -1095,6 +1133,7 @@ npm run webext:lint
 ```
 
 Expected:
+
 - `typecheck`: no type errors.
 - `lint`: no ESLint errors.
 - `test`: all unit tests pass.

@@ -1,10 +1,10 @@
 # NEXT_STEP — Reddit Slideshow
 
-**Doc updated:** 2026-05-29 · **Branch:** `main` · **Status:** planning complete, implementation not started.
+**Doc updated:** 2026-05-29 · **Branch:** `main` · **Status:** foundation scaffold complete and green; live validation spikes + queue builder are next.
 
 > **Hard rule:** work directly on `main`. Do not create branches or worktrees unless the user explicitly asks. See `AGENTS.md`.
 
-This project is a Firefox-first WebExtension for turning the current `old.reddit.com` feed into a media slideshow. The next move is to execute the foundation plan, not to jump straight into the slideshow UI.
+This project is a Firefox-first WebExtension for turning the current `old.reddit.com` feed into a media slideshow. The foundation scaffold (WXT/MV3 tooling, settings, entrypoints, listing-URL conversion, direct-image slide normalization, offline fixtures) is in place and passes the full verification gate. The next move is to run the live validation spikes and build the queue, not to jump straight into the slideshow UI.
 
 ---
 
@@ -31,23 +31,14 @@ Key decisions already made:
 
 ## 1. Immediate Todo
 
-Execute the foundation plan in order:
+The foundation scaffold is complete (`lib/reddit-url.js`, `lib/slides.js`, `lib/settings.js`, WXT/MV3 entrypoints, offline fixtures, full verification gate). The next work, in order:
 
-1. Scaffold WXT/MV3 tooling.
-2. Add validated settings module.
-3. Add background/content/options entrypoints.
-4. Add offline fixture docs and sample old Reddit/Reddit JSON fixtures.
-5. Add old Reddit listing URL conversion.
-6. Add direct-image slide normalization.
-7. Run full verification and update fixture docs.
+1. **Live Reddit `.json` spike.** Confirm a background fetch of `old.reddit.com/.../.json?raw_json=1` works with the existing logged-in session, at slideshow-realistic volume, surviving rate limits and returning the expected shapes. This is the go/no-go for the whole pagination design.
+2. **Capture real sanitized fixtures and harden the resolver.** Real posts may carry media in `url` as well as `url_overridden_by_dest`; fix `slidesFromPost` against a real captured fixture rather than the hand-authored one. Add fixtures for galleries, Reddit video, crossposts, and Redgifs (see §5).
+3. **Queue builder + pagination.** Build the media-only queue from listing JSON and append the next page via `after` when nearing the end, triggering on posts scanned (not slides produced).
+4. Continue down the V1 backlog (§6): overlay shell, timer, video, Redgifs, settings polish, RES coexistence.
 
-Plan file:
-
-```text
-docs/superpowers/plans/2026-05-29-foundation-wxt-mv3.md
-```
-
-Use the plan’s small commits. Do not batch the whole thing into one giant commit.
+Keep small commits. Do not batch multiple slices into one giant commit.
 
 ---
 
@@ -102,7 +93,7 @@ For each task or feature:
 
 ## 3. Tooling Target
 
-The foundation plan will add these commands:
+These commands are available:
 
 ```sh
 npm install
@@ -114,7 +105,7 @@ npm run webext:lint
 npm run dev
 ```
 
-Expected roles:
+Roles:
 
 - `npm run typecheck`: JS/JSDoc type checking via TypeScript.
 - `npm run lint`: ESLint, including unsafe DOM sink checks.
@@ -175,11 +166,11 @@ Do these after the foundation scaffold exists:
 
 ## 6. Current Backlog Shape
 
-V1 path:
+V1 path (foundation + fixtures complete; remaining):
 
-1. Foundation + fixtures.
+1. Live `.json` spike and real captured fixtures.
 2. Queue builder and pagination.
-3. Direct images and gallery support.
+3. Direct images (normalization done; rendering pending) and gallery support.
 4. Overlay shell and keyboard navigation.
 5. Timer behavior.
 6. Reddit-hosted video.

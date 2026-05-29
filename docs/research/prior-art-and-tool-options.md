@@ -32,17 +32,17 @@ No tool found so far satisfies this whole set.
 
 ## Summary Table
 
-| Tool | Type | Open Source | Firefox | Old Reddit Current Page | Slideshow | Pagination | Redgifs | Fit |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| RedditP | Hosted web app | Yes, MIT | Browser-agnostic website | Not an extension overlay | Yes | Yes-ish via Reddit listings | Unknown/currently risky | Strong prior art, weak direct fit |
-| redditpx | Hosted web app | Reported open source | Browser-agnostic website | Not an extension overlay | Yes | Unknown | Unknown | Possible inspiration; needs source verification |
-| Rexplorer | Browser extension | Not found as OSS | Chrome Web Store focus | Reddit page overlay | Lightbox/slideshow/cycle | Yes/free cap | Unknown | Strong product reference, not reuse candidate |
-| Reddit Slideshow Chrome extension | Browser extension | Source view claimed, repo not found | Chrome focus | Reddit web, likely not old-Reddit-first | Yes | Unknown | Unknown | Product reference, not reliable OSS base |
-| Reddit Gallery Keys | Browser extension | Yes, MIT | Firefox add-on exists | New Reddit gallery lightbox, not old Reddit feed | No | No | No | Useful tiny extension reference only |
-| Reddit Enhancement Suite | Browser extension | Yes, GPL-3.0 | Yes | Yes | Not this feature | N/A | Historically constrained | Compatibility target/future upstream path |
-| RedditEnhancer | Browser extension | Yes | Browser extension | Some old Reddit UI tweaks | No | No | No | Adjacent UI tweak reference |
-| Slide for Reddit | Android app | Yes | No | N/A | Media browsing, not extension | App-specific | Unknown | Product inspiration only |
-| Reddit gallery saver/downloader tools | Browser extensions/scripts | Some OSS | Mostly Chrome | Varies | No | Varies | Usually no | Resolver/download inspiration only |
+| Tool                                  | Type                       | Open Source                         | Firefox                  | Old Reddit Current Page                          | Slideshow                     | Pagination                  | Redgifs                  | Fit                                             |
+| ------------------------------------- | -------------------------- | ----------------------------------- | ------------------------ | ------------------------------------------------ | ----------------------------- | --------------------------- | ------------------------ | ----------------------------------------------- |
+| RedditP                               | Hosted web app             | Yes, MIT                            | Browser-agnostic website | Not an extension overlay                         | Yes                           | Yes-ish via Reddit listings | Unknown/currently risky  | Strong prior art, weak direct fit               |
+| redditpx                              | Hosted web app             | Reported open source                | Browser-agnostic website | Not an extension overlay                         | Yes                           | Unknown                     | Unknown                  | Possible inspiration; needs source verification |
+| Rexplorer                             | Browser extension          | Not found as OSS                    | Chrome Web Store focus   | Reddit page overlay                              | Lightbox/slideshow/cycle      | Yes/free cap                | Unknown                  | Strong product reference, not reuse candidate   |
+| Reddit Slideshow Chrome extension     | Browser extension          | Source view claimed, repo not found | Chrome focus             | Reddit web, likely not old-Reddit-first          | Yes                           | Unknown                     | Unknown                  | Product reference, not reliable OSS base        |
+| Reddit Gallery Keys                   | Browser extension          | Yes, MIT                            | Firefox add-on exists    | New Reddit gallery lightbox, not old Reddit feed | No                            | No                          | No                       | Useful tiny extension reference only            |
+| Reddit Enhancement Suite              | Browser extension          | Yes, GPL-3.0                        | Yes                      | Yes                                              | Not this feature              | N/A                         | Historically constrained | Compatibility target/future upstream path       |
+| RedditEnhancer                        | Browser extension          | Yes                                 | Browser extension        | Some old Reddit UI tweaks                        | No                            | No                          | No                       | Adjacent UI tweak reference                     |
+| Slide for Reddit                      | Android app                | Yes                                 | No                       | N/A                                              | Media browsing, not extension | App-specific                | Unknown                  | Product inspiration only                        |
+| Reddit gallery saver/downloader tools | Browser extensions/scripts | Some OSS                            | Mostly Chrome            | Varies                                           | No                            | Varies                      | Usually no               | Resolver/download inspiration only              |
 
 ## Candidate Notes
 
