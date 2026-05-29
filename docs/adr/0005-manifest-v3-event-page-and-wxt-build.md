@@ -14,11 +14,12 @@ Two facts constrain the manifest and build choices for this extension:
    MV2 advantage). Chrome has fully removed MV2 (139+), so any future
    cross-browser build requires MV3.
 
-2. **A bundler is mandatory regardless of manifest version.** Firefox has never
-   supported ES-module `import` in content scripts (platform bug
-   [1451545](https://bugzilla.mozilla.org/show_bug.cgi?id=1451545), open since
-   2018). The content script depends on shared modules, so the source must be
-   bundled — the raw tree cannot be loaded directly.
+2. **Use a bundler regardless of manifest version.** Firefox now supports
+   dynamic module imports from content scripts for `moz-extension://` URLs, but
+   static ES-module content scripts declared directly in the manifest are still
+   not a clean cross-browser foundation. The content script, background,
+   options page, and tests all need shared modules, so the source should be
+   bundled instead of depending on browser-specific module-loading details.
 
 The project's code style (static HTML/CSS/JS modules, `textContent`, no
 `innerHTML`/`eval`) already satisfies the strict MV3 CSP.
@@ -55,8 +56,8 @@ Benefits:
 - Aligns with the modern, supported Firefox model (event page) and avoids the
   deprecated persistent-background pattern.
 - Cross-browser optionality preserved (Chrome requires MV3).
-- A correct build pipeline from day one; content-script shared imports actually
-  load.
+- A correct build pipeline from day one; shared imports are resolved before the
+  extension is packaged.
 - WXT removes per-browser manifest hand-maintenance and provides a tested
   `browser.*` mock for unit tests.
 

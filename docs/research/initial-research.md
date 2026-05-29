@@ -60,7 +60,7 @@ Source:
 
 ## Redgifs
 
-Redgifs is a first-class provider, embedded inline via the Redgifs first-party iframe (`https://www.redgifs.com/ifr/<id>`). The iframe is served by Redgifs, so its inner video is a same-origin request that carries the Origin/Referer Redgifs whitelists and avoids the cross-origin hotlink 403 that direct `.mp4` embedding hits. It needs no `redgifs.com` host permission. Because an iframe has no native `ended` event, Redgifs slides advance on a duration timer. Unresolvable or removed posts fall back to a slide with title/source context and an open-original action.
+Redgifs is a first-class provider. The current hypothesis is to embed it inline via the Redgifs first-party iframe (`https://www.redgifs.com/ifr/<id>`). The iframe is served by Redgifs, so its inner video should behave as Redgifs' own player rather than as a hotlinked direct `.mp4`. Because an iframe does not expose a native `<video>` `ended` event to the extension, Redgifs slides would advance on a duration timer. This still needs a live Firefox validation spike before being treated as settled. Unresolvable or removed posts fall back to a slide with title/source context and an open-original action.
 
 ## Current Research Conclusions
 
@@ -73,4 +73,5 @@ Redgifs is a first-class provider, embedded inline via the Redgifs first-party i
 ## Open Research Tasks
 
 - Capture real old Reddit listing JSON fixtures for direct images, Reddit galleries, Reddit videos, and Redgifs.
+- Confirm Redgifs iframe playback in Firefox without `redgifs.com` host permission.
 - Verify autoplay behavior for muted and unmuted video clips.

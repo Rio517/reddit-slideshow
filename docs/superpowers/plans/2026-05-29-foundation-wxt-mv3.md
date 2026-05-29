@@ -9,7 +9,7 @@
 **Tech Stack:** WXT, Vite, Vitest (+ `WxtVitest()` fake-browser, happy-dom), JavaScript ES modules with JSDoc + `checkJs` type-checking, ESLint flat config + `eslint-plugin-no-unsanitized`, Prettier, `web-ext lint` on the built output.
 
 **Decisions baked in (see [ADR 0005](../../adr/0005-manifest-v3-event-page-and-wxt-build.md)):**
-- MV3 + event page + `action`; a bundler (WXT) is mandatory because Firefox does not support ESM `import` in content scripts.
+- MV3 + event page + `action`; use WXT so shared modules are bundled instead of relying on browser-specific content-script module loading.
 - Host scope is **`old.reddit.com` only** for v1 — `www.reddit.com` is not in permissions or `SUPPORTED_HOSTS`.
 - `options` consumes `lib/settings.js` via a single `getSettings()`/`saveSettings()` path — no duplicated defaults.
 - `browser_specific_settings.gecko.id` is set.
@@ -261,179 +261,7 @@ Expected: commit succeeds.
 
 ---
 
-## Task 2: Extension Entrypoints Skeleton
-
-**Files:**
-- Create: `entrypoints/background.js`, `entrypoints/content.js`, `entrypoints/options/index.html`, `entrypoints/options/main.js`, `assets/overlay.css`
-
-- [ ] **Step 1: Create `entrypoints/background.js`**
-
-```js
-export default defineBackground(() => {
-  browser.runtime.onInstalled.addListener(() => {
-    console.info("Reddit Slideshow installed");
-  });
-
-  browser.action.onClicked.addListener(async (tab) => {
-    if (!tab.id) return;
-    try {
-      await browser.tabs.sendMessage(tab.id, {
-        type: "slideshow.startRequested",
-        payload: { source: "action" },
-      });
-    } catch {
-      // No content script on this tab (not an old.reddit.com listing).
-      // Swallow the "no receiving end" rejection instead of throwing an
-      // unhandled rejection, and point the user at old Reddit.
-      console.info("Reddit Slideshow: open an old.reddit.com listing first");
-    }
-  });
-});
-```
-
-- [ ] **Step 2: Create `entrypoints/content.js`**
-
-```js
-import "@/assets/overlay.css";
-
-export default defineContentScript({
-  matches: ["https://old.reddit.com/*"],
-  cssInjectionMode: "manifest",
-  main() {
-    const ROOT_ID = "reddit-slideshow-root";
-
-    function ensureRoot() {
-      let root = document.getElementById(ROOT_ID);
-      if (root) return root;
-      root = document.createElement("div");
-      root.id = ROOT_ID;
-      root.hidden = true;
-      root.textContent = "Reddit Slideshow";
-      document.documentElement.append(root);
-      return root;
-    }
-
-    // Firefox onMessage contract: return a Promise to respond async, or
-    // return undefined to signal "not handled". Do NOT return true (Chrome-only).
-    browser.runtime.onMessage.addListener((message) => {
-      if (message?.type !== "slideshow.startRequested") return undefined;
-      const root = ensureRoot();
-      root.hidden = false;
-      return Promise.resolve({ ok: true });
-    });
-  },
-});
-```
-
-- [ ] **Step 3: Create `assets/overlay.css`**
-
-```css
-#reddit-slideshow-root {
-  position: fixed;
-  inset: 0;
-  z-index: 2147483647;
-  display: grid;
-  place-items: center;
-  color: #f8fafc;
-  background: rgba(7, 10, 15, 0.96);
-  font: 16px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-#reddit-slideshow-root[hidden] {
-  display: none;
-}
-```
-
-- [ ] **Step 4: Create `entrypoints/options/index.html`**
-
-```html
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Reddit Slideshow Options</title>
-  </head>
-  <body>
-    <main>
-      <h1>Reddit Slideshow</h1>
-      <label>
-        Image timer
-        <select id="imageTimerSeconds">
-          <option value="3">3 seconds</option>
-          <option value="5">5 seconds</option>
-          <option value="10">10 seconds</option>
-        </select>
-      </label>
-      <label>
-        <input id="startMuted" type="checkbox" />
-        Start videos muted
-      </label>
-      <label>
-        <input id="autoplay" type="checkbox" />
-        Autoplay slideshow
-      </label>
-    </main>
-    <script type="module" src="./main.js"></script>
-  </body>
-</html>
-```
-
-- [ ] **Step 5: Create `entrypoints/options/main.js`**
-
-This intentionally imports the shared settings module so defaults and validation live in one place. `lib/settings.js` is created in Task 3; until then this file references it. Implement Task 3 immediately after so the import resolves.
-
-```js
-import { getSettings, saveSettings } from "@/lib/settings.js";
-
-const timerSelect = document.querySelector("#imageTimerSeconds");
-const mutedCheckbox = document.querySelector("#startMuted");
-const autoplayCheckbox = document.querySelector("#autoplay");
-
-async function load() {
-  const settings = await getSettings();
-  timerSelect.value = String(settings.imageTimerSeconds);
-  mutedCheckbox.checked = settings.startMuted;
-  autoplayCheckbox.checked = settings.autoplay;
-}
-
-async function persist() {
-  await saveSettings({
-    imageTimerSeconds: Number(timerSelect.value),
-    startMuted: mutedCheckbox.checked,
-    autoplay: autoplayCheckbox.checked,
-  });
-}
-
-timerSelect.addEventListener("change", persist);
-mutedCheckbox.addEventListener("change", persist);
-autoplayCheckbox.addEventListener("change", persist);
-
-load();
-```
-
-- [ ] **Step 6: Build to register entrypoints**
-
-Run:
-
-```sh
-npm run build
-```
-
-Expected: build fails or warns only because `@/lib/settings.js` does not exist yet. That module is created in Task 3 — continue.
-
-- [ ] **Step 7: Commit entrypoints skeleton**
-
-```sh
-git add entrypoints assets
-git commit -m "feat: add MV3 entrypoints skeleton (background, content, options)"
-```
-
-Expected: commit succeeds.
-
----
-
-## Task 3: Shared Settings Module (validated, wired to options)
+## Task 2: Shared Settings Module
 
 **Files:**
 - Create: `lib/settings.js`, `tests/unit/settings.test.js`
@@ -564,13 +392,185 @@ Run:
 npm test -- tests/unit/settings.test.js
 ```
 
-Expected: PASS. The options page (`entrypoints/options/main.js`) now resolves its import of `getSettings`/`saveSettings`.
+Expected: PASS.
 
 - [ ] **Step 5: Commit settings module**
 
 ```sh
 git add lib/settings.js tests/unit/settings.test.js
-git commit -m "feat: add validated settings module wired to options"
+git commit -m "feat: add validated settings module"
+```
+
+Expected: commit succeeds.
+
+---
+
+## Task 3: Extension Entrypoints Skeleton
+
+**Files:**
+- Create: `entrypoints/background.js`, `entrypoints/content.js`, `entrypoints/options/index.html`, `entrypoints/options/main.js`, `assets/overlay.css`
+
+- [ ] **Step 1: Create `entrypoints/background.js`**
+
+```js
+export default defineBackground(() => {
+  browser.runtime.onInstalled.addListener(() => {
+    console.info("Reddit Slideshow installed");
+  });
+
+  browser.action.onClicked.addListener(async (tab) => {
+    if (!tab.id) return;
+    try {
+      await browser.tabs.sendMessage(tab.id, {
+        type: "slideshow.startRequested",
+        payload: { source: "action" },
+      });
+    } catch {
+      // No content script on this tab (not an old.reddit.com listing).
+      // Swallow the "no receiving end" rejection instead of throwing an
+      // unhandled rejection, and point the user at old Reddit.
+      console.info("Reddit Slideshow: open an old.reddit.com listing first");
+    }
+  });
+});
+```
+
+- [ ] **Step 2: Create `entrypoints/content.js`**
+
+```js
+import "@/assets/overlay.css";
+
+export default defineContentScript({
+  matches: ["https://old.reddit.com/*"],
+  cssInjectionMode: "manifest",
+  main() {
+    const ROOT_ID = "reddit-slideshow-root";
+
+    function ensureRoot() {
+      let root = document.getElementById(ROOT_ID);
+      if (root) return root;
+      root = document.createElement("div");
+      root.id = ROOT_ID;
+      root.hidden = true;
+      root.textContent = "Reddit Slideshow";
+      document.documentElement.append(root);
+      return root;
+    }
+
+    // Firefox onMessage contract: return a Promise to respond async, or
+    // return undefined to signal "not handled". Do NOT return true (Chrome-only).
+    browser.runtime.onMessage.addListener((message) => {
+      if (message?.type !== "slideshow.startRequested") return undefined;
+      const root = ensureRoot();
+      root.hidden = false;
+      return Promise.resolve({ ok: true });
+    });
+  },
+});
+```
+
+- [ ] **Step 3: Create `assets/overlay.css`**
+
+```css
+#reddit-slideshow-root {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: grid;
+  place-items: center;
+  color: #f8fafc;
+  background: rgba(7, 10, 15, 0.96);
+  font: 16px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+#reddit-slideshow-root[hidden] {
+  display: none;
+}
+```
+
+- [ ] **Step 4: Create `entrypoints/options/index.html`**
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reddit Slideshow Options</title>
+  </head>
+  <body>
+    <main>
+      <h1>Reddit Slideshow</h1>
+      <label>
+        Image timer
+        <select id="imageTimerSeconds">
+          <option value="3">3 seconds</option>
+          <option value="5">5 seconds</option>
+          <option value="10">10 seconds</option>
+        </select>
+      </label>
+      <label>
+        <input id="startMuted" type="checkbox" />
+        Start videos muted
+      </label>
+      <label>
+        <input id="autoplay" type="checkbox" />
+        Autoplay slideshow
+      </label>
+    </main>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
+```
+
+- [ ] **Step 5: Create `entrypoints/options/main.js`**
+
+This imports the shared settings module so defaults and validation live in one place. `lib/settings.js` already exists from Task 2.
+
+```js
+import { getSettings, saveSettings } from "@/lib/settings.js";
+
+const timerSelect = document.querySelector("#imageTimerSeconds");
+const mutedCheckbox = document.querySelector("#startMuted");
+const autoplayCheckbox = document.querySelector("#autoplay");
+
+async function load() {
+  const settings = await getSettings();
+  timerSelect.value = String(settings.imageTimerSeconds);
+  mutedCheckbox.checked = settings.startMuted;
+  autoplayCheckbox.checked = settings.autoplay;
+}
+
+async function persist() {
+  await saveSettings({
+    imageTimerSeconds: Number(timerSelect.value),
+    startMuted: mutedCheckbox.checked,
+    autoplay: autoplayCheckbox.checked,
+  });
+}
+
+timerSelect.addEventListener("change", persist);
+mutedCheckbox.addEventListener("change", persist);
+autoplayCheckbox.addEventListener("change", persist);
+
+load();
+```
+
+- [ ] **Step 6: Build to register entrypoints**
+
+Run:
+
+```sh
+npm run build
+```
+
+Expected: PASS. WXT builds to `.output/firefox-mv3/` and registers the background, content, and options entrypoints.
+
+- [ ] **Step 7: Commit entrypoints skeleton**
+
+```sh
+git add entrypoints assets
+git commit -m "feat: add MV3 entrypoints skeleton (background, content, options)"
 ```
 
 Expected: commit succeeds.
@@ -1122,7 +1122,7 @@ Spec coverage:
 
 Placeholder scan:
 
-- No "TODO"/"implement later" steps. The Task-2 `options/main.js` deliberately imports `lib/settings.js` before Task 3 creates it; this is called out and resolved within the same plan (build is expected to fail until Task 3), not left as a placeholder.
+- No placeholder steps remain. The settings module is created before the options page imports it, so each committed task can leave the project in a buildable state.
 
 Type consistency:
 

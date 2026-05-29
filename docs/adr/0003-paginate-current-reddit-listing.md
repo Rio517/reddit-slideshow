@@ -27,7 +27,7 @@ Costs:
 
 ## Terms-of-Service Posture
 
-The v1 approach is to fetch `old.reddit.com/.../.json` using the user's existing logged-in browser session (cookies), without OAuth app credentials. This is viable because Reddit's blocking targets datacenter-IP, unauthenticated, bot scrapers; logged-in browser access is accepted, and RES relies on the same mechanism. The fetch runs from the **background script** to carry session cookies reliably.
+The v1 working hypothesis is to fetch `old.reddit.com/.../.json` using the user's existing logged-in browser session (cookies), without OAuth app credentials. Reddit's current Data API guidance says clients must authenticate and that traffic without OAuth or login credentials may be blocked. A logged-in browser-session fetch is therefore operationally plausible but still needs a live Firefox spike before we treat it as settled. The fetch should run from the **background script** so session cookies and host permissions are handled consistently.
 
 This carries modest but real ToS/AMO risk, so the extension adopts and documents an explicit posture:
 
@@ -38,7 +38,7 @@ This carries modest but real ToS/AMO risk, so the extension adopts and documents
 - Keeps the listing transport swappable (the ADR 0002 resolver layer) so optional per-user OAuth is an escape hatch if the cookie path is ever blocked. The extension must **not** ship app OAuth client credentials.
 - Always sends `raw_json=1` (load-bearing invariant): without it, `preview` and `media_metadata` URLs are HTML-entity-encoded.
 
-This posture both reduces real risk and is what an AMO reviewer needs to see.
+This posture reduces real risk, but it does not remove the need to validate Reddit's current behavior and AMO review expectations with a working prototype.
 
 ## Follow-Up
 

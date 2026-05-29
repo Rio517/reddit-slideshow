@@ -71,11 +71,11 @@ v.redd.it is DASH with separated tracks: `secure_media.reddit_video.fallback_url
 
 ### Redgifs
 
-Redgifs is a first-class provider, embedded inline via the Redgifs first-party iframe:
+Redgifs is a first-class provider. The current implementation hypothesis is to embed it inline via the Redgifs first-party iframe:
 
 - Parse the id from `redgifs.com/watch/<id>` or `/ifr/<id>` and embed `<iframe src="https://www.redgifs.com/ifr/<id>">`.
 - The iframe is served by Redgifs itself, so the `<video>` inside is a same-origin request from `redgifs.com` to its own CDN. It carries the Origin/Referer Redgifs whitelists, so it does not hit the cross-origin hotlink HTTP 403 that direct `.mp4` embedding triggers. The hotlink-protected CDN `.mp4` URLs are never touched.
-- No `redgifs.com` host permission is required for the iframe (it is a page element, not an extension-initiated fetch). An optional `api.redgifs.com` permission is only needed for best-effort aspect-ratio metadata, and playback does not depend on it.
+- The iframe should not require `redgifs.com` host permission because it is a page element, not an extension-initiated fetch. This must be validated in Firefox before final implementation. An optional `api.redgifs.com` permission is only needed for best-effort aspect-ratio metadata, and playback should not depend on it.
 
 Because an iframe does not fire a native `<video>` `ended` event, Redgifs slides auto-advance on a duration timer (clip duration from best-effort metadata, else a fixed dwell), not media-completion. Mute/scrub control is limited to what the iframe player exposes. Do not embed the direct v2-API `.mp4` in a `<video>` (the path that fights hotlink protection) unless precise native `ended`/mute/scrub control becomes a hard requirement.
 
@@ -183,6 +183,7 @@ Run these against live Firefox and real Reddit before committing to the full bui
 
 - **Reddit listing access:** a background fetch of paginated `.json` listings using the existing session, without OAuth, at slideshow-realistic request volume, survives rate limits and returns expected shapes.
 - **v.redd.it video:** `secure_media.reddit_video.fallback_url` plays inside the overlay (muted), and the separate-audio-track behavior is understood.
+- **Redgifs iframe:** `https://www.redgifs.com/ifr/<id>` embeds and plays from the extension overlay in Firefox without a `redgifs.com` host permission.
 - **RES coexistence:** the prototype overlay alongside RES on a real old Reddit page has no arrow-key/keyboard capture or DOM-mutation conflicts.
 - **Field-shape capture:** real captured fixtures (not hand-authored) for galleries (`gallery_data` order + `media_metadata`), Reddit video, crossposts (`crosspost_parent_list[0]`), and Redgifs match the resolver's assumptions.
 

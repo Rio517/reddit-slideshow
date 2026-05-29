@@ -227,9 +227,9 @@ Recommendation:
 - Document the chosen manifest model in an ADR before implementation.
 - MV3 caveat for later: host permissions become user-revocable, so a content script won't auto-inject without a granted host permission — check `permissions.contains` / `permissions.request`. Not an issue under MV2.
 
-### Build tooling: a bundler is required, not optional
+### Build tooling: use a bundler from the start
 
-Firefox has **never** supported ES-module `import` in content scripts (platform bug [1451545](https://bugzilla.mozilla.org/show_bug.cgi?id=1451545), open since 2018). A content script that does `import { ... } from "../shared/..."` throws a `SyntaxError` and does not run. Because this project's content script depends on shared modules, the source **must be bundled** before loading — loading the raw `extension/` tree directly will not work.
+Firefox now supports dynamic module imports from content scripts for `moz-extension://` URLs, but static ES-module content scripts declared directly in the manifest are still not a clean cross-browser foundation for this project. Because this project's content, background, options, and tests all need shared modules, the source should be bundled before loading instead of relying on browser-specific module-loading details.
 
 Recommendation:
 
@@ -338,10 +338,10 @@ Do not:
 
 ### Clear user-facing permission rationale
 
-If the extension asks for Redgifs access at runtime, the prompt should be preceded by a plain explanation in the extension UI:
+If the extension asks for optional Redgifs metadata access at runtime, the prompt should be preceded by a plain explanation in the extension UI:
 
 ```text
-Redgifs support needs permission to read Redgifs pages and media so the slideshow can play clips directly. If you decline, Redgifs posts will show an open-original fallback.
+Redgifs metadata support needs permission to read Redgifs API responses so the slideshow can size clips more accurately. If you decline, Redgifs posts can still try iframe playback with default sizing.
 ```
 
 This should be short, honest, and specific.
@@ -542,8 +542,8 @@ Make review easy:
 
 ## Open Follow-Up Research
 
-- Test optional host permissions UX for Redgifs in Firefox.
+- Test whether Redgifs iframe playback needs no extension host permission in Firefox on a real old Reddit page.
 - Collect representative old Reddit and Reddit JSON fixtures.
-- Test Redgifs direct playback behavior in Firefox with real links.
+- Test Redgifs iframe playback behavior in Firefox with real links.
 - Confirm whether `old.reddit.com` listing JSON sends useful rate-limit headers in this use case.
 - Review RES source for keyboard and DOM interaction conflict risks.
