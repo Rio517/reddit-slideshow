@@ -12,6 +12,12 @@ export default defineConfig({
       "https://v.redd.it/*",
     ],
     action: { default_title: "Start Reddit Slideshow" },
+    commands: {
+      _execute_action: {
+        suggested_key: { default: "Alt+Shift+S" },
+        description: "Start Reddit Slideshow",
+      },
+    },
     browser_specific_settings: {
       gecko: {
         id: "reddit-slideshow@knyflores.com",

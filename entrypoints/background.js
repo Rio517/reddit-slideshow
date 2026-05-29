@@ -19,16 +19,23 @@ export default defineBackground(() => {
     }
 
     return fetchListingJson(pageUrl)
-      .then(({ summary }) => ({ ok: true, summary }))
-      .catch((error) => ({
-        ok: false,
-        error: {
+      .then(({ summary }) => {
+        console.info("Reddit Slideshow listing diagnostic", summary);
+        return { ok: true, summary };
+      })
+      .catch((error) => {
+        const payload = {
           code: error.name ?? "listing-fetch-failed",
           message: error.message,
           status: error.status,
           jsonUrl: error.jsonUrl,
-        },
-      }));
+        };
+        console.info("Reddit Slideshow listing diagnostic failed", payload);
+        return {
+          ok: false,
+          error: payload,
+        };
+      });
   });
 
   browser.action.onClicked.addListener(

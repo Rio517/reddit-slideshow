@@ -39,8 +39,7 @@ export default defineContentScript({
       root.append(panel);
     }
 
-    browser.runtime.onMessage.addListener((/** @type {any} */ message) => {
-      if (message?.type !== "slideshow.startRequested") return undefined;
+    function runListingDiagnostic() {
       const root = ensureRoot();
       root.hidden = false;
       renderDiagnostic(root, "Reddit Slideshow", [
@@ -72,6 +71,17 @@ export default defineContentScript({
           ]);
           return { ok: false };
         });
+    }
+
+    browser.runtime.onMessage.addListener((/** @type {any} */ message) => {
+      if (message?.type !== "slideshow.startRequested") return undefined;
+      return runListingDiagnostic();
     });
+
+    if (
+      new URL(window.location.href).searchParams.has("reddit_slideshow_probe")
+    ) {
+      runListingDiagnostic();
+    }
   },
 });
