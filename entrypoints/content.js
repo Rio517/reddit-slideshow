@@ -1,4 +1,5 @@
 import "@/assets/overlay.css";
+import { renderSlide } from "@/lib/overlay-render.js";
 
 export default defineContentScript({
   matches: ["https://old.reddit.com/*"],
@@ -12,76 +13,107 @@ export default defineContentScript({
       root = document.createElement("div");
       root.id = ROOT_ID;
       root.hidden = true;
+
+      const closeButton = document.createElement("button");
+      closeButton.type = "button";
+      closeButton.className = "reddit-slideshow-close";
+      closeButton.textContent = "✕";
+      closeButton.title = "Close slideshow (Esc)";
+      closeButton.addEventListener("click", closeOverlay);
+      root.append(closeButton);
+
+      const stage = document.createElement("div");
+      stage.className = "reddit-slideshow-stage";
+      root.append(stage);
+
       document.documentElement.append(root);
       return root;
     }
 
     /**
      * @param {HTMLElement} root
-     * @param {string} title
-     * @param {string[]} lines
      */
-    function renderDiagnostic(root, title, lines) {
-      root.replaceChildren();
-      const panel = document.createElement("section");
-      panel.className = "reddit-slideshow-diagnostic";
-
-      const heading = document.createElement("h1");
-      heading.textContent = title;
-      panel.append(heading);
-
-      for (const line of lines) {
-        const paragraph = document.createElement("p");
-        paragraph.textContent = line;
-        panel.append(paragraph);
-      }
-
-      root.append(panel);
+    function stageOf(root) {
+      return root.querySelector(".reddit-slideshow-stage");
     }
 
-    function runListingDiagnostic() {
+    function closeOverlay() {
+      const root = document.getElementById(ROOT_ID);
+      if (root) root.hidden = true;
+    }
+
+    /**
+     * @param {string} text
+     */
+    function showStatus(text) {
+      const stage = stageOf(ensureRoot());
+      if (!stage) return;
+      const status = document.createElement("p");
+      status.className = "reddit-slideshow-status";
+      status.textContent = text;
+      stage.replaceChildren(status);
+    }
+
+    /**
+     * @param {import("@/lib/slides.js").Slide} slide
+     */
+    function showSlide(slide) {
+      const stage = stageOf(ensureRoot());
+      if (!stage) return;
+      stage.replaceChildren(renderSlide(slide));
+    }
+
+    async function startSlideshow() {
       const root = ensureRoot();
       root.hidden = false;
-      renderDiagnostic(root, "Reddit Slideshow", [
-        "Checking current listing JSON with your browser session...",
-      ]);
+      showStatus("Loading slideshow…");
 
-      return browser.runtime
-        .sendMessage({
-          type: "slideshow.probeListing",
+      let response;
+      try {
+        response = await browser.runtime.sendMessage({
+          type: "slideshow.requestPage",
           payload: { pageUrl: window.location.href },
-        })
-        .then((response) => {
-          if (response?.ok) {
-            const summary = response.summary;
-            renderDiagnostic(root, "Listing JSON reachable", [
-              `Posts returned: ${summary.childCount}`,
-              `Next page cursor: ${summary.after ?? "none"}`,
-              `HTTP status: ${summary.status}`,
-              `Rate limit remaining: ${summary.rateLimitRemaining ?? "not reported"}`,
-            ]);
-            return { ok: true };
-          }
-
-          renderDiagnostic(root, "Listing JSON check failed", [
-            response?.error?.message ?? "Unknown listing fetch failure",
-            response?.error?.jsonUrl
-              ? `JSON URL: ${response.error.jsonUrl}`
-              : "JSON URL unavailable",
-          ]);
-          return { ok: false };
         });
+      } catch {
+        showStatus("Could not reach the extension background.");
+        return;
+      }
+
+      if (!response?.ok) {
+        showStatus(response?.error?.message ?? "Could not load this listing.");
+        return;
+      }
+
+      const slides = response.page?.slides ?? [];
+      if (slides.length === 0) {
+        showStatus("No supported media on this page.");
+        return;
+      }
+
+      showSlide(slides[0]);
     }
+
+    document.addEventListener("keydown", (event) => {
+      const root = document.getElementById(ROOT_ID);
+      if (!root || root.hidden) return;
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeOverlay();
+      }
+    });
 
     browser.runtime.onMessage.addListener((/** @type {any} */ message) => {
       if (message?.type !== "slideshow.startRequested") return undefined;
-      return runListingDiagnostic();
+      startSlideshow();
+      return Promise.resolve({ ok: true });
     });
 
+    // Temporary aid: a plain navigation can launch the slideshow for validation
+    // without the toolbar. Remove before v1 ship.
     if (
       new URL(window.location.href).searchParams.has("reddit_slideshow_probe")
     ) {
-      runListingDiagnostic();
+      startSlideshow();
     }
   },
 });

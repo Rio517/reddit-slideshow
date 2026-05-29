@@ -1,0 +1,84 @@
+import { describe, expect, it } from "vitest";
+import { renderSlide, MEDIA_CLASS } from "../../lib/overlay-render.js";
+
+/**
+ * @param {Partial<import("../../lib/slides.js").Slide>} [overrides]
+ * @returns {import("../../lib/slides.js").Slide}
+ */
+function slide(overrides) {
+  return {
+    id: "t3_x:0",
+    postId: "t3_x",
+    provider: "reddit-image",
+    kind: "image",
+    mediaUrl: "https://i.redd.it/x.jpg",
+    sourceUrl: "https://i.redd.it/x.jpg",
+    permalink: "https://old.reddit.com/r/x/comments/x/x/",
+    title: "A title",
+    over18: false,
+    durationMode: "timer",
+    audioAvailable: false,
+    sourceWidth: 1000,
+    sourceHeight: 500,
+    quality: "original",
+    mimeType: "image/jpeg",
+    filenameHint: "t3_x.jpg",
+    ...overrides,
+  };
+}
+
+describe("renderSlide", () => {
+  it("renders an image with src, alt, and the media class", () => {
+    const el = renderSlide(slide());
+    expect(el.tagName).toBe("IMG");
+    expect(el.getAttribute("src")).toBe("https://i.redd.it/x.jpg");
+    expect(el.getAttribute("alt")).toBe("A title");
+    expect(el.classList.contains(MEDIA_CLASS)).toBe(true);
+    expect(el.dataset.slideId).toBe("t3_x:0");
+  });
+
+  it("renders Reddit video muted and autoplaying, not looping", () => {
+    const el = /** @type {HTMLVideoElement} */ (
+      renderSlide(
+        slide({
+          provider: "reddit-video",
+          kind: "video",
+          mediaUrl: "https://v.redd.it/x/CMAF_720.mp4?source=fallback",
+          isGif: false,
+        }),
+      )
+    );
+    expect(el.tagName).toBe("VIDEO");
+    expect(el.muted).toBe(true);
+    expect(el.autoplay).toBe(true);
+    expect(el.loop).toBe(false);
+    expect(el.getAttribute("src")).toBe(
+      "https://v.redd.it/x/CMAF_720.mp4?source=fallback",
+    );
+    expect(el.style.aspectRatio).toBe("1000 / 500");
+  });
+
+  it("loops GIF-like Reddit video", () => {
+    const el = /** @type {HTMLVideoElement} */ (
+      renderSlide(slide({ kind: "video", isGif: true }))
+    );
+    expect(el.loop).toBe(true);
+  });
+
+  it("renders Redgifs as a fullscreen-capable iframe using embedUrl", () => {
+    const el = renderSlide(
+      slide({
+        provider: "redgifs",
+        kind: "embed",
+        mediaUrl: "https://www.redgifs.com/ifr/abc",
+        embedUrl: "https://www.redgifs.com/ifr/abc",
+        sourceWidth: 1080,
+        sourceHeight: 1920,
+      }),
+    );
+    expect(el.tagName).toBe("IFRAME");
+    expect(el.getAttribute("src")).toBe("https://www.redgifs.com/ifr/abc");
+    expect(el.hasAttribute("allowfullscreen")).toBe(true);
+    expect(el.style.aspectRatio).toBe("1080 / 1920");
+  });
+});
