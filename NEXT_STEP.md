@@ -1,10 +1,10 @@
 # NEXT_STEP — Reddit Slideshow
 
-**Doc updated:** 2026-05-29 · **Branch:** `main` · **Status:** foundation scaffold complete and green; live validation spikes + queue builder are next.
+**Doc updated:** 2026-05-29 · **Branch:** `main` · **Status:** live-fetch diagnostic path and queue core are built; real Firefox validation and real fixtures are next.
 
 > **Hard rule:** work directly on `main`. Do not create branches or worktrees unless the user explicitly asks. See `AGENTS.md`.
 
-This project is a Firefox-first WebExtension for turning the current `old.reddit.com` feed into a media slideshow. The foundation scaffold (WXT/MV3 tooling, settings, entrypoints, listing-URL conversion, direct-image slide normalization, offline fixtures) is in place and passes the full verification gate. The next move is to run the live validation spikes and build the queue, not to jump straight into the slideshow UI.
+This project is a Firefox-first WebExtension for turning the current `old.reddit.com` feed into a media slideshow. The foundation scaffold is in place, and the first queue/fetch core exists: the browser action can trigger a background listing JSON fetch diagnostic, direct images normalize from `url_overridden_by_dest` or `url`, and queue pagination decisions are tested. The next move is to validate the diagnostic in the user's real Firefox profile and capture sanitized real fixtures.
 
 ---
 
@@ -25,18 +25,18 @@ Key decisions already made:
 - Keep v1 old-Reddit-only: `old.reddit.com`.
 - Use offline fixtures for unit tests instead of live Reddit.
 - Use provider adapters later for Reddit images, galleries, videos, and Redgifs.
-- Treat Redgifs iframe playback and Reddit session-cookie `.json` pagination as validation spikes, not settled facts.
+- Treat Redgifs iframe playback and Reddit session-cookie `.json` pagination as validation spikes until checked in the user's real Firefox profile.
 
 ---
 
 ## 1. Immediate Todo
 
-The foundation scaffold is complete (`lib/reddit-url.js`, `lib/slides.js`, `lib/settings.js`, WXT/MV3 entrypoints, offline fixtures, full verification gate). The next work, in order:
+The foundation scaffold is complete, and the first queue/fetch core has landed (`lib/reddit-listing.js`, `lib/queue.js`, `lib/reddit-url.js`, `lib/slides.js`, `lib/settings.js`, WXT/MV3 entrypoints, offline fixtures). The next work, in order:
 
-1. **Live Reddit `.json` spike.** Confirm a background fetch of `old.reddit.com/.../.json?raw_json=1` works with the existing logged-in session, at slideshow-realistic volume, surviving rate limits and returning the expected shapes. This is the go/no-go for the whole pagination design.
-2. **Capture real sanitized fixtures and harden the resolver.** Real posts may carry media in `url` as well as `url_overridden_by_dest`; fix `slidesFromPost` against a real captured fixture rather than the hand-authored one. Add fixtures for galleries, Reddit video, crossposts, and Redgifs (see §5).
-3. **Queue builder + pagination.** Build the media-only queue from listing JSON and append the next page via `after` when nearing the end, triggering on posts scanned (not slides produced).
-4. Continue down the V1 backlog (§6): overlay shell, timer, video, Redgifs, settings polish, RES coexistence.
+1. **Run the live Firefox `.json` diagnostic.** Build/run the extension in the user's real Firefox environment, open an `old.reddit.com` listing, click the browser action, and confirm the overlay reports listing JSON success using the existing logged-in session. Record status codes, child counts, whether `X-Ratelimit-*` headers appear, and any auth/rate-limit failures.
+2. **Capture real sanitized fixtures and harden providers.** Save small sanitized JSON for direct images, galleries, Reddit video, crossposts, and Redgifs. Direct images already handle both `url_overridden_by_dest` and `url`; galleries/video/crossposts/Redgifs still need resolver tests.
+3. **Connect queue builder to the slideshow flow.** `buildQueuePage()` and `shouldFetchNextPage()` are tested, but the content/background flow still only shows diagnostics. The next implementation slice should request a first queue page, return normalized slides, and render the first real image in the overlay.
+4. Continue down the V1 backlog (§6): overlay shell, keyboard navigation, timer, video, Redgifs, settings polish, RES coexistence.
 
 Keep small commits. Do not batch multiple slices into one giant commit.
 
@@ -152,7 +152,7 @@ Before calling provider/media work done:
 
 Do these after the foundation scaffold exists:
 
-- Live Firefox spike: background fetch of current `old.reddit.com/.../.json?raw_json=1` with existing session.
+- Live Firefox spike: background fetch diagnostic for current `old.reddit.com/.../.json?raw_json=1` with existing session.
 - Capture real sanitized fixtures for:
   - Direct `i.redd.it` image.
   - Reddit gallery with `gallery_data` + `media_metadata`.
@@ -166,17 +166,18 @@ Do these after the foundation scaffold exists:
 
 ## 6. Current Backlog Shape
 
-V1 path (foundation + fixtures complete; remaining):
+V1 path (foundation + first queue/fetch core complete; remaining):
 
-1. Live `.json` spike and real captured fixtures.
-2. Queue builder and pagination.
-3. Direct images (normalization done; rendering pending) and gallery support.
-4. Overlay shell and keyboard navigation.
-5. Timer behavior.
-6. Reddit-hosted video.
-7. Redgifs iframe provider.
-8. Settings/options polish.
-9. RES coexistence verification.
+1. Real Firefox `.json` diagnostic validation and real captured fixtures.
+2. First queue page wired into the extension flow.
+3. Direct image rendering in the overlay.
+4. Gallery support.
+5. Overlay shell and keyboard navigation.
+6. Timer behavior.
+7. Reddit-hosted video.
+8. Redgifs iframe provider.
+9. Settings/options polish.
+10. RES coexistence verification.
 
 V2 backlog:
 

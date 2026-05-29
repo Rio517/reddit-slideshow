@@ -55,4 +55,32 @@ describe("slidesFromListing", () => {
     const slides = slidesFromListing(listing);
     expect(slides[0].filenameHint).toBe("t3_notitle.png");
   });
+
+  it("uses url when url_overridden_by_dest is missing", () => {
+    const slides = slidesFromListing({
+      data: {
+        children: [
+          {
+            kind: "t3",
+            data: {
+              name: "t3_urlonly",
+              title: "URL only image",
+              permalink: "/r/example/comments/urlonly/url_only_image/",
+              url: "https://i.redd.it/urlonly.webp",
+              domain: "i.redd.it",
+              post_hint: "image",
+            },
+          },
+        ],
+      },
+    });
+
+    expect(slides[0]).toMatchObject({
+      id: "t3_urlonly:0",
+      mediaUrl: "https://i.redd.it/urlonly.webp",
+      sourceUrl: "https://i.redd.it/urlonly.webp",
+      quality: "original",
+      mimeType: "image/webp",
+    });
+  });
 });

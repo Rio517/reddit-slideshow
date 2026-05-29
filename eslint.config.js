@@ -12,9 +12,12 @@ export default [
       globals: {
         browser: "readonly",
         document: "readonly",
+        fetch: "readonly",
+        Response: "readonly",
         console: "readonly",
         URL: "readonly",
         URLSearchParams: "readonly",
+        window: "readonly",
         defineBackground: "readonly",
         defineContentScript: "readonly",
       },

@@ -43,6 +43,15 @@ permalinks because they return a different JSON shape. Pagination can append
 `after=<fullname>` to the normalized listing URL. This is covered by unit tests
 against `lib/reddit-url.js`; live Firefox/session validation remains open.
 
+Implementation spike result (2026-05-29): `lib/reddit-listing.js` now performs
+the listing fetch with `credentials: "include"` and `accept: application/json`,
+returns a small diagnostic summary, and preserves observed rate-limit headers
+when Reddit sends them. The browser action now asks the content script for the
+current page URL, then the background page fetches the normalized JSON URL and
+shows success/failure details in the overlay. This proves the extension code
+path builds, but it still needs manual validation in the user's real Firefox
+profile to prove session-cookie access against Reddit.
+
 ## Media Fields To Investigate In Real Fixtures
 
 Likely useful Reddit listing fields:
@@ -62,6 +71,12 @@ normalized into slide candidates with `quality: "original"`, while
 The fixture keeps `preview.images[0].source.width/height` as
 `sourceWidth/sourceHeight`, because those dimensions are the best-known source
 metadata and not necessarily proof of the original file dimensions.
+
+Implementation spike result (2026-05-29): direct-image normalization now checks
+`url_overridden_by_dest` first and falls back to `url`, because real Reddit
+listing shapes may use either field for media destinations. Queue-page helpers
+now count posts scanned separately from slides produced, preserving the
+pagination rule needed for sparse media listings.
 
 ## Reddit Enhancement Suite
 
@@ -86,6 +101,9 @@ Redgifs is a first-class provider. The current hypothesis is to embed it inline 
 ## Open Research Tasks
 
 - Capture real old Reddit listing JSON fixtures for direct images, Reddit galleries, Reddit videos, and Redgifs.
+- Validate the in-extension listing diagnostic in the user's real Firefox
+  profile and record whether the website `.json` path returns account/session
+  content without OAuth credentials.
 - Confirm Redgifs iframe playback in Firefox without `redgifs.com` host permission.
 - Verify autoplay behavior for muted and unmuted video clips.
 - Confirm logged-in Firefox background fetches of `old.reddit.com/.../.json?raw_json=1`

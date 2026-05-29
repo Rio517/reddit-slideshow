@@ -1,6 +1,34 @@
+import { fetchListingJson } from "@/lib/reddit-listing.js";
+
 export default defineBackground(() => {
   browser.runtime.onInstalled.addListener(() => {
     console.info("Reddit Slideshow installed");
+  });
+
+  browser.runtime.onMessage.addListener((message) => {
+    if (message?.type !== "slideshow.probeListing") return undefined;
+    const pageUrl = message.payload?.pageUrl;
+    if (typeof pageUrl !== "string") {
+      return Promise.resolve({
+        ok: false,
+        error: {
+          code: "missing-page-url",
+          message: "Missing old Reddit page URL",
+        },
+      });
+    }
+
+    return fetchListingJson(pageUrl)
+      .then(({ summary }) => ({ ok: true, summary }))
+      .catch((error) => ({
+        ok: false,
+        error: {
+          code: error.name ?? "listing-fetch-failed",
+          message: error.message,
+          status: error.status,
+          jsonUrl: error.jsonUrl,
+        },
+      }));
   });
 
   browser.action.onClicked.addListener(

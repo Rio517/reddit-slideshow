@@ -48,9 +48,13 @@ Do not use live Reddit as the normal unit-test path.
   Under the WXT test plugin, `import.meta.url` is browser-shaped, so
   Node-style `fileURLToPath(import.meta.url)` fixture loading is a poor fit.
 - Direct `i.redd.it` image URLs are treated as original-quality candidates.
+- Direct-image posts can use either `url_overridden_by_dest` or `url`; resolver
+  tests cover both fields.
 - `preview.redd.it` image URLs are retained as explicit preview-quality
   fallbacks so the slideshow can still show something when no original URL is
   present.
+- Queue tests count posts scanned separately from slides produced, so sparse
+  pages can still drive pagination.
 
 ## Commands
 
