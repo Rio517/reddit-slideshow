@@ -103,7 +103,7 @@ v1 is `old.reddit.com`-only, so install-time host permissions are scoped to the 
 
 Plus the `storage` API permission for settings.
 
-`www.reddit.com` is intentionally not requested: v1 reads the current old Reddit context only. Redgifs needs **no** host permission because it plays through a first-party iframe (a page element, not an extension-initiated fetch); an optional `api.redgifs.com` permission would only be added later for best-effort aspect-ratio metadata, and playback must not depend on it. Any additional provider host stays out of install-time permissions and is requested optionally if and when it is needed.
+`www.reddit.com` is intentionally not requested: v1 reads the current old Reddit context only. Redgifs playback is expected to avoid a `redgifs.com` host permission because it plays through a first-party iframe (a page element, not an extension-initiated fetch), but that remains a Firefox validation spike before final implementation. An optional `api.redgifs.com` permission would only be added later for best-effort aspect-ratio metadata, and playback must not depend on it. Any additional provider host stays out of install-time permissions and is requested optionally if and when it is needed.
 
 ## Error Handling
 
