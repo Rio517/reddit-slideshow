@@ -67,17 +67,17 @@ Gallery posts should resolve through Reddit listing data, using gallery item ord
 
 Reddit-hosted videos should use playable video URLs from listing media metadata when available. Playback completion should advance the slideshow.
 
-v.redd.it is DASH with separated tracks: `secure_media.reddit_video.fallback_url` is video-only, so a plain `<video>` pointed at it has no audio. v1 plays Reddit video muted-only (reporting `audioAvailable: false`); audio requires bundling an HLS player and using `hls_url`. The mute/unmute setting is meaningful only once an audio-capable path exists.
+v.redd.it is DASH/HLS with separated tracks. The listing's `secure_media.reddit_video` carries `fallback_url` (a plain `.mp4`), `dash_url`, `hls_url`, `duration`, dimensions, `is_gif`, and `has_audio`. The resolver reports `audioAvailable` from `has_audio` (false for `is_gif` clips), so the slide knows whether audio exists. v1 still plays the `fallback_url` in a plain `<video>`, which is silent; actually hearing the audio requires a DASH/HLS player (`dash_url`/`hls_url`). The mute/unmute setting is therefore meaningful only once that audio-capable path exists.
 
 ### Redgifs
 
-Redgifs is a first-class provider. The current implementation hypothesis is to embed it inline via the Redgifs first-party iframe:
+Redgifs is a first-class provider — the single most common media domain on real NSFW feeds. The resolver embeds it inline via the Redgifs first-party iframe:
 
-- Parse the id from `redgifs.com/watch/<id>` or `/ifr/<id>` and embed `<iframe src="https://www.redgifs.com/ifr/<id>">`.
+- Parse the id from `redgifs.com/watch/<id>` (or `/ifr/<id>`) and embed `<iframe src="https://www.redgifs.com/ifr/<id>">`.
 - The iframe is served by Redgifs itself, so the `<video>` inside is a same-origin request from `redgifs.com` to its own CDN. It carries the Origin/Referer Redgifs whitelists, so it does not hit the cross-origin hotlink HTTP 403 that direct `.mp4` embedding triggers. The hotlink-protected CDN `.mp4` URLs are never touched.
-- The iframe should not require `redgifs.com` host permission because it is a page element, not an extension-initiated fetch. This must be validated in Firefox before final implementation. An optional `api.redgifs.com` permission is only needed for best-effort aspect-ratio metadata, and playback should not depend on it.
+- Aspect ratio comes from `secure_media.oembed.width`/`height` in the listing, so no `api.redgifs.com` call is needed. The iframe should not require `redgifs.com` host permission because it is a page element, not an extension-initiated fetch — this (and that the iframe plays inside the overlay in Firefox) still needs a live validation spike.
 
-Because an iframe does not fire a native `<video>` `ended` event, Redgifs slides auto-advance on a duration timer (clip duration from best-effort metadata, else a fixed dwell), not media-completion. Mute/scrub control is limited to what the iframe player exposes. Do not embed the direct v2-API `.mp4` in a `<video>` (the path that fights hotlink protection) unless precise native `ended`/mute/scrub control becomes a hard requirement.
+Because an iframe does not fire a native `<video>` `ended` event, Redgifs slides auto-advance on a duration timer. The listing oembed carries no clip duration, so v1 uses a fixed dwell (an optional `api.redgifs.com` lookup could supply real duration later). Mute/scrub control is limited to what the iframe player exposes. Do not embed the direct v2-API `.mp4` in a `<video>` (the path that fights hotlink protection) unless precise native `ended`/mute/scrub control becomes a hard requirement.
 
 Unresolvable or removed Redgifs items degrade gracefully to a placeholder slide with title/source context and an action to open the original Redgifs page.
 

@@ -116,7 +116,7 @@ Redgifs is a first-class provider, and a large share of real feeds: it was the s
 
 ## Open Research Tasks
 
-- Capture real old Reddit listing JSON fixtures for direct images, Reddit galleries, Reddit videos, and Redgifs.
+- Capture a real crosspost fixture (`crosspost_parent_list[0]`); they were absent from ~450 sampled posts, so the current crosspost fixture is hand-authored from the known shape.
 - Validate the in-extension listing diagnostic from the Firefox toolbar in the
   user's real Firefox profile. The cookie-backed `.json` request itself has now
   been validated; this remaining check is browser-action/UI integration.

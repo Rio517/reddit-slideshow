@@ -41,6 +41,16 @@ Do not use live Reddit as the normal unit-test path.
   gallery-shaped posts.
 - `subreddit-direct-images.json`: Reddit listing JSON with one original
   `i.redd.it` image and one preview-only image fallback.
+- `gallery.json`: gallery post with `gallery_data` ordering, `media_metadata`
+  sources, and a deleted item to exercise skip-without-gap.
+- `reddit-video.json`: two `v.redd.it` posts — one with audio, one `is_gif`
+  silent loop — covering `fallback_url`/`dash_url`/`hls_url`/`has_audio`.
+- `redgifs.json`: Redgifs post with `secure_media.oembed` aspect ratio.
+- `crosspost.json`: outer post whose media lives in `crosspost_parent_list[0]`.
+
+These JSON fixtures are sanitized and hand-authored from shapes captured from a
+logged-in session; the resolver is also exercised against unsanitized real
+captures during development, but those are never committed.
 
 ## Spike Findings
 
