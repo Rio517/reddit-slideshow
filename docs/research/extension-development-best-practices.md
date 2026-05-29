@@ -122,6 +122,10 @@ Suggested normalized slide fields:
 - `kind`: `image`, `video`, `animated`, or `fallback`.
 - `mediaUrl`: playable/displayable URL when available.
 - `posterUrl`: thumbnail/poster image when available.
+- `mediaWidth` and `mediaHeight`: original dimensions when known.
+- `quality`: `original`, `derived`, `preview`, or `unknown`.
+- `mimeType`: known media MIME type when available.
+- `filenameHint`: sanitized base filename for future download support.
 - `sourceUrl`: original Reddit or external URL.
 - `permalink`: Reddit comments URL.
 - `title`: post title.
@@ -159,6 +163,32 @@ Practical rule:
 - Handle `play()` promise rejection for autoplay-blocked cases.
 - Default muted playback should be the safer setting because browsers are stricter about autoplay with sound.
 - Do not bypass provider restrictions through brittle private endpoints.
+
+### Preserve original image quality metadata
+
+The slideshow is intended for high-resolution viewing, including 4K displays and ultra-high-definition image subreddits. Image resolvers should therefore retain original media dimensions and source quality metadata when available, even if v1 renders images with simple fit-to-screen behavior.
+
+Practical rule:
+
+- Prefer original `i.redd.it` and provider media URLs over preview URLs.
+- Keep preview URLs as fallbacks, not primary image sources.
+- Track known width/height on normalized slide items.
+- Track whether the selected URL is original, derived, or fallback.
+- Avoid transforming images through canvas or blob pipelines unless a provider forces it.
+
+This prepares v2 pan/zoom and quality indicators without complicating the first renderer.
+
+### Treat downloads as a separate capability
+
+Media downloading is useful but changes the product surface. It introduces new UI, filename rules, provider restrictions, browser download API behavior, and possibly stronger user expectations around bulk actions.
+
+Practical rule:
+
+- Keep v1 focused on viewing.
+- Preserve enough metadata for future downloads: provider, source URL, original URL, post ID, title, extension/MIME type when known, and gallery index.
+- Implement downloads through WebExtension download APIs when the feature is added.
+- Avoid hidden bulk downloading or aggressive prefetching.
+- Keep download actions explicit and user initiated.
 
 ### Be conservative with fetching
 

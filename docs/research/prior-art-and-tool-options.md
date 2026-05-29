@@ -20,6 +20,7 @@ An ideal existing tool would:
 - Paginate into next listing pages.
 - Expand Reddit galleries into sequential slides.
 - Prefer full-resolution `i.redd.it` media over preview URLs.
+- Preserve a path toward downloads and high-resolution image inspection.
 - Support Reddit-hosted videos/GIF-like media.
 - Support Redgifs or degrade gracefully.
 - Offer arrow-key navigation.
@@ -290,7 +291,7 @@ Gaps:
 
 Recommendation:
 
-Use as resolver research only. Avoid turning our project into a downloader.
+Use as resolver and future v2 download research only. Avoid turning v1 into a downloader.
 
 ## Broader Observations
 
@@ -310,6 +311,10 @@ The closest slideshow tools are web apps, not old Reddit extensions. The closest
 ### Redgifs remains a differentiator and risk
 
 Most discovered tools do not clearly document robust Redgifs support. This reinforces the provider-adapter/fallback design.
+
+### Downloads and pan/zoom are adjacent but distinct
+
+Downloader tools can help us understand media resolution and filename edge cases, but their product incentives are different. Pan/zoom features are more common in image viewers than Reddit extensions, so v2 should likely borrow interaction patterns from desktop image viewers rather than Reddit-specific tools alone.
 
 ### Open source status is uneven
 
@@ -335,6 +340,8 @@ This keeps us free to build the exact old Reddit/Firefox/RES/Redgifs experience 
 - Locate and verify the canonical source repository for redditpx.
 - Locate the source repository and license for Gopiandcode's Reddit Slideshow.
 - Inspect RedditP's current media resolver for galleries, videos, and Redgifs.
+- Inspect media downloader tools for filename, MIME type, and full-resolution URL handling before v2 download work.
+- Review image-viewer pan/zoom interaction patterns before v2 high-resolution image inspection work.
 - Inspect RES modules related to media expansion and keyboard shortcuts.
 - Test Rexplorer manually against old Reddit and Firefox if a Firefox build exists.
 - Read the Reddit Slideshow Chrome extension source through a source viewer only if its license/reuse status becomes clear.

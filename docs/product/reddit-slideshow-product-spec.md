@@ -31,6 +31,8 @@ A Firefox user who browses `old.reddit.com`, uses Reddit Enhancement Suite, and 
 - Supporting every external media host.
 - Requiring Reddit API app credentials.
 - Rebuilding Reddit browsing, voting, commenting, or moderation workflows.
+- Downloading/saving media from the slideshow.
+- Advanced image inspection controls such as pan and zoom.
 - Syncing settings across browsers unless it comes nearly free through WebExtension storage.
 
 ## Core Experience
@@ -53,7 +55,7 @@ If a post has multiple media items, such as a Reddit gallery, each media item be
 
 ### Reddit-hosted images
 
-Direct image posts should resolve to full-size `i.redd.it` URLs when available. Preview URLs should be fallback only.
+Direct image posts should resolve to full-size `i.redd.it` URLs when available. Preview URLs should be fallback only. The resolver should preserve the original image dimensions so the renderer can make good decisions for 4K and other high-resolution displays.
 
 ### Reddit galleries
 
@@ -111,6 +113,49 @@ External provider permissions may be optional if the implementation can keep ins
 ## Compatibility
 
 Primary target is Firefox on desktop. The extension should coexist with Reddit Enhancement Suite by using isolated content scripts, avoiding global page mutations where possible, and namespacing injected DOM/classes.
+
+## V2 Backlog
+
+These features are intentionally outside the first implementation but should shape early architecture enough that v2 does not require a rewrite.
+
+### Download media
+
+Add a download action for the current slide. The feature should support direct images first, then galleries and playable video clips where technically and legally reasonable. It should use browser download APIs instead of inventing a custom downloader UI.
+
+Design questions for v2:
+
+- Should downloads use post titles, Reddit IDs, provider names, or timestamps in filenames?
+- Should a gallery download action save only the current slide, the current post's gallery, or the whole slideshow queue?
+- Should downloads be single-click or require confirmation for external providers and NSFW media?
+- How should failed Redgifs or provider-restricted downloads degrade?
+
+### Highest-resolution image viewing
+
+Improve the image pipeline for ultra-high-resolution subreddits and 4K displays. Version 1 should already prefer original media URLs, but v2 should make high-resolution behavior explicit and inspectable.
+
+Desired v2 behavior:
+
+- Prefer original image URLs over Reddit previews whenever possible.
+- Preserve and display image dimensions when known.
+- Avoid browser downscaling artifacts where possible.
+- Provide a visible indicator when only a preview/lower-resolution fallback is available.
+- Support image preloading without fetching far ahead indefinitely.
+
+### Pan and zoom
+
+Add image inspection controls for large images that do not fit comfortably on screen.
+
+Possible controls:
+
+- Zoom in/out/reset.
+- Fit to screen vs actual size.
+- Click-drag or keyboard panning.
+- Optional scroll-wheel zoom.
+- Preserve slideshow navigation without making arrow-key panning confusing.
+
+Open UX question:
+
+- When zoomed in, should arrow keys pan the image or continue to move between slides? The likely answer is to keep slide navigation on left/right and use drag/WASD/trackpad for panning, but this should be tested.
 
 ## Open Questions
 
