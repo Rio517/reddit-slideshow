@@ -51,6 +51,8 @@ When the queue nears the end, the extension fetches the next listing page using 
 
 If a post has multiple media items, such as a Reddit gallery, each media item becomes its own slide while preserving the post-level context.
 
+The queue is **media-only by definition.** Text/self posts, outbound article links, stickied/announcement posts, and promoted/ad posts are dropped from the queue, not shown as placeholder slides — a linear auto-advancing slideshow that lands on non-media breaks the lean-back experience. Placeholder slides are reserved for the rare case of a *resolution failure on something that should have rendered* (e.g. a blocked Redgifs clip). This "skip anything not renderable" behavior is core to v1, not a configurable filter. Because most of a listing page can be non-media, pagination must be triggered on *posts scanned*, not *slides produced*, so a sparse page does not cause back-to-back fetches.
+
 ## Media Support
 
 ### Reddit-hosted images
@@ -65,9 +67,19 @@ Gallery posts should resolve through Reddit listing data, using gallery item ord
 
 Reddit-hosted videos should use playable video URLs from listing media metadata when available. Playback completion should advance the slideshow.
 
+Caveat (see the [2026-05-29 audit](../research/2026-05-29-engineering-product-audit.md), §2): v.redd.it is DASH with **separated** tracks. `secure_media.reddit_video.fallback_url` is video-only — a plain `<video>` pointed at it has **no audio**. v1 should either play Reddit video **muted-only** (and report `audioAvailable: false`) or bundle an HLS player and use `hls_url`. The mute/unmute setting is meaningful only once an audio-capable path exists.
+
 ### Redgifs
 
-Redgifs is a first-class provider. The extension should attempt native playback when a direct playable media URL can be resolved. Because Redgifs access may be restricted or unstable, unsupported or blocked Redgifs items should degrade gracefully to a placeholder slide with title/source context and an action to open the original Redgifs page.
+Redgifs is a first-class provider, embedded **inline via the Redgifs first-party iframe** — the same approach Reddit Enhancement Suite ships and relies on. This is the decisive correction to the earlier "fallback is the common path" framing (see the [2026-05-29 audit](../research/2026-05-29-engineering-product-audit.md), §2, and ADR [0002](../adr/0002-provider-based-media-resolution.md)):
+
+- Parse the id from `redgifs.com/watch/<id>` or `/ifr/<id>` and embed `<iframe src="https://www.redgifs.com/ifr/<id>">`.
+- The iframe is served by Redgifs itself, so the `<video>` inside is a *same-origin* request from `redgifs.com` to its own CDN. It carries the Origin/Referer Redgifs whitelists, so it **does not hit** the cross-origin hotlink HTTP 403 that direct `.mp4` embedding triggers. The hotlink-protected CDN `.mp4` URLs are never touched.
+- **No `redgifs.com` host permission is required** for the iframe (it is a page element, not an extension-initiated fetch). An optional `api.redgifs.com` permission is only needed for best-effort aspect-ratio metadata, and playback does not depend on it.
+
+Tradeoff for the slideshow: an iframe does not fire a native `<video>` `ended` event, so auto-advance for Redgifs uses a **duration timer** (read clip duration from best-effort metadata, else a fixed dwell), not media-completion. Mute/scrub control is limited to what the iframe player exposes. The avoid path (direct v2-API `.mp4` in a `<video>` for native `ended`/mute control) is the one that fights hotlink protection — do not take it unless that control becomes a hard requirement.
+
+Genuinely unresolvable or removed Redgifs items still degrade gracefully to a placeholder slide with title/source context and an action to open the original Redgifs page.
 
 ### Other hosts
 
@@ -78,6 +90,7 @@ Other external hosts are out of v1 unless they are simple direct media links. Th
 - Image timer: 3 seconds, 5 seconds, 10 seconds, and custom.
 - Start muted: on/off.
 - Autoplay slideshow: on/off.
+- Include NSFW: follow Reddit / always hide. **Default: follow Reddit** — show over-18 content only insofar as the signed-in session already exposes it. This is the least-surprising default and avoids the extension becoming an NSFW-unlocking tool. (`over_18` is already captured per slide, so this is a product decision, not a technical one.)
 - Provider permissions: Redgifs should be requested only if needed or clearly disclosed.
 
 ## Permissions
@@ -159,8 +172,8 @@ Open UX question:
 
 ## Open Questions
 
-- Should v1 include all media posts, or allow filters such as images only, videos only, NSFW include/exclude, and external hosts include/exclude?
-- Should NSFW behavior follow Reddit visibility exactly, or add an extension-level toggle?
+- Beyond the core media-only queue (now specified under Queue Behavior), should v1 add *optional* refinements such as images-only / videos-only? (Optional; the non-media skip is no longer an open question.)
+- NSFW behavior is now decided (follow Reddit session visibility, with a hide toggle — see Settings). Remaining nuance: should an auto-advancing NSFW slide behave differently (e.g. require a tap to reveal) than a SFW one?
 - Should the queue include posts that RES has hidden or filtered on the current page?
 - Should the extension start from only the visible sort/filter state, or support special pages like saved, user profiles, and search in v1?
 - How much Redgifs native playback is possible in Firefox without relying on brittle private APIs?

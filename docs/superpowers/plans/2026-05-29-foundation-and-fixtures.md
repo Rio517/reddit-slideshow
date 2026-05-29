@@ -1,6 +1,16 @@
 # Foundation And Offline Fixtures Implementation Plan
 
+> **🛑 SUPERSEDED (2026-05-29).** This MV2/unbundled plan has been replaced by [`2026-05-29-foundation-wxt-mv3.md`](2026-05-29-foundation-wxt-mv3.md), which adopts WXT + Manifest V3 ([ADR 0005](../../adr/0005-manifest-v3-event-page-and-wxt-build.md)) and folds in the audit corrections below. Kept for history; do not implement this version.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+> **⚠️ Audit corrections (2026-05-29) — read before implementing.** The [engineering & product audit](../../research/2026-05-29-engineering-product-audit.md) found foundation-level issues in this plan. The most important:
+> - **A bundler is required.** Firefox does not support ES-module `import` in content scripts (bug 1451545, open since 2018), so `content-script.js` cannot `import` from `shared/*.js` and the raw `extension/` tree will not load. Adopt **WXT** (or an equivalent bundler) before/while implementing; the file layout below should map onto WXT's `entrypoints/` convention. (Audit C-7, §3.)
+> - **Settle MV2 vs MV3 first** with corrected reasoning (Firefox MV3 = event pages, not service workers). Capture it in an ADR. (Audit C-1, §1.)
+> - **`options.js` must consume `shared/settings.js`** (`normalizeSettings`), not duplicate defaults — otherwise the Task-3 module is dead code. (Audit C-8.)
+> - **Consider validating risk first.** This slice proves nothing about live Reddit access, Redgifs, or the actual experience. Consider running the live spikes in the audit (§5, P-1) before investing further in offline foundation.
+>
+> The inline fixes below (web-ext version, dead code, `filenameHint` null-guard, settings wiring note) have been applied to the snippets; the structural items above are flagged but left for a deliberate re-plan.
 
 **Goal:** Create the first runnable Firefox WebExtension scaffold plus offline fixtures and tests for old Reddit page/listing parsing.
 
@@ -111,7 +121,7 @@ Create `package.json` with:
   },
   "devDependencies": {
     "vitest": "^3.2.0",
-    "web-ext": "^8.8.0"
+    "web-ext": "^10.0.0"
   }
 }
 ```
@@ -237,7 +247,7 @@ Create:
 }
 ```
 
-Note: this first scaffold uses Manifest V2 because Firefox supports persistent background scripts cleanly. Create a follow-up ADR before changing to Manifest V3.
+Note (corrected per audit C-1): this scaffold uses Manifest V2. MV2 still works on Firefox indefinitely, but "Firefox supports persistent background scripts cleanly" is the wrong reason — MV3 on Firefox uses **event pages**, not service workers, and persistent backgrounds are the deprecated direction. Treat MV2 as a conscious, time-boxed choice and prefer MV3 + event page + `action` for a new extension; a build tool (WXT) can emit both. Also add `browser_specific_settings.gecko.id` (required for `storage.sync` and unsigned dev installs; otherwise `web-ext lint` warns `MISSING_ADDON_ID`). Settle this in an ADR before implementation.
 
 - [ ] **Step 2: Create `extension/background/background.js`**
 
@@ -257,6 +267,8 @@ browser.browserAction.onClicked.addListener(async (tab) => {
   });
 });
 ```
+
+> **Audit C-9 / H-10:** `tabs.sendMessage` rejects ("Could not establish connection") on any tab without a content script — i.e. every non-`old.reddit.com` tab, including `www.reddit.com` (which has the host permission but no content-script match). This `async` listener has no `try/catch`, so that is an unhandled rejection with no user feedback. Wrap the send in `try/catch` and surface "open an old.reddit.com listing first" (or gate the action by `tab.url` host). Separately, decide the host scope: either drop `www.reddit.com` from `permissions` and `SUPPORTED_HOSTS`, or add it to `content_scripts.matches` — the three lists must agree.
 
 - [ ] **Step 3: Create `extension/content/content-script.js`**
 
@@ -371,6 +383,8 @@ mutedCheckbox.addEventListener("change", saveSettings);
 
 loadSettings();
 ```
+
+> **Audit C-8 (must fix in Task 3):** this snippet inlines its own `DEFAULT_SETTINGS` (missing `autoplay`) and never validates stored values. Once `shared/settings.js` exists (Task 3), replace the inline object with `import { DEFAULT_SETTINGS, normalizeSettings } from "../shared/settings.js"` and run `loadSettings` through `normalizeSettings(stored)`. Otherwise the Task-3 validation module has no runtime consumer and the two default sets will drift. Prefer a single `getSettings()` helper in `settings.js` that wraps `storage.local.get` + `normalizeSettings`.
 
 - [ ] **Step 7: Run extension lint**
 
@@ -710,7 +724,8 @@ export function toListingJsonUrl(pageUrl, options = {}) {
   if (!pathname.endsWith(".json/") && !pathname.endsWith(".json")) {
     pathname = `${pathname}.json`;
   }
-  pathname = pathname.replace("/.json", "/.json").replace(/\.json\/$/, ".json");
+  // Strip the trailing slash that the endsWith("/") step re-added onto a `.json` path.
+  pathname = pathname.replace(/\.json\/$/, ".json");
 
   const output = new URL(url.href);
   output.pathname = pathname;
@@ -871,13 +886,17 @@ function mimeTypeFromUrl(url) {
 
 function filenameHint(post, url) {
   const extension = new URL(url).pathname.split(".").pop() || "jpg";
-  const slug = post.title
+  // Guard missing/non-ASCII titles: a missing title must not throw (it would
+  // kill the whole listing parse), and unicode titles must not collapse to an
+  // empty slug. Unicode-aware match, fall back to the post id when empty.
+  const slug = (post.title ?? "")
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
+    .normalize("NFKD")
+    .replace(/[^\p{L}\p{N}]+/gu, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 80);
 
-  return `${post.name}-${slug}.${extension}`;
+  return slug ? `${post.name}-${slug}.${extension}` : `${post.name}.${extension}`;
 }
 ```
 

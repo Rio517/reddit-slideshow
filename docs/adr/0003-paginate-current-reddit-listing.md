@@ -25,6 +25,21 @@ Costs:
 - Needs request throttling and failure handling.
 - Listings can shift while browsing because Reddit feeds are dynamic.
 
+## Terms-of-Service Posture
+
+The v1 approach is to fetch `old.reddit.com/.../.json` using the user's existing logged-in browser session (cookies), without OAuth app credentials. Verified viable in 2026 (see the [2026-05-29 audit](../research/2026-05-29-engineering-product-audit.md), §2): the widely reported "403 on `.json`" failures are datacenter-IP, unauthenticated, bot-UA scrapers; Reddit's help text carves out logged-in access, and RES relies on the same mechanism. The fetch must run from the **background script** to carry session cookies reliably.
+
+This carries modest but real ToS/AMO risk, so the extension adopts and documents an explicit posture:
+
+- Acts only on behalf of the logged-in user, on data already visible to that user.
+- Human-scale request rates: one pagination request at a time, only for the active queue, no indefinite prefetch.
+- Stores nothing server-side; no bulk collection, no redistribution, no analytics.
+- Degrades on `403`/`429` (and `X-Ratelimit-*` headers when present — note they are often **absent** on the cookie-session website path, so `403`/`429` must also drive backoff).
+- Keeps the listing transport swappable (the ADR 0002 resolver layer) so optional per-user OAuth is an escape hatch if the cookie path is ever blocked. The extension must **not** ship app OAuth client credentials.
+- Always sends `raw_json=1` (load-bearing invariant): without it, `preview` and `media_metadata` URLs are HTML-entity-encoded.
+
+This posture both reduces real risk and is what an AMO reviewer needs to see.
+
 ## Follow-Up
 
-Implementation should include saved JSON fixtures for front page, subreddit, gallery, video, and Redgifs examples. Pagination behavior should be tested with `after` tokens and with end-of-list/error responses.
+Implementation should include saved JSON fixtures for front page, subreddit, gallery, video, and Redgifs examples — captured from real responses, not hand-authored, so field shapes (`gallery_data`, `media_metadata`, crosspost media in `crosspost_parent_list[0]`) match reality. Pagination behavior should be tested with `after` tokens and with end-of-list/error responses. Before building further, spike live Reddit access in Firefox to confirm the session-cookie path survives at slideshow-realistic volume.

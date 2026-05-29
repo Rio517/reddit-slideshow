@@ -25,6 +25,8 @@ Sources:
 
 Reddit listing endpoints use common `after`, `before`, `limit`, `count`, and `show` parameters. Reddit's documentation says listing responses contain `after` and `before` fields equivalent to old site's next/previous controls. This is the likely mechanism for keeping the slideshow queue going past the current page.
 
+Rate limits (verified 2026, see the [audit](2026-05-29-engineering-product-audit.md), §2): free-tier OAuth is **100 queries/min** (≈10-minute averaging window), not the older 60/min figure; unauthenticated *API* requests are rejected. The session-cookie `.json` website path used here is a different surface that works while logged in, but `X-Ratelimit-*` headers are often absent on it, so `403`/`429` must also drive backoff. Always request with `raw_json=1` — without it, `preview` and `media_metadata` URLs come back HTML-entity-encoded (`&amp;`).
+
 Source:
 
 - Reddit API listings documentation: https://www.reddit.com/dev/api/
