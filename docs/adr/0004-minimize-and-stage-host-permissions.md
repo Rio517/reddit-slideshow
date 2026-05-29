@@ -15,7 +15,7 @@ Use the narrowest practical install-time host permissions and stage external pro
 
 Core Reddit permissions should be required for v1. External providers such as Redgifs should either be declared narrowly at install time or requested as optional host permissions when the user enables or encounters that provider.
 
-Note (updated per the [2026-05-29 audit](../research/2026-05-29-engineering-product-audit.md), §2): Redgifs is embedded via its first-party iframe (`/ifr/<id>`, the RES approach), which is a page element and therefore needs **no `redgifs.com` host permission at all**. A `redgifs` host permission is only required if the optional aspect-ratio metadata API (`api.redgifs.com`) is used — and playback does not depend on it. So Redgifs is the strongest case for the optional/staged pattern: install-time permissions can stay Reddit-only, and the metadata permission (if ever added) is requested from a user gesture. The MV2/MV3 key for that optional host differs (`optional_permissions` in MV2 vs `optional_host_permissions` in MV3, Firefox 128+).
+Redgifs is embedded via its first-party iframe (`/ifr/<id>`), which is a page element and therefore needs **no `redgifs.com` host permission at all**. A `redgifs` host permission is only required if the optional aspect-ratio metadata API (`api.redgifs.com`) is used — and playback does not depend on it. So Redgifs is the strongest case for the optional/staged pattern: install-time permissions stay Reddit-only, and the metadata permission (if ever added) is requested from a user gesture via `optional_host_permissions`.
 
 ## Consequences
 

@@ -25,7 +25,7 @@ Sources:
 
 Reddit listing endpoints use common `after`, `before`, `limit`, `count`, and `show` parameters. Reddit's documentation says listing responses contain `after` and `before` fields equivalent to old site's next/previous controls. This is the likely mechanism for keeping the slideshow queue going past the current page.
 
-Rate limits (verified 2026, see the [audit](2026-05-29-engineering-product-audit.md), §2): free-tier OAuth is **100 queries/min** (≈10-minute averaging window), not the older 60/min figure; unauthenticated *API* requests are rejected. The session-cookie `.json` website path used here is a different surface that works while logged in, but `X-Ratelimit-*` headers are often absent on it, so `403`/`429` must also drive backoff. Always request with `raw_json=1` — without it, `preview` and `media_metadata` URLs come back HTML-entity-encoded (`&amp;`).
+Rate limits: free-tier OAuth is **100 queries/min** (≈10-minute averaging window); unauthenticated *API* requests are rejected. The session-cookie `.json` website path used here is a different surface that works while logged in, but `X-Ratelimit-*` headers are often absent on it, so `403`/`429` must also drive backoff. Always request with `raw_json=1` — without it, `preview` and `media_metadata` URLs come back HTML-entity-encoded (`&amp;`).
 
 Source:
 
@@ -60,9 +60,7 @@ Source:
 
 ## Redgifs
 
-Redgifs should be treated as a first-class provider because it is important to the desired experience. Research so far suggests native playback can be brittle if it depends on private or unstable API behavior. The product should therefore support graceful fallback: unresolved Redgifs posts should show a slide with title/source context and an action to open the original Redgifs page.
-
-Implementation research should test current Redgifs URL formats in Firefox with representative Reddit posts before promising native playback.
+Redgifs is a first-class provider, embedded inline via the Redgifs first-party iframe (`https://www.redgifs.com/ifr/<id>`). The iframe is served by Redgifs, so its inner video is a same-origin request that carries the Origin/Referer Redgifs whitelists and avoids the cross-origin hotlink 403 that direct `.mp4` embedding hits. It needs no `redgifs.com` host permission. Because an iframe has no native `ended` event, Redgifs slides advance on a duration timer. Unresolvable or removed posts fall back to a slide with title/source context and an open-original action.
 
 ## Current Research Conclusions
 
@@ -75,7 +73,4 @@ Implementation research should test current Redgifs URL formats in Firefox with 
 ## Open Research Tasks
 
 - Capture real old Reddit listing JSON fixtures for direct images, Reddit galleries, Reddit videos, and Redgifs.
-- Confirm whether Redgifs direct playback can be resolved reliably in Firefox.
-- Confirm whether Firefox MV3 background behavior is sufficient for long-running queue fetches or whether extension architecture needs special care.
 - Verify autoplay behavior for muted and unmuted video clips.
-- Investigate optional host permissions for Redgifs to keep install-time permission prompts narrow.

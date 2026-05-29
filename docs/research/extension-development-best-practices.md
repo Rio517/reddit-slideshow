@@ -542,7 +542,6 @@ Make review easy:
 
 ## Open Follow-Up Research
 
-- ~~Verify current Firefox behavior for MV2 vs MV3 in the exact APIs we need.~~ Resolved in the [2026-05-29 audit](2026-05-29-engineering-product-audit.md) (§1): MV2 still works on Firefox but the modern model is MV3 + event page; a bundler is required regardless.
 - Test optional host permissions UX for Redgifs in Firefox.
 - Collect representative old Reddit and Reddit JSON fixtures.
 - Test Redgifs direct playback behavior in Firefox with real links.

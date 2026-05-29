@@ -27,7 +27,7 @@ Costs:
 
 ## Terms-of-Service Posture
 
-The v1 approach is to fetch `old.reddit.com/.../.json` using the user's existing logged-in browser session (cookies), without OAuth app credentials. Verified viable in 2026 (see the [2026-05-29 audit](../research/2026-05-29-engineering-product-audit.md), §2): the widely reported "403 on `.json`" failures are datacenter-IP, unauthenticated, bot-UA scrapers; Reddit's help text carves out logged-in access, and RES relies on the same mechanism. The fetch must run from the **background script** to carry session cookies reliably.
+The v1 approach is to fetch `old.reddit.com/.../.json` using the user's existing logged-in browser session (cookies), without OAuth app credentials. This is viable because Reddit's blocking targets datacenter-IP, unauthenticated, bot scrapers; logged-in browser access is accepted, and RES relies on the same mechanism. The fetch runs from the **background script** to carry session cookies reliably.
 
 This carries modest but real ToS/AMO risk, so the extension adopts and documents an explicit posture:
 

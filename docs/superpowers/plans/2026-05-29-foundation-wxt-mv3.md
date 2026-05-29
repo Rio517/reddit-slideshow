@@ -8,14 +8,12 @@
 
 **Tech Stack:** WXT, Vite, Vitest (+ `WxtVitest()` fake-browser, happy-dom), JavaScript ES modules with JSDoc + `checkJs` type-checking, ESLint flat config + `eslint-plugin-no-unsanitized`, Prettier, `web-ext lint` on the built output.
 
-**Supersedes:** `2026-05-29-foundation-and-fixtures.md` (MV2/unbundled). This plan applies the [2026-05-29 audit](../../research/2026-05-29-engineering-product-audit.md) corrections and [ADR 0005](../../adr/0005-manifest-v3-event-page-and-wxt-build.md).
-
-**Key decisions baked in (from the audit):**
-- MV3 + event page + `action` (ADR 0005); a bundler (WXT) is mandatory because Firefox does not support ESM `import` in content scripts.
-- Host scope is **`old.reddit.com` only** for v1 — `www.reddit.com` is dropped from permissions and from `SUPPORTED_HOSTS` (audit H-10).
-- `options` consumes `lib/settings.js` via a single `getSettings()`/`saveSettings()` path — no duplicated defaults (audit C-8).
-- `browser_specific_settings.gecko.id` is set (audit M-2).
-- `filenameHint` guards missing/non-ASCII titles (audit H-11/H-12); the dead `replace("/.json","/.json")` is gone (audit L-16); the preview-image case asserts `mediaUrl` (audit M-15).
+**Decisions baked in (see [ADR 0005](../../adr/0005-manifest-v3-event-page-and-wxt-build.md)):**
+- MV3 + event page + `action`; a bundler (WXT) is mandatory because Firefox does not support ESM `import` in content scripts.
+- Host scope is **`old.reddit.com` only** for v1 — `www.reddit.com` is not in permissions or `SUPPORTED_HOSTS`.
+- `options` consumes `lib/settings.js` via a single `getSettings()`/`saveSettings()` path — no duplicated defaults.
+- `browser_specific_settings.gecko.id` is set.
+- `filenameHint` guards missing/non-ASCII titles; the preview-image case asserts `mediaUrl`; the URL converter rejects comment permalinks.
 
 ---
 
@@ -285,8 +283,8 @@ export default defineBackground(() => {
       });
     } catch {
       // No content script on this tab (not an old.reddit.com listing).
-      // Audit C-9: swallow the "no receiving end" rejection instead of
-      // throwing an unhandled rejection, and point the user at old Reddit.
+      // Swallow the "no receiving end" rejection instead of throwing an
+      // unhandled rejection, and point the user at old Reddit.
       console.info("Reddit Slideshow: open an old.reddit.com listing first");
     }
   });
@@ -383,7 +381,7 @@ export default defineContentScript({
 
 - [ ] **Step 5: Create `entrypoints/options/main.js`**
 
-This intentionally imports the shared settings module (audit C-8). `lib/settings.js` is created in Task 3; until then this file references it. Implement Task 3 immediately after so the import resolves.
+This intentionally imports the shared settings module so defaults and validation live in one place. `lib/settings.js` is created in Task 3; until then this file references it. Implement Task 3 immediately after so the import resolves.
 
 ```js
 import { getSettings, saveSettings } from "@/lib/settings.js";
@@ -978,9 +976,9 @@ function slidesFromPost(post) {
       over18: Boolean(post.over_18),
       durationMode: "timer",
       audioAvailable: false,
-      // Dimensions come from the preview pipeline source, which is the
-      // best-known size but not guaranteed identical to the original asset
-      // (audit M-14): name the fields by provenance, not as "original".
+      // Dimensions come from the preview pipeline source: the best-known size,
+      // not guaranteed identical to the original asset. Name the fields by
+      // provenance (sourceWidth/sourceHeight), not as "original".
       sourceWidth: previewSource?.width,
       sourceHeight: previewSource?.height,
       quality: isOriginal ? "original" : "preview",
@@ -1012,9 +1010,9 @@ function mimeTypeFromUrl(url) {
 
 function filenameHint(post, url) {
   const extension = new URL(url).pathname.split(".").pop() || "jpg";
-  // Audit H-11/H-12: never throw on a missing title (one bad post must not
-  // kill the whole listing parse), and never collapse unicode titles to an
-  // empty slug. Fall back to the post id when the slug is empty.
+  // Never throw on a missing title (one bad post must not kill the whole
+  // listing parse), and never collapse unicode titles to an empty slug.
+  // Fall back to the post id when the slug is empty.
   const slug = (post.title ?? "")
     .toLowerCase()
     .normalize("NFKD")
@@ -1118,8 +1116,8 @@ Expected: commit succeeds.
 
 Spec coverage:
 
-- Establishes the runnable MV3/WXT foundation and the testable shared core (`reddit-url`, `settings`, `slides`) without live Reddit, per the audit's "validate-first / fixtures for unit tests" split.
-- Applies audit corrections: MV3 + event page + `action` (ADR 0005); WXT bundler; `old.reddit.com`-only host scope (H-10); options wired to validated settings (C-8); `gecko.id` (M-2); `filenameHint` guards (H-11/H-12); dead `.json` replace removed (L-16); preview-image `mediaUrl` asserted and dimension fields renamed by provenance (M-14/M-15); comment-permalink guard (L-17).
+- Establishes the runnable MV3/WXT foundation and the testable shared core (`reddit-url`, `settings`, `slides`) without live Reddit; fixtures cover the unit tests.
+- Decisions applied: MV3 + event page + `action` (ADR 0005); WXT bundler; `old.reddit.com`-only host scope; options wired to validated settings; `gecko.id`; `filenameHint` guards; dimension fields named by provenance with the preview-image `mediaUrl` asserted; comment-permalink guard.
 - Defers UI, timers, pagination, galleries, video, and the Redgifs iframe provider to later plans.
 
 Placeholder scan:

@@ -8,13 +8,13 @@ This directory holds planning material for a Firefox-first browser extension tha
 - [Research notes](research/initial-research.md): source-backed notes on Firefox extensions, old Reddit behavior, Reddit listing pagination, RES, and external media providers.
 - [Extension development best practices](research/extension-development-best-practices.md): architecture, security, permissions, testing, Reddit access, and release guidance.
 - [Prior art and tool options](research/prior-art-and-tool-options.md): existing slideshow/gallery tools, reuse candidates, and gaps.
-- [Engineering & product audit (2026-05-29)](research/2026-05-29-engineering-product-audit.md): verified review of the corpus — MV2/MV3, the mandatory bundler, Reddit/Redgifs/v.redd.it reality, code-level bugs in the plan, ToS posture, and product scope. Corrections from it have been folded back into the docs below.
 - [ADR 0001](adr/0001-standalone-firefox-webextension.md): build as a standalone Firefox WebExtension first.
 - [ADR 0002](adr/0002-provider-based-media-resolution.md): resolve media through provider adapters.
 - [ADR 0003](adr/0003-paginate-current-reddit-listing.md): keep the slideshow queue going through Reddit listing pagination.
 - [ADR 0004](adr/0004-minimize-and-stage-host-permissions.md): minimize install-time permissions and stage external-provider permissions.
 - [ADR 0005](adr/0005-manifest-v3-event-page-and-wxt-build.md): adopt Manifest V3 (event page) and a WXT-based build.
+- [Foundation plan](superpowers/plans/2026-05-29-foundation-wxt-mv3.md): task-by-task plan for the WXT/MV3 scaffold, shared core, and offline fixtures.
 
 ## Status
 
-These are living planning docs. They capture current research and decisions, but they are not yet an implementation plan.
+These are living planning docs capturing current research and decisions. The foundation implementation plan is ready to execute.

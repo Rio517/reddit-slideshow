@@ -5,30 +5,23 @@ Status: Proposed
 
 ## Context
 
-The first implementation plan ([foundation-and-fixtures](../superpowers/plans/2026-05-29-foundation-and-fixtures.md))
-assumed Manifest V2 with a persistent background page, loaded directly from an
-unbundled `extension/` tree, justified as "Firefox supports persistent
-background scripts cleanly." The [2026-05-29 audit](../research/2026-05-29-engineering-product-audit.md)
-(§1, §3) found two problems with that foundation:
+Two facts constrain the manifest and build choices for this extension:
 
-1. **The MV2 justification is wrong-headed.** MV2 is not deprecated on Firefox
-   (Mozilla promises ≥12 months' notice), but Firefox MV3 does **not** use
-   service workers — it uses **non-persistent event pages** — and MV3 *removes*
-   persistent background pages. Choosing MV2 specifically to keep a persistent
-   background opts into the deprecated direction. This extension has no blocking
-   `webRequest` need (the one real Firefox MV2 advantage), so MV2 buys nothing
-   functional. Chrome has fully removed MV2 (139+), so any future cross-browser
-   build requires MV3 anyway.
+1. **Firefox MV3 uses non-persistent event pages, not service workers, and MV3
+   removes persistent background pages.** MV2 is not deprecated on Firefox
+   (Mozilla promises ≥12 months' notice), but it carries no functional advantage
+   here — this extension has no blocking `webRequest` need (the one real Firefox
+   MV2 advantage). Chrome has fully removed MV2 (139+), so any future
+   cross-browser build requires MV3.
 
 2. **A bundler is mandatory regardless of manifest version.** Firefox has never
    supported ES-module `import` in content scripts (platform bug
    [1451545](https://bugzilla.mozilla.org/show_bug.cgi?id=1451545), open since
-   2018). The content script depends on shared modules, so the raw tree cannot
-   be loaded directly — the source must be bundled.
+   2018). The content script depends on shared modules, so the source must be
+   bundled — the raw tree cannot be loaded directly.
 
-The project's intended code style (static HTML/CSS/JS modules, `textContent`, no
-`innerHTML`/`eval`) already satisfies the strict MV3 CSP, so the migration cost
-is near zero now and grows with the codebase.
+The project's code style (static HTML/CSS/JS modules, `textContent`, no
+`innerHTML`/`eval`) already satisfies the strict MV3 CSP.
 
 ## Decision
 

@@ -67,19 +67,19 @@ Gallery posts should resolve through Reddit listing data, using gallery item ord
 
 Reddit-hosted videos should use playable video URLs from listing media metadata when available. Playback completion should advance the slideshow.
 
-Caveat (see the [2026-05-29 audit](../research/2026-05-29-engineering-product-audit.md), §2): v.redd.it is DASH with **separated** tracks. `secure_media.reddit_video.fallback_url` is video-only — a plain `<video>` pointed at it has **no audio**. v1 should either play Reddit video **muted-only** (and report `audioAvailable: false`) or bundle an HLS player and use `hls_url`. The mute/unmute setting is meaningful only once an audio-capable path exists.
+v.redd.it is DASH with separated tracks: `secure_media.reddit_video.fallback_url` is video-only, so a plain `<video>` pointed at it has no audio. v1 plays Reddit video muted-only (reporting `audioAvailable: false`); audio requires bundling an HLS player and using `hls_url`. The mute/unmute setting is meaningful only once an audio-capable path exists.
 
 ### Redgifs
 
-Redgifs is a first-class provider, embedded **inline via the Redgifs first-party iframe** — the same approach Reddit Enhancement Suite ships and relies on. This is the decisive correction to the earlier "fallback is the common path" framing (see the [2026-05-29 audit](../research/2026-05-29-engineering-product-audit.md), §2, and ADR [0002](../adr/0002-provider-based-media-resolution.md)):
+Redgifs is a first-class provider, embedded inline via the Redgifs first-party iframe:
 
 - Parse the id from `redgifs.com/watch/<id>` or `/ifr/<id>` and embed `<iframe src="https://www.redgifs.com/ifr/<id>">`.
-- The iframe is served by Redgifs itself, so the `<video>` inside is a *same-origin* request from `redgifs.com` to its own CDN. It carries the Origin/Referer Redgifs whitelists, so it **does not hit** the cross-origin hotlink HTTP 403 that direct `.mp4` embedding triggers. The hotlink-protected CDN `.mp4` URLs are never touched.
-- **No `redgifs.com` host permission is required** for the iframe (it is a page element, not an extension-initiated fetch). An optional `api.redgifs.com` permission is only needed for best-effort aspect-ratio metadata, and playback does not depend on it.
+- The iframe is served by Redgifs itself, so the `<video>` inside is a same-origin request from `redgifs.com` to its own CDN. It carries the Origin/Referer Redgifs whitelists, so it does not hit the cross-origin hotlink HTTP 403 that direct `.mp4` embedding triggers. The hotlink-protected CDN `.mp4` URLs are never touched.
+- No `redgifs.com` host permission is required for the iframe (it is a page element, not an extension-initiated fetch). An optional `api.redgifs.com` permission is only needed for best-effort aspect-ratio metadata, and playback does not depend on it.
 
-Tradeoff for the slideshow: an iframe does not fire a native `<video>` `ended` event, so auto-advance for Redgifs uses a **duration timer** (read clip duration from best-effort metadata, else a fixed dwell), not media-completion. Mute/scrub control is limited to what the iframe player exposes. The avoid path (direct v2-API `.mp4` in a `<video>` for native `ended`/mute control) is the one that fights hotlink protection — do not take it unless that control becomes a hard requirement.
+Because an iframe does not fire a native `<video>` `ended` event, Redgifs slides auto-advance on a duration timer (clip duration from best-effort metadata, else a fixed dwell), not media-completion. Mute/scrub control is limited to what the iframe player exposes. Do not embed the direct v2-API `.mp4` in a `<video>` (the path that fights hotlink protection) unless precise native `ended`/mute/scrub control becomes a hard requirement.
 
-Genuinely unresolvable or removed Redgifs items still degrade gracefully to a placeholder slide with title/source context and an action to open the original Redgifs page.
+Unresolvable or removed Redgifs items degrade gracefully to a placeholder slide with title/source context and an action to open the original Redgifs page.
 
 ### Other hosts
 
@@ -90,7 +90,7 @@ Other external hosts are out of v1 unless they are simple direct media links. Th
 - Image timer: 3 seconds, 5 seconds, 10 seconds, and custom.
 - Start muted: on/off.
 - Autoplay slideshow: on/off.
-- Include NSFW: follow Reddit / always hide. **Default: follow Reddit** — show over-18 content only insofar as the signed-in session already exposes it. This is the least-surprising default and avoids the extension becoming an NSFW-unlocking tool. (`over_18` is already captured per slide, so this is a product decision, not a technical one.)
+- Include NSFW: follow Reddit / always hide. **Default: follow Reddit** — show over-18 content only insofar as the signed-in session already exposes it. This is the least-surprising default and avoids the extension becoming an NSFW-unlocking tool.
 - Provider permissions: Redgifs should be requested only if needed or clearly disclosed.
 
 ## Permissions
@@ -172,21 +172,38 @@ Open UX question:
 
 ## Open Questions
 
-- Beyond the core media-only queue (now specified under Queue Behavior), should v1 add *optional* refinements such as images-only / videos-only? (Optional; the non-media skip is no longer an open question.)
-- NSFW behavior is now decided (follow Reddit session visibility, with a hide toggle — see Settings). Remaining nuance: should an auto-advancing NSFW slide behave differently (e.g. require a tap to reveal) than a SFW one?
+- Beyond the core media-only queue, should v1 add optional refinements such as images-only / videos-only?
+- Should an auto-advancing NSFW slide behave differently (e.g. require a tap to reveal) than a SFW one?
 - Should the queue include posts that RES has hidden or filtered on the current page?
 - Should the extension start from only the visible sort/filter state, or support special pages like saved, user profiles, and search in v1?
-- How much Redgifs native playback is possible in Firefox without relying on brittle private APIs?
 
-## Acceptance Criteria Draft
+## Validation Spikes
+
+Run these against live Firefox and real Reddit before committing to the full build; each is a go/no-go:
+
+- **Reddit listing access:** a background fetch of paginated `.json` listings using the existing session, without OAuth, at slideshow-realistic request volume, survives rate limits and returns expected shapes.
+- **v.redd.it video:** `secure_media.reddit_video.fallback_url` plays inside the overlay (muted), and the separate-audio-track behavior is understood.
+- **RES coexistence:** the prototype overlay alongside RES on a real old Reddit page has no arrow-key/keyboard capture or DOM-mutation conflicts.
+- **Field-shape capture:** real captured fixtures (not hand-authored) for galleries (`gallery_data` order + `media_metadata`), Reddit video, crossposts (`crosspost_parent_list[0]`), and Redgifs match the resolver's assumptions.
+
+## Acceptance Criteria
+
+Feature criteria:
 
 - From an old Reddit subreddit listing, the user can launch a full-screen slideshow.
 - Direct `i.redd.it` image posts display as full-resolution slides.
 - Reddit galleries are expanded into sequential slides.
+- The queue contains only renderable media; text/link/stickied/promoted posts are dropped.
 - Right and left arrow navigation works.
 - Image slides advance using the selected timer.
 - Manual navigation does not disable the running slideshow timer.
-- Reddit-hosted video/GIF-like media advances when playback ends.
-- The queue fetches at least one additional Reddit listing page when nearing the end.
-- Redgifs links either play natively or show a graceful fallback with an open-original action.
+- Reddit-hosted video advances when playback ends; Redgifs slides play inline and advance on a duration timer.
+- The queue fetches at least one additional Reddit listing page when nearing the end, with a visible loading state and a distinct end-of-queue state.
 - Settings persist between sessions.
+
+Outcome criteria (what "good" means for a lean-back tool):
+
+- Time-to-first-slide after launch is under ~1 second on a typical listing.
+- The fraction of feed media posts that render (vs fall back) is high; the fallback rate is visible and explainable.
+- Slide-to-slide transitions are smooth — a preloaded next slide (1–2 ahead) is ready before its turn, so advancing does not stutter.
+- A position/progress affordance lets the user tell where they are and whether more is loading.
