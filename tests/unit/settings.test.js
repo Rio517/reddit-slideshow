@@ -19,9 +19,9 @@ describe("normalizeSettings", () => {
   });
 
   it("falls back when timer value is unsupported", () => {
-    expect(normalizeSettings({ imageTimerSeconds: 999 }).imageTimerSeconds).toBe(
-      5,
-    );
+    expect(
+      normalizeSettings({ imageTimerSeconds: 999 }).imageTimerSeconds,
+    ).toBe(5);
   });
 
   it("normalizes startMuted to a boolean", () => {

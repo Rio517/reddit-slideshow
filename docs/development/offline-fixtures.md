@@ -34,3 +34,33 @@ HTML-entity-encoded.
 5. Add or update a focused test that explains why the fixture exists.
 
 Do not use live Reddit as the normal unit-test path.
+
+## Current Fixture Coverage
+
+- `subreddit-page.html`: minimal old Reddit listing HTML with direct image and
+  gallery-shaped posts.
+- `subreddit-direct-images.json`: Reddit listing JSON with one original
+  `i.redd.it` image and one preview-only image fallback.
+
+## Spike Findings
+
+- WXT/Vitest fixtures should be loaded with Vite-native imports in unit tests.
+  Under the WXT test plugin, `import.meta.url` is browser-shaped, so
+  Node-style `fileURLToPath(import.meta.url)` fixture loading is a poor fit.
+- Direct `i.redd.it` image URLs are treated as original-quality candidates.
+- `preview.redd.it` image URLs are retained as explicit preview-quality
+  fallbacks so the slideshow can still show something when no original URL is
+  present.
+
+## Commands
+
+Run build before `webext:lint`; do not parallelize those two commands because
+WXT rebuilds `.output/firefox-mv3/` and `web-ext` can race the output directory.
+
+```sh
+npm run typecheck
+npm run lint
+npm test
+npm run build
+npm run webext:lint
+```

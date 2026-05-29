@@ -23,6 +23,8 @@ Primary sources used:
 - MDN Content Security Policy for extensions: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Content_Security_Policy
 - MDN content_security_policy manifest key: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/content_security_policy
 - Mozilla Extension Workshop `web-ext`: https://extensionworkshop.com/documentation/develop/getting-started-with-web-ext/
+- Firefox built-in consent for data collection and transmission: https://extensionworkshop.com/documentation/develop/firefox-builtin-data-consent/
+- MDN `browser_specific_settings`: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/browser_specific_settings
 - Mozilla Extension Workshop permission testing: https://extensionworkshop.com/documentation/develop/test-permission-requests/
 - Mozilla signing and distribution overview: https://extensionworkshop.com/documentation/publish/signing-and-distribution-overview/
 - Reddit API listing docs: https://www.reddit.com/dev/api/
@@ -37,6 +39,22 @@ Primary sources used:
 The extension should run entirely in the user's browser. It should not send browsing activity, Reddit post data, media URLs, settings, or usage events to any service controlled by us.
 
 This matters because Reddit browsing can reveal sensitive interests and communities. It also makes Firefox add-on review simpler: fewer privacy claims, fewer data handling obligations, and fewer failure points.
+
+Firefox also now requires new extensions submitted on or after November 3, 2025
+to declare data collection in `browser_specific_settings.gecko.data_collection_permissions`.
+For this extension, the correct starting declaration is:
+
+```json
+{
+  "browser_specific_settings": {
+    "gecko": {
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  }
+}
+```
 
 Practical rule:
 
@@ -215,8 +233,8 @@ Reddit's current policy surface is broader than the old unauthenticated `.json` 
 Firefox supports both MV2 and MV3, but the background model differs from Chromium, and the difference is easy to state wrong. Verified facts (2026):
 
 - MV2 is **not** deprecated on Firefox; Mozilla has committed to at least 12 months' notice if that changes ([Mozilla, 2024-03](https://blog.mozilla.org/addons/2024/03/13/manifest-v3-manifest-v2-march-2024-update/)).
-- Firefox MV3 does **not** use service workers. It uses **non-persistent event pages** (`background.scripts` + `"persistent": false`). The claim "Firefox doesn't support `background.service_worker`" is true but stale — the modern Firefox model is the event page, and MV3 *removes* persistent background pages entirely.
-- Choosing MV2 *specifically to keep a persistent background* opts into the pattern being phased out. This extension has no blocking-`webRequest` need (the one real Firefox MV2 advantage), so MV2 buys nothing functional here.
+- Firefox MV3 does **not** use service workers. It uses **non-persistent event pages** (`background.scripts` + `"persistent": false`). The claim "Firefox doesn't support `background.service_worker`" is true but stale — the modern Firefox model is the event page, and MV3 _removes_ persistent background pages entirely.
+- Choosing MV2 _specifically to keep a persistent background_ opts into the pattern being phased out. This extension has no blocking-`webRequest` need (the one real Firefox MV2 advantage), so MV2 buys nothing functional here.
 - Chrome has fully removed MV2 (Chrome 139+), so any future cross-browser build requires MV3.
 - The intended code style (static HTML/CSS/JS modules, `textContent`, no `innerHTML`/`eval`) already satisfies the strict MV3 CSP, so migration cost is near zero now and grows with the codebase.
 
@@ -235,7 +253,16 @@ Recommendation:
 
 - Use **WXT** (`wxt.dev`): a Vite-based, framework-agnostic WebExtension build tool that bundles content/background/options, generates per-browser MV2/MV3 manifests, and integrates with Vitest (auto-mocking `browser.*` in-memory via `@webext-core/fake-browser`). It supports plain DOM with no UI framework, matching the "keep dependencies boring" goal.
 - Keep `web-ext lint` / `web-ext run` in the loop, but point `web-ext lint` at the **built** output (what AMO actually receives), not the raw source.
-- Skip the `webextension-polyfill` runtime for v1 (in 2026 it is effectively a no-op on both Chrome MV3 and Firefox); use its *types* (`@types/webextension-polyfill`) for type-checking only.
+- Skip the `webextension-polyfill` runtime for v1 (in 2026 it is effectively a no-op on both Chrome MV3 and Firefox); use its _types_ (`@types/webextension-polyfill`) for type-checking only.
+
+Implementation finding (2026-05-29): WXT 0.20.26 `prepare` fails when no
+`entrypoints/` directory exists. Scaffold the minimal background/content/options
+entrypoints before relying on `postinstall: wxt prepare`, rather than expecting
+an empty WXT build to succeed.
+
+Implementation finding (2026-05-29): WXT's Vitest plugin may need localhost
+port binding during config resolution. In this workspace, the focused tests only
+ran after the test command was allowed to bind localhost.
 
 ### Use the `browser` Promise API
 

@@ -49,6 +49,12 @@ The project's code style (static HTML/CSS/JS modules, `textContent`, no
 4. **Add `browser_specific_settings.gecko.id`** (required for `storage.sync` and
    unsigned dev installs; otherwise `web-ext lint` warns `MISSING_ADDON_ID`).
 
+5. **Declare no data collection for Firefox built-in consent.** New Firefox
+   extensions submitted on or after November 3, 2025 must specify
+   `browser_specific_settings.gecko.data_collection_permissions`. This extension
+   starts local-only with no telemetry/backend, so the declaration is
+   `required: ["none"]`.
+
 ## Consequences
 
 Benefits:
@@ -66,6 +72,9 @@ Costs:
 - WXT imposes a file-based `entrypoints/` convention and owns manifest
   generation (configured in `wxt.config.ts`, not a hand-written `manifest.json`).
   The foundation plan must be re-expressed in that layout.
+- WXT 0.20.26 `prepare` expects real entrypoints. The project scaffold must
+  create at least the minimal background/content/options entrypoints before
+  relying on `postinstall: wxt prepare`.
 - MV3 host permissions are user-revocable; a content script will not auto-inject
   without a granted host permission, so the extension must check
   `permissions.contains` / `permissions.request` for `old.reddit.com`.

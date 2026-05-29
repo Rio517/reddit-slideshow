@@ -17,7 +17,7 @@ export default defineContentScript({
       return root;
     }
 
-    browser.runtime.onMessage.addListener((message) => {
+    browser.runtime.onMessage.addListener((/** @type {any} */ message) => {
       if (message?.type !== "slideshow.startRequested") return undefined;
       const root = ensureRoot();
       root.hidden = false;

@@ -25,7 +25,7 @@ Sources:
 
 Reddit listing endpoints use common `after`, `before`, `limit`, `count`, and `show` parameters. Reddit's documentation says listing responses contain `after` and `before` fields equivalent to old site's next/previous controls. This is the likely mechanism for keeping the slideshow queue going past the current page.
 
-Rate limits: free-tier OAuth is **100 queries/min** (≈10-minute averaging window); unauthenticated *API* requests are rejected. The session-cookie `.json` website path used here is a different surface that works while logged in, but `X-Ratelimit-*` headers are often absent on it, so `403`/`429` must also drive backoff. Always request with `raw_json=1` — without it, `preview` and `media_metadata` URLs come back HTML-entity-encoded (`&amp;`).
+Rate limits: free-tier OAuth is **100 queries/min** (≈10-minute averaging window); unauthenticated _API_ requests are rejected. The session-cookie `.json` website path used here is a different surface that works while logged in, but `X-Ratelimit-*` headers are often absent on it, so `403`/`429` must also drive backoff. Always request with `raw_json=1` — without it, `preview` and `media_metadata` URLs come back HTML-entity-encoded (`&amp;`).
 
 Source:
 
@@ -36,6 +36,12 @@ Source:
 Old Reddit listing pages can generally be represented as JSON by requesting the corresponding listing URL as JSON. For this extension, the current page context should be converted into a listing JSON request while preserving subreddit, sort, and query parameters.
 
 Risk: Reddit has changed API and legacy surface behavior over time. The extension should avoid requiring OAuth app credentials for v1 and should be conservative with request volume.
+
+Offline spike result (2026-05-29): the first implementation normalizes listing
+URLs to `.json?raw_json=1`, preserves sort/query parameters, and rejects comment
+permalinks because they return a different JSON shape. Pagination can append
+`after=<fullname>` to the normalized listing URL. This is covered by unit tests
+against `lib/reddit-url.js`; live Firefox/session validation remains open.
 
 ## Media Fields To Investigate In Real Fixtures
 
@@ -49,6 +55,13 @@ Likely useful Reddit listing fields:
 - `is_video`, `post_hint`, `domain`, `permalink`, `title`, and `over_18` for classification and display context.
 
 These field names need to be confirmed against saved real-world JSON fixtures during implementation.
+
+Offline spike result (2026-05-29): direct `i.redd.it` image posts can already be
+normalized into slide candidates with `quality: "original"`, while
+`preview.redd.it` image posts are retained as `quality: "preview"` fallbacks.
+The fixture keeps `preview.images[0].source.width/height` as
+`sourceWidth/sourceHeight`, because those dimensions are the best-known source
+metadata and not necessarily proof of the original file dimensions.
 
 ## Reddit Enhancement Suite
 
@@ -75,3 +88,7 @@ Redgifs is a first-class provider. The current hypothesis is to embed it inline 
 - Capture real old Reddit listing JSON fixtures for direct images, Reddit galleries, Reddit videos, and Redgifs.
 - Confirm Redgifs iframe playback in Firefox without `redgifs.com` host permission.
 - Verify autoplay behavior for muted and unmuted video clips.
+- Confirm logged-in Firefox background fetches of `old.reddit.com/.../.json?raw_json=1`
+  use the user's existing session without adding OAuth credentials.
+- Confirm Firefox MV3 host permission behavior for `old.reddit.com` in a real
+  profile, including what happens when the user revokes host access.
