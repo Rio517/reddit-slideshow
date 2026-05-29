@@ -25,7 +25,7 @@ Sources:
 
 Reddit listing endpoints use common `after`, `before`, `limit`, `count`, and `show` parameters. Reddit's documentation says listing responses contain `after` and `before` fields equivalent to old site's next/previous controls. This is the likely mechanism for keeping the slideshow queue going past the current page.
 
-Rate limits: free-tier OAuth is **100 queries/min** (≈10-minute averaging window); unauthenticated _API_ requests are rejected. The session-cookie `.json` website path used here is a different surface that works while logged in, but `X-Ratelimit-*` headers are often absent on it, so `403`/`429` must also drive backoff. Always request with `raw_json=1` — without it, `preview` and `media_metadata` URLs come back HTML-entity-encoded (`&amp;`).
+Rate limits: free-tier OAuth is **100 queries/min** (≈10-minute averaging window); unauthenticated _API_ requests are rejected. The session-cookie `.json` website path used here is a different surface that works while logged in, and `X-Ratelimit-*` headers (`remaining`/`used`/`reset`) are present on it, so `403`/`429` backoff can read them. Always request with `raw_json=1` — without it, `preview` and `media_metadata` URLs come back HTML-entity-encoded (`&amp;`).
 
 Source:
 
@@ -37,46 +37,62 @@ Old Reddit listing pages can generally be represented as JSON by requesting the 
 
 Risk: Reddit has changed API and legacy surface behavior over time. The extension should avoid requiring OAuth app credentials for v1 and should be conservative with request volume.
 
-Offline spike result (2026-05-29): the first implementation normalizes listing
-URLs to `.json?raw_json=1`, preserves sort/query parameters, and rejects comment
-permalinks because they return a different JSON shape. Pagination can append
-`after=<fullname>` to the normalized listing URL. This is covered by unit tests
-against `lib/reddit-url.js`; live Firefox/session validation remains open.
+Listing URLs are normalized to `.json?raw_json=1` with sort/query parameters
+preserved; comment permalinks are rejected because they return a different JSON
+shape; pagination appends `after=<fullname>`. This is covered by unit tests
+against `lib/reddit-url.js`.
 
-Implementation spike result (2026-05-29): `lib/reddit-listing.js` now performs
-the listing fetch with `credentials: "include"` and `accept: application/json`,
-returns a small diagnostic summary, and preserves observed rate-limit headers
-when Reddit sends them. The browser action now asks the content script for the
-current page URL, then the background page fetches the normalized JSON URL and
-shows success/failure details in the overlay. This proves the extension code
-path builds, but it still needs manual validation in the user's real Firefox
-profile to prove session-cookie access against Reddit.
+The extension fetches listings with `credentials: "include"` and
+`accept: application/json` (`lib/reddit-listing.js`), reusing the browser's
+existing Reddit login with no OAuth app credentials. The browser action asks the
+content script for the current page URL; the background page fetches the
+normalized JSON URL and renders a diagnostic summary.
 
-## Media Fields To Investigate In Real Fixtures
+Session-cookie access is validated against live Reddit. A logged-in Firefox
+session reaches `old.reddit.com/.../.json?raw_json=1` and returns HTTP 200
+`application/json`, including NSFW (`over_18`) posts that Reddit serves only to a
+logged-in, NSFW-enabled account. Listings return 50 children per page with an
+`after` cursor, and `X-Ratelimit-*` headers (`remaining`/`used`/`reset`) are
+present on the cookie `.json` path, so 403/429 backoff can read them. What still
+needs a manual check is the toolbar-triggered diagnostic in a real Firefox UI;
+the validated request path was driven directly, not through the toolbar.
 
-Likely useful Reddit listing fields:
+## Listing Media Shapes
 
-- `url_overridden_by_dest` for direct outbound/media URLs.
-- `preview` for fallback thumbnails/previews.
-- `gallery_data` for Reddit gallery item order.
-- `media_metadata` for gallery asset metadata.
-- `secure_media.reddit_video.fallback_url` for Reddit-hosted video playback.
-- `is_video`, `post_hint`, `domain`, `permalink`, `title`, and `over_18` for classification and display context.
+These shapes are confirmed against real `raw_json=1` listings captured from a
+logged-in session (front page plus several default subreddits). A census of
+~450 sampled posts found direct images, galleries, Reddit-hosted video, and
+Redgifs all common; crossposts were absent from the sample, so they are rare in
+practice but still handled defensively.
 
-These field names need to be confirmed against saved real-world JSON fixtures during implementation.
+- **Direct image** — `domain: i.redd.it`, `post_hint: "image"`, media in
+  `url_overridden_by_dest` (or `url`); `preview.images[0].source` carries the
+  original `width`/`height`. Normalized with `quality: "original"` for
+  `i.redd.it` and `quality: "preview"` for `preview.redd.it` fallbacks.
+  `sourceWidth`/`sourceHeight` come from `preview.images[0].source` — the
+  best-known source metadata, not proof of the original file dimensions.
+- **Gallery** — `is_gallery: true` (no `post_hint`); `gallery_data.items[]` gives
+  ordered `{ media_id }`, and `media_metadata[media_id]` carries `m` (mime),
+  `s.u` (full-resolution source URL, on `preview.redd.it`, signed with `s=`), and
+  `p[]` (smaller previews). Each item becomes its own slide.
+- **Reddit-hosted video** — `domain: v.redd.it`, `post_hint: "hosted:video"`,
+  `is_video: true`; `secure_media.reddit_video` (mirrored in `media.reddit_video`)
+  carries `fallback_url` (a `CMAF_*.mp4`), `dash_url`, `hls_url`, `duration`,
+  `width`, `height`, `is_gif`, and `has_audio`. Audio availability is therefore
+  known from the data; `fallback_url` is the plain-`<video>` (muted) path, while
+  audio needs DASH/HLS.
+- **Redgifs** — `domain: redgifs.com` (also `v3.redgifs.com`),
+  `post_hint: "rich:video"`, `url`/`url_overridden_by_dest` is
+  `https://www.redgifs.com/watch/<id>`. `secure_media.oembed` carries `width`,
+  `height`, and `thumbnail_url`, so aspect ratio is available from the listing
+  without calling `api.redgifs.com`.
+- **Crosspost** — the outer post carries no own media; the original lives in
+  `crosspost_parent_list[0]`, which is a full post object resolved with the same
+  rules. Display context (permalink/title) comes from the outer post.
 
-Offline spike result (2026-05-29): direct `i.redd.it` image posts can already be
-normalized into slide candidates with `quality: "original"`, while
-`preview.redd.it` image posts are retained as `quality: "preview"` fallbacks.
-The fixture keeps `preview.images[0].source.width/height` as
-`sourceWidth/sourceHeight`, because those dimensions are the best-known source
-metadata and not necessarily proof of the original file dimensions.
-
-Implementation spike result (2026-05-29): direct-image normalization now checks
-`url_overridden_by_dest` first and falls back to `url`, because real Reddit
-listing shapes may use either field for media destinations. Queue-page helpers
-now count posts scanned separately from slides produced, preserving the
-pagination rule needed for sparse media listings.
+Direct-image normalization checks `url_overridden_by_dest` first and falls back
+to `url`. Queue-page helpers count posts scanned separately from slides produced,
+preserving the pagination rule needed for sparse media listings.
 
 ## Reddit Enhancement Suite
 
@@ -88,7 +104,7 @@ Source:
 
 ## Redgifs
 
-Redgifs is a first-class provider. The current hypothesis is to embed it inline via the Redgifs first-party iframe (`https://www.redgifs.com/ifr/<id>`). The iframe is served by Redgifs, so its inner video should behave as Redgifs' own player rather than as a hotlinked direct `.mp4`. Because an iframe does not expose a native `<video>` `ended` event to the extension, Redgifs slides would advance on a duration timer. This still needs a live Firefox validation spike before being treated as settled. Unresolvable or removed posts fall back to a slide with title/source context and an open-original action.
+Redgifs is a first-class provider, and a large share of real feeds: it was the single most common media domain on the sampled NSFW front page. The approach is to embed it inline via the Redgifs first-party iframe (`https://www.redgifs.com/ifr/<id>`), parsing `<id>` from the `redgifs.com/watch/<id>` post URL. The iframe is served by Redgifs, so its inner video behaves as Redgifs' own player rather than as a hotlinked direct `.mp4`. Aspect ratio comes free from `secure_media.oembed.width`/`height` in the listing, so no `api.redgifs.com` call is needed. Because an iframe does not expose a native `<video>` `ended` event to the extension, Redgifs slides advance on a duration timer. Iframe playback inside the extension overlay in Firefox (and that it needs no `redgifs.com` host permission) still needs a live validation spike. Unresolvable or removed posts fall back to a slide with title/source context and an open-original action.
 
 ## Current Research Conclusions
 
@@ -101,12 +117,10 @@ Redgifs is a first-class provider. The current hypothesis is to embed it inline 
 ## Open Research Tasks
 
 - Capture real old Reddit listing JSON fixtures for direct images, Reddit galleries, Reddit videos, and Redgifs.
-- Validate the in-extension listing diagnostic in the user's real Firefox
-  profile and record whether the website `.json` path returns account/session
-  content without OAuth credentials.
+- Validate the in-extension listing diagnostic from the Firefox toolbar in the
+  user's real Firefox profile. The cookie-backed `.json` request itself has now
+  been validated; this remaining check is browser-action/UI integration.
 - Confirm Redgifs iframe playback in Firefox without `redgifs.com` host permission.
 - Verify autoplay behavior for muted and unmuted video clips.
-- Confirm logged-in Firefox background fetches of `old.reddit.com/.../.json?raw_json=1`
-  use the user's existing session without adding OAuth credentials.
 - Confirm Firefox MV3 host permission behavior for `old.reddit.com` in a real
   profile, including what happens when the user revokes host access.

@@ -1,10 +1,10 @@
 # NEXT_STEP — Reddit Slideshow
 
-**Doc updated:** 2026-05-29 · **Branch:** `main` · **Status:** live-fetch diagnostic path and queue core are built; real Firefox validation and real fixtures are next.
+**Doc updated:** 2026-05-29 · **Branch:** `main` · **Status:** session-cookie Reddit JSON access is validated; extension UI diagnostic and real fixtures are next.
 
 > **Hard rule:** work directly on `main`. Do not create branches or worktrees unless the user explicitly asks. See `AGENTS.md`.
 
-This project is a Firefox-first WebExtension for turning the current `old.reddit.com` feed into a media slideshow. The foundation scaffold is in place, and the first queue/fetch core exists: the browser action can trigger a background listing JSON fetch diagnostic, direct images normalize from `url_overridden_by_dest` or `url`, and queue pagination decisions are tested. The next move is to validate the diagnostic in the user's real Firefox profile and capture sanitized real fixtures.
+This project is a Firefox-first WebExtension for turning the current `old.reddit.com` feed into a media slideshow. The foundation scaffold is in place, and the first queue/fetch core exists: the browser action can trigger a background listing JSON fetch diagnostic, direct images normalize from `url_overridden_by_dest` or `url`, and queue pagination decisions are tested. A local diagnostic using the user's Firefox Reddit cookies confirmed that `old.reddit.com/.json?raw_json=1` returns logged-in JSON, including NSFW-enabled account state. The next move is to validate the installed extension's toolbar-triggered diagnostic and capture sanitized real fixtures.
 
 ---
 
@@ -25,7 +25,7 @@ Key decisions already made:
 - Keep v1 old-Reddit-only: `old.reddit.com`.
 - Use offline fixtures for unit tests instead of live Reddit.
 - Use provider adapters later for Reddit images, galleries, videos, and Redgifs.
-- Treat Redgifs iframe playback and Reddit session-cookie `.json` pagination as validation spikes until checked in the user's real Firefox profile.
+- Treat Redgifs iframe playback as a validation spike. Reddit session-cookie `.json` access is validated at the request layer, but the toolbar-triggered extension diagnostic still needs UI validation.
 
 ---
 
@@ -33,8 +33,8 @@ Key decisions already made:
 
 The foundation scaffold is complete, and the first queue/fetch core has landed (`lib/reddit-listing.js`, `lib/queue.js`, `lib/reddit-url.js`, `lib/slides.js`, `lib/settings.js`, WXT/MV3 entrypoints, offline fixtures). The next work, in order:
 
-1. **Run the live Firefox `.json` diagnostic.** Build/run the extension in the user's real Firefox environment, open an `old.reddit.com` listing, click the browser action, and confirm the overlay reports listing JSON success using the existing logged-in session. Record status codes, child counts, whether `X-Ratelimit-*` headers appear, and any auth/rate-limit failures.
-2. **Capture real sanitized fixtures and harden providers.** Save small sanitized JSON for direct images, galleries, Reddit video, crossposts, and Redgifs. Direct images already handle both `url_overridden_by_dest` and `url`; galleries/video/crossposts/Redgifs still need resolver tests.
+1. **Run the toolbar-triggered Firefox diagnostic.** Build/run the extension in the user's real Firefox environment, open an `old.reddit.com` listing, click the browser action, and confirm the overlay reports listing JSON success. The same request path has already returned HTTP 200 JSON with the user's NSFW-enabled account cookies; this step proves UI/extension wiring.
+2. **Capture real sanitized fixtures and harden providers.** Save small sanitized JSON for direct images, galleries, Reddit video, crossposts, and Redgifs. Direct images already handle both `url_overridden_by_dest` and `url`; the live front-page sample included image, gallery, and Redgifs shapes but did not include Reddit video/crosspost shapes.
 3. **Connect queue builder to the slideshow flow.** `buildQueuePage()` and `shouldFetchNextPage()` are tested, but the content/background flow still only shows diagnostics. The next implementation slice should request a first queue page, return normalized slides, and render the first real image in the overlay.
 4. Continue down the V1 backlog (§6): overlay shell, keyboard navigation, timer, video, Redgifs, settings polish, RES coexistence.
 
@@ -168,7 +168,7 @@ Do these after the foundation scaffold exists:
 
 V1 path (foundation + first queue/fetch core complete; remaining):
 
-1. Real Firefox `.json` diagnostic validation and real captured fixtures.
+1. Toolbar-triggered Firefox diagnostic validation and real captured fixtures.
 2. First queue page wired into the extension flow.
 3. Direct image rendering in the overlay.
 4. Gallery support.
