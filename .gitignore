@@ -1,1 +1,8 @@
 .superpowers/
+node_modules/
+.output/
+.wxt/
+dist/
+stats.html
+coverage/
+web-ext-artifacts/

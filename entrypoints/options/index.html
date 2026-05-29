@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reddit Slideshow Options</title>
+  </head>
+  <body>
+    <main>
+      <h1>Reddit Slideshow</h1>
+      <label>
+        Image timer
+        <select id="imageTimerSeconds">
+          <option value="3">3 seconds</option>
+          <option value="5">5 seconds</option>
+          <option value="10">10 seconds</option>
+        </select>
+      </label>
+      <label>
+        <input id="startMuted" type="checkbox" />
+        Start videos muted
+      </label>
+      <label>
+        <input id="autoplay" type="checkbox" />
+        Autoplay slideshow
+      </label>
+    </main>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

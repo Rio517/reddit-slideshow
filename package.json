@@ -1,0 +1,30 @@
+{
+  "name": "reddit-slideshow",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Firefox-first old Reddit media slideshow extension.",
+  "scripts": {
+    "postinstall": "wxt prepare",
+    "dev": "wxt -b firefox --mv3",
+    "build": "wxt build -b firefox --mv3",
+    "zip": "wxt zip -b firefox --mv3",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --check .",
+    "webext:lint": "web-ext lint --source-dir .output/firefox-mv3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "eslint-plugin-no-unsanitized": "^4.1.0",
+    "happy-dom": "^15.0.0",
+    "prettier": "^3.3.0",
+    "typescript": "^5.5.0",
+    "vitest": "^3.2.0",
+    "web-ext": "^10.0.0",
+    "wxt": "^0.20.0"
+  }
+}
