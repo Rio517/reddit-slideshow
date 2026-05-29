@@ -1,0 +1,71 @@
+{
+  "kind": "Listing",
+  "data": {
+    "after": "t3_video_after",
+    "before": null,
+    "children": [
+      {
+        "kind": "t3",
+        "data": {
+          "name": "t3_vid1",
+          "title": "Short clip with sound",
+          "permalink": "/r/example/comments/vid1/short_clip_with_sound/",
+          "domain": "v.redd.it",
+          "post_hint": "hosted:video",
+          "is_video": true,
+          "over_18": false,
+          "url": "https://v.redd.it/vidfake1",
+          "media": {
+            "reddit_video": {
+              "fallback_url": "https://v.redd.it/vidfake1/CMAF_720.mp4?source=fallback",
+              "dash_url": "https://v.redd.it/vidfake1/DASHPlaylist.mpd?a=000&v=1&f=sd",
+              "hls_url": "https://v.redd.it/vidfake1/HLSPlaylist.m3u8?a=000&v=1&f=sd",
+              "duration": 14,
+              "width": 720,
+              "height": 1280,
+              "is_gif": false,
+              "has_audio": true
+            }
+          },
+          "secure_media": {
+            "reddit_video": {
+              "fallback_url": "https://v.redd.it/vidfake1/CMAF_720.mp4?source=fallback",
+              "dash_url": "https://v.redd.it/vidfake1/DASHPlaylist.mpd?a=000&v=1&f=sd",
+              "hls_url": "https://v.redd.it/vidfake1/HLSPlaylist.m3u8?a=000&v=1&f=sd",
+              "duration": 14,
+              "width": 720,
+              "height": 1280,
+              "is_gif": false,
+              "has_audio": true
+            }
+          }
+        }
+      },
+      {
+        "kind": "t3",
+        "data": {
+          "name": "t3_vid2",
+          "title": "Silent looping gif",
+          "permalink": "/r/example/comments/vid2/silent_looping_gif/",
+          "domain": "v.redd.it",
+          "post_hint": "hosted:video",
+          "is_video": true,
+          "over_18": false,
+          "url": "https://v.redd.it/vidfake2",
+          "secure_media": {
+            "reddit_video": {
+              "fallback_url": "https://v.redd.it/vidfake2/CMAF_480.mp4?source=fallback",
+              "dash_url": "https://v.redd.it/vidfake2/DASHPlaylist.mpd?a=000&v=1&f=sd",
+              "hls_url": "https://v.redd.it/vidfake2/HLSPlaylist.m3u8?a=000&v=1&f=sd",
+              "duration": 6,
+              "width": 480,
+              "height": 480,
+              "is_gif": true,
+              "has_audio": false
+            }
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "kind": "Listing",
+  "data": {
+    "after": "t3_redgifs_after",
+    "before": null,
+    "children": [
+      {
+        "kind": "t3",
+        "data": {
+          "name": "t3_rg1",
+          "title": "Redgifs clip",
+          "permalink": "/r/example/comments/rg1/redgifs_clip/",
+          "domain": "redgifs.com",
+          "post_hint": "rich:video",
+          "is_video": false,
+          "over_18": true,
+          "url": "https://www.redgifs.com/watch/fakeslugword",
+          "url_overridden_by_dest": "https://www.redgifs.com/watch/fakeslugword",
+          "secure_media": {
+            "type": "redgifs.com",
+            "oembed": {
+              "provider_name": "RedGIFs",
+              "provider_url": "https://www.redgifs.com",
+              "type": "video",
+              "width": 1080,
+              "height": 1920,
+              "thumbnail_url": "https://example.com/thumb.jpg"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

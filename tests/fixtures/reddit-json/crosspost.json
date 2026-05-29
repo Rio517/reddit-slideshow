@@ -1,0 +1,45 @@
+{
+  "kind": "Listing",
+  "data": {
+    "after": "t3_crosspost_after",
+    "before": null,
+    "children": [
+      {
+        "kind": "t3",
+        "data": {
+          "name": "t3_xp1",
+          "title": "Crossposted clip seen by the user",
+          "permalink": "/r/example/comments/xp1/crossposted_clip/",
+          "domain": "v.redd.it",
+          "is_video": true,
+          "over_18": false,
+          "url": "https://v.redd.it/parentfake1",
+          "crosspost_parent_list": [
+            {
+              "name": "t3_parent1",
+              "title": "Original post in another subreddit",
+              "permalink": "/r/origin/comments/parent1/original_post/",
+              "domain": "v.redd.it",
+              "post_hint": "hosted:video",
+              "is_video": true,
+              "over_18": false,
+              "url": "https://v.redd.it/parentfake1",
+              "secure_media": {
+                "reddit_video": {
+                  "fallback_url": "https://v.redd.it/parentfake1/CMAF_720.mp4?source=fallback",
+                  "dash_url": "https://v.redd.it/parentfake1/DASHPlaylist.mpd?a=000&v=1&f=sd",
+                  "hls_url": "https://v.redd.it/parentfake1/HLSPlaylist.m3u8?a=000&v=1&f=sd",
+                  "duration": 20,
+                  "width": 1080,
+                  "height": 1920,
+                  "is_gif": false,
+                  "has_audio": true
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

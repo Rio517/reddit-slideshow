@@ -1,0 +1,60 @@
+{
+  "kind": "Listing",
+  "data": {
+    "after": "t3_gallery_after",
+    "before": null,
+    "children": [
+      {
+        "kind": "t3",
+        "data": {
+          "name": "t3_gal1",
+          "title": "Three photo set",
+          "permalink": "/r/example/comments/gal1/three_photo_set/",
+          "domain": "old.reddit.com",
+          "is_gallery": true,
+          "over_18": false,
+          "gallery_data": {
+            "items": [
+              { "media_id": "aaa111", "id": 1 },
+              { "media_id": "bbb222", "id": 2 },
+              { "media_id": "ccc333", "id": 3 },
+              { "media_id": "ddd444", "is_deleted": true, "id": 4 }
+            ]
+          },
+          "media_metadata": {
+            "bbb222": {
+              "status": "valid",
+              "e": "Image",
+              "m": "image/png",
+              "s": {
+                "x": 1920,
+                "y": 1080,
+                "u": "https://preview.redd.it/bbb222.png?width=1920&format=png&auto=webp&s=fakesig2"
+              }
+            },
+            "aaa111": {
+              "status": "valid",
+              "e": "Image",
+              "m": "image/jpg",
+              "s": {
+                "x": 4000,
+                "y": 3000,
+                "u": "https://preview.redd.it/aaa111.jpg?width=4000&format=pjpg&auto=webp&s=fakesig1"
+              }
+            },
+            "ccc333": {
+              "status": "valid",
+              "e": "Image",
+              "m": "image/jpg",
+              "s": {
+                "x": 2000,
+                "y": 2000,
+                "u": "https://preview.redd.it/ccc333.jpg?width=2000&format=pjpg&auto=webp&s=fakesig3"
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}
