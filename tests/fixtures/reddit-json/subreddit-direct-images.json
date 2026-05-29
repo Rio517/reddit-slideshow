@@ -1,0 +1,59 @@
+{
+  "kind": "Listing",
+  "data": {
+    "after": "t3_beta",
+    "before": null,
+    "children": [
+      {
+        "kind": "t3",
+        "data": {
+          "id": "alpha",
+          "name": "t3_alpha",
+          "title": "Ultra high resolution landscape",
+          "permalink": "/r/example/comments/alpha/ultra_high_resolution_landscape/",
+          "url_overridden_by_dest": "https://i.redd.it/alpha.jpg",
+          "domain": "i.redd.it",
+          "post_hint": "image",
+          "is_video": false,
+          "over_18": false,
+          "preview": {
+            "images": [
+              {
+                "source": {
+                  "url": "https://preview.redd.it/alpha.jpg?auto=webp&s=fake",
+                  "width": 7680,
+                  "height": 4320
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "kind": "t3",
+        "data": {
+          "id": "gamma",
+          "name": "t3_gamma",
+          "title": "Preview only fallback",
+          "permalink": "/r/example/comments/gamma/preview_only_fallback/",
+          "url_overridden_by_dest": "https://preview.redd.it/gamma.jpg?width=1080&crop=smart&auto=webp&s=fake",
+          "domain": "preview.redd.it",
+          "post_hint": "image",
+          "is_video": false,
+          "over_18": false,
+          "preview": {
+            "images": [
+              {
+                "source": {
+                  "url": "https://preview.redd.it/gamma.jpg?auto=webp&s=fake",
+                  "width": 1600,
+                  "height": 900
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
