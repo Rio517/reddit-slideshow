@@ -47,6 +47,16 @@ describe("normalizeSettings", () => {
     expect(normalizeSettings({}).dedupe).toBe(true);
     expect(normalizeSettings({ dedupe: false }).dedupe).toBe(false);
   });
+
+  it("defaults maxLoadWaitSeconds to 5 and only accepts preset values", () => {
+    expect(normalizeSettings({}).maxLoadWaitSeconds).toBe(5);
+    expect(
+      normalizeSettings({ maxLoadWaitSeconds: 20 }).maxLoadWaitSeconds,
+    ).toBe(20);
+    expect(
+      normalizeSettings({ maxLoadWaitSeconds: 7 }).maxLoadWaitSeconds,
+    ).toBe(5);
+  });
 });
 
 describe("getSettings / saveSettings", () => {
@@ -65,6 +75,7 @@ describe("getSettings / saveSettings", () => {
       startMuted: false,
       includeNsfw: false,
       dedupe: false,
+      maxLoadWaitSeconds: 10,
     });
     expect(await getSettings()).toEqual({
       imageTimerSeconds: 12,
@@ -72,6 +83,7 @@ describe("getSettings / saveSettings", () => {
       autoplay: false,
       includeNsfw: false,
       dedupe: false,
+      maxLoadWaitSeconds: 10,
     });
   });
 

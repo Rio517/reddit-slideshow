@@ -161,6 +161,7 @@ export default defineContentScript({
           ui.renderCurrent(slide, {
             ...position,
             effectiveSeconds: effectiveSeconds(slide, controller),
+            loadWaitMs: settings.maxLoadWaitSeconds * 1000,
             playing: !controller.paused,
           });
           preloadUpcoming();
