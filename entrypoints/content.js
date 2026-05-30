@@ -1,7 +1,7 @@
 import "@/assets/overlay.css";
 import { createOverlay } from "@/lib/overlay-ui.js";
 import { SlideshowController } from "@/lib/slideshow.js";
-import { getSettings } from "@/lib/settings.js";
+import { getSettings, saveSettings } from "@/lib/settings.js";
 import { afterCursorForViewport } from "@/lib/page-cursor.js";
 import { DuplicateTracker } from "@/lib/dedup.js";
 
@@ -14,6 +14,7 @@ export default defineContentScript({
     /** @type {SlideshowController | null} */
     let controller = null;
     let starting = false;
+    let muted = true;
 
     function ensureOverlay() {
       if (overlay) return overlay;
@@ -28,6 +29,7 @@ export default defineContentScript({
         },
         onMediaEnded: () => controller?.mediaEnded(),
         onMediaReady: () => controller?.markReady(),
+        onToggleMute: toggleMute,
       });
       document.documentElement.append(overlay.root);
       return overlay;
@@ -37,6 +39,12 @@ export default defineContentScript({
       if (!controller || !overlay) return;
       controller.togglePause();
       overlay.setPlaying(!controller.paused);
+    }
+
+    function toggleMute() {
+      muted = !muted;
+      overlay?.setMuted(muted);
+      saveSettings({ startMuted: muted });
     }
 
     let savedOverflow = "";
@@ -119,6 +127,8 @@ export default defineContentScript({
       ui.showStatus("Loading slideshow…");
 
       const settings = await getSettings();
+      muted = settings.startMuted;
+      ui.setMuted(muted);
       const response = await requestPage(startingAfter());
       if (!response?.ok) {
         ui.showStatus(
@@ -168,7 +178,14 @@ export default defineContentScript({
       starting = false;
     }
 
-    const HANDLED_KEYS = new Set(["ArrowLeft", "ArrowRight", " ", "Escape"]);
+    const HANDLED_KEYS = new Set([
+      "ArrowLeft",
+      "ArrowRight",
+      " ",
+      "Escape",
+      "m",
+      "M",
+    ]);
     document.addEventListener(
       "keydown",
       (event) => {
@@ -186,6 +203,10 @@ export default defineContentScript({
             break;
           case " ":
             togglePlay();
+            break;
+          case "m":
+          case "M":
+            toggleMute();
             break;
           case "Escape":
             closeOverlay();

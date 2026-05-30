@@ -238,11 +238,11 @@ iframe.reddit-slideshow-media {
   display: block;
 }
 
-.rs-icon--fill path {
+.rs-icon path {
   fill: currentColor;
 }
 
-.rs-icon--stroke path {
+.rs-icon path.rs-stroke {
   fill: none;
   stroke: currentColor;
   stroke-width: 2;

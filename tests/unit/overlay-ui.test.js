@@ -36,6 +36,7 @@ function noopHandlers() {
     onOpenOriginal() {},
     onMediaEnded() {},
     onMediaReady() {},
+    onToggleMute() {},
   };
 }
 
@@ -54,11 +55,11 @@ describe("createOverlay", () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
 
-  it("builds the chrome with five controls, hidden by default", () => {
+  it("builds the chrome with six controls, hidden by default", () => {
     const overlay = createOverlay(noopHandlers());
     expect(overlay.root.querySelector(".rs-stage")).toBeTruthy();
     expect(overlay.root.querySelector(".rs-timer")).toBeTruthy();
-    expect(overlay.root.querySelectorAll(".rs-btn").length).toBe(5);
+    expect(overlay.root.querySelectorAll(".rs-btn").length).toBe(6);
     expect(overlay.isOpen()).toBe(false);
   });
 
@@ -112,6 +113,7 @@ describe("createOverlay", () => {
       onOpenOriginal: () => calls.push("open"),
       onMediaEnded: () => {},
       onMediaReady: () => {},
+      onToggleMute: () => calls.push("mute"),
     });
     overlay.renderCurrent(imageSlide(), {
       index: 0,
@@ -123,8 +125,9 @@ describe("createOverlay", () => {
     clickByLabel(overlay.root, "Next");
     clickByLabel(overlay.root, "Previous");
     clickByLabel(overlay.root, "Open");
+    clickByLabel(overlay.root, "Mute");
     clickByLabel(overlay.root, "Close");
-    expect(calls).toEqual(["next", "prev", "open", "close"]);
+    expect(calls).toEqual(["next", "prev", "open", "mute", "close"]);
   });
 
   it("renders a status message", () => {
