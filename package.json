@@ -7,8 +7,12 @@
   "scripts": {
     "postinstall": "wxt prepare",
     "dev": "wxt -b firefox --mv3",
+    "dev:chrome": "wxt -b chrome",
     "build": "wxt build -b firefox --mv3",
+    "build:chrome": "wxt build -b chrome",
     "zip": "wxt zip -b firefox --mv3",
+    "zip:chrome": "wxt zip -b chrome",
+    "icons": "for s in 16 32 48 96 128; do rsvg-convert -w $s -h $s public/icon.svg -o public/icon/$s.png; done",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",

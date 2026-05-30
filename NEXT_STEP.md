@@ -35,9 +35,10 @@ v1 is feature-complete, including mute/audio, duplicate detection (both layers),
 and the self-audit fixes. Remaining work needs a human or is optional:
 
 1. **Real-Firefox verification (needs a human).** Reload the built add-on and check: the side-rail controls/icons, custom-timer slider + max-load-wait, Include-NSFW filter, autoplay-off, start-from-scroll-position, the loading spinner, the toolbar icon, Redgifs playback **under the new iframe `sandbox`**, **audio on unmute** for a v.redd.it clip, and — after enabling "Also detect re-uploaded images" — that **Layer 2 dedup** actually skips a repost (the `createImageBitmap`/`OffscreenCanvas` + privileged-fetch chain).
-2. **New Reddit check (needs a human).** On a logged-in `www.reddit.com/r/<sub>/` listing, launch the slideshow and confirm images / v.redd.it / Redgifs render under the www CSP, nav/pagination work, and "open original" stays on www. If media is blocked, capture the CSP directive (ADR 0008's iframe fallback). Optional follow-up: the shreddit start-from-viewport cursor (Task 4 in the new-Reddit plan).
-3. **Full HLS/DASH audio** — only if the unmute check shows many clips are silent (muxed-fallback assumption wrong).
-4. **Packaging:** `npm run zip` + AMO signing/listing when ready.
+2. **New Reddit check (needs a human).** On a logged-in `www.reddit.com/r/<sub>/` listing, launch the slideshow and confirm images / v.redd.it / Redgifs render under the www CSP, nav/pagination work, start-from-scroll lands on the right post (shreddit cursor), and "open original" stays on www. If media is blocked, capture the CSP directive (ADR 0008's iframe fallback).
+3. **Chrome smoke test (needs a human).** `npm run build:chrome`, load `.output/chrome-mv3/` unpacked in Chrome, and confirm the service-worker background round-trips (listing fetch, Layer 2 image fetch) and the slideshow works on old + www Reddit.
+4. **Full HLS/DASH audio** — only if the unmute check shows many clips are silent (muxed-fallback assumption wrong).
+5. **Packaging:** `npm run zip` (Firefox/AMO) and `npm run zip:chrome` (Chrome Web Store) when ready.
 
 The content↔overlay↔background glue now lives in `lib/session.js` (injected deps),
 covered by `tests/unit/session.test.js`.

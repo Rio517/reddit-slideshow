@@ -53,13 +53,19 @@ Then in Firefox:
 ```sh
 npm run dev          # WXT dev runner (fresh Firefox profile — not logged in)
 npm run build        # Firefox MV3 build → .output/firefox-mv3/
-npm run zip          # packaged zip for distribution
+npm run build:chrome # Chrome MV3 build → .output/chrome-mv3/
+npm run zip          # packaged zip (Firefox / AMO)
+npm run zip:chrome   # packaged zip (Chrome Web Store)
+npm run icons        # regenerate PNG icons from public/icon.svg (needs rsvg-convert)
 npm test             # Vitest unit tests
 npm run typecheck    # tsc --noEmit over JSDoc-typed JS
 npm run lint         # ESLint (incl. unsafe-DOM checks)
 npm run format       # Prettier check
-npm run webext:lint  # Mozilla addons-linter on the built output
+npm run webext:lint  # Mozilla addons-linter on the built (Firefox) output
 ```
+
+The same source builds both browsers; WXT emits a Chrome `service_worker`
+background and a Firefox event page from one `defineBackground`.
 
 `npm run dev` launches a clean Firefox profile that is **not** logged into
 Reddit, so prefer the temporary-add-on flow above for real testing.

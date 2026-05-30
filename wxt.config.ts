@@ -2,9 +2,9 @@ import { defineConfig } from "wxt";
 
 export default defineConfig({
   manifestVersion: 3,
-  manifest: {
+  manifest: ({ browser }) => ({
     name: "Reddit Slideshow",
-    description: "Turn old Reddit listings into a media slideshow.",
+    description: "Turn Reddit listings into a media slideshow.",
     permissions: ["storage"],
     host_permissions: [
       "https://old.reddit.com/*",
@@ -18,16 +18,23 @@ export default defineConfig({
       "https://preview.redd.it/*",
       "https://external-preview.redd.it/*",
     ],
+    // PNG (not SVG) so the same icons work on Chrome, which rejects SVG icons.
+    // Regenerate from public/icon.svg with: npm run icons
     icons: {
-      16: "icon.svg",
-      32: "icon.svg",
-      48: "icon.svg",
-      96: "icon.svg",
-      128: "icon.svg",
+      16: "icon/16.png",
+      32: "icon/32.png",
+      48: "icon/48.png",
+      96: "icon/96.png",
+      128: "icon/128.png",
     },
     action: {
       default_title: "Start Reddit Slideshow",
-      default_icon: "icon.svg",
+      default_icon: {
+        16: "icon/16.png",
+        32: "icon/32.png",
+        48: "icon/48.png",
+        128: "icon/128.png",
+      },
     },
     commands: {
       _execute_action: {
@@ -35,13 +42,19 @@ export default defineConfig({
         description: "Start Reddit Slideshow",
       },
     },
-    browser_specific_settings: {
-      gecko: {
-        id: "reddit-slideshow@knyflores.com",
-        data_collection_permissions: {
-          required: ["none"],
-        },
-      },
-    },
-  },
+    // Firefox-only: gecko id + data-collection declaration. Omitted on Chrome,
+    // which would warn on an unrecognized key.
+    ...(browser === "firefox"
+      ? {
+          browser_specific_settings: {
+            gecko: {
+              id: "reddit-slideshow@knyflores.com",
+              data_collection_permissions: {
+                required: ["none"],
+              },
+            },
+          },
+        }
+      : {}),
+  }),
 });

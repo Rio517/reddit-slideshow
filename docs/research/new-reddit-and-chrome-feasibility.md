@@ -101,20 +101,25 @@ via WXT, a fetch-based background, no Firefox-only runtime APIs).
   with `host_permissions` sends the user's Reddit cookies, same as Firefox.
 - **Distribution:** Chrome Web Store (separate listing/review from AMO).
 
-### Work to support Chrome
+### Chrome target — implemented
 
-- Add PNG icons and a `chrome` build target.
-- Smoke-test the service-worker background (message round-trips, the listing
-  fetch, the Layer 2 image fetch).
-- Note: old Reddit works in Chrome too, so a Chrome build can target
-  `old.reddit.com` with no new-Reddit work required.
+- PNG icons are generated from `public/icon.svg` (`npm run icons`, via
+  `rsvg-convert`) into `public/icon/{16,32,48,96,128}.png`, and the manifest
+  references the PNGs for both browsers.
+- A `chrome` build target exists (`npm run build:chrome` / `zip:chrome`). WXT
+  emits the correct per-browser manifest: Chrome gets a `service_worker`
+  background and no `browser_specific_settings`; Firefox keeps the event page +
+  gecko id (the gecko block is conditional on `browser === "firefox"`).
+- Remaining: smoke-test the service-worker background in real Chrome (message
+  round-trips, the listing fetch, the Layer 2 image fetch) and submit to the
+  Chrome Web Store.
 
 ## Verdict
 
-- **New Reddit:** feasible, and implemented per ADR 0008 — the content script
-  runs on `www.reddit.com`, fetches its own `.json`, and resolves permalinks
-  against the page origin (no old-Reddit dependency). The remaining real work is
-  overlay/keyboard validation under the shreddit SPA and the (Reddit-controlled)
-  CSP in a real logged-in session, plus the optional shreddit start cursor.
-- **Chrome:** feasible with modest work — PNG icons, a `chrome` target, and
-  service-worker smoke testing. Nothing in the architecture blocks it.
+- **New Reddit:** implemented per ADR 0008 — the content script runs on
+  `www.reddit.com`, fetches its own `.json`, resolves permalinks against the page
+  origin (no old-Reddit dependency), and the start cursor reads `shreddit-post`
+  ids. The remaining real work is overlay/keyboard validation under the shreddit
+  SPA and the (Reddit-controlled) CSP in a real logged-in session.
+- **Chrome:** the build target is in place (PNG icons, per-browser manifest).
+  The remaining work is a real-Chrome smoke test and a Web Store listing.
