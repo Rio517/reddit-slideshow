@@ -20,7 +20,6 @@ export default [
         window: "readonly",
         Image: "readonly",
         Event: "readonly",
-        BigInt: "readonly",
         AbortController: "readonly",
         setTimeout: "readonly",
         clearTimeout: "readonly",
