@@ -59,10 +59,19 @@ New Reddit renders posts as `shreddit-post` web components inside a
 `shreddit-feed`, not `old`'s `div.thing[data-fullname]`, and some content lives
 in shadow DOM. Verified against a live page: each `shreddit-post` element's `id`
 **is** the post fullname (e.g. `id="t3_1ts5tg7"`). So the "start from the post
-nearest the viewport" cursor reads `shreddit-post[id^="t3_"]` on new Reddit and
-`div.thing[data-fullname]` (excluding promoted) on old Reddit
-(`lib/reddit-dom.js`). RES is old-Reddit-only, so the RES coexistence concern
-does not apply on new Reddit (other extensions and Reddit's own SPA still do).
+nearest the viewport" cursor reads `shreddit-post[id^="t3_"]:not([promoted])` on
+new Reddit and `div.thing[data-fullname]` (excluding promoted) on old Reddit
+(`lib/reddit-dom.js`).
+
+Ads are excluded automatically: verified against `r/all`, promoted posts render
+as a **distinct `shreddit-ad-post` element** (carrying its own `promoted`
+attribute and a `t3_` id), which the `shreddit-post` selector never matches.
+Organic `shreddit-post` elements carry no `promoted` attribute; the
+`:not([promoted])` guard is belt-and-suspenders against Reddit ever marking a
+`shreddit-post` itself as promoted.
+
+RES is old-Reddit-only, so the RES coexistence concern does not apply on new
+Reddit (other extensions and Reddit's own SPA still do).
 
 ## Implemented
 

@@ -24,6 +24,17 @@ describe("listingPostElements + postFullname", () => {
     expect(fullnames(document)).toEqual(["t3_a", "t3_b"]);
   });
 
+  it("excludes new Reddit ads (shreddit-ad-post and promoted shreddit-post)", () => {
+    // Ads render as a distinct shreddit-ad-post element; the :not([promoted])
+    // guard also drops any shreddit-post that is ever marked promoted.
+    document.body.innerHTML = `
+      <shreddit-post id="t3_a"></shreddit-post>
+      <shreddit-ad-post id="t3_ad1" promoted></shreddit-ad-post>
+      <shreddit-post id="t3_ad2" promoted></shreddit-post>
+      <shreddit-post id="t3_b"></shreddit-post>`;
+    expect(fullnames(document)).toEqual(["t3_a", "t3_b"]);
+  });
+
   it("prefers old Reddit posts when both exist (old-Reddit page)", () => {
     document.body.innerHTML = `
       <div class="thing link" data-fullname="t3_old"></div>

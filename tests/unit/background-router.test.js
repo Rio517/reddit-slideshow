@@ -154,6 +154,22 @@ describe("createMessageRouter — fetchImage", () => {
     expect(called).toBe(false);
   });
 
+  it("rejects a cleartext http URL on an allowlisted host", async () => {
+    let called = false;
+    const router = makeRouter({
+      fetchImageBytes: async () => {
+        called = true;
+        return new ArrayBuffer(8);
+      },
+    });
+    const result = await router(
+      { type: "slideshow.fetchImage", payload: { url: "http://i.redd.it/a.jpg" } },
+      OWN,
+    );
+    expect(result).toEqual({ ok: false });
+    expect(called).toBe(false);
+  });
+
   it("rejects a missing url", async () => {
     const router = makeRouter();
     expect(
