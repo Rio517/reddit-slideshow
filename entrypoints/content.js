@@ -36,10 +36,20 @@ export default defineContentScript({
       overlay.setPlaying(!controller.paused);
     }
 
+    let savedOverflow = "";
+    function lockScroll() {
+      savedOverflow = document.documentElement.style.overflow;
+      document.documentElement.style.overflow = "hidden";
+    }
+    function unlockScroll() {
+      document.documentElement.style.overflow = savedOverflow;
+    }
+
     function closeOverlay() {
       controller?.destroy();
       controller = null;
       overlay?.hide();
+      unlockScroll();
     }
 
     // Warm the browser cache for the next slides so transitions do not stutter.
@@ -85,8 +95,10 @@ export default defineContentScript({
     async function startSlideshow() {
       if (starting) return;
       starting = true;
+      const wasOpen = overlay?.isOpen() ?? false;
       const ui = ensureOverlay();
       ui.show();
+      if (!wasOpen) lockScroll();
       ui.showStatus("Loading slideshow…");
 
       const settings = await getSettings();
@@ -128,27 +140,32 @@ export default defineContentScript({
       starting = false;
     }
 
-    document.addEventListener("keydown", (event) => {
-      if (!overlay?.isOpen()) return;
-      switch (event.key) {
-        case "ArrowLeft":
-          event.preventDefault();
-          controller?.prev();
-          break;
-        case "ArrowRight":
-          event.preventDefault();
-          controller?.next();
-          break;
-        case " ":
-          event.preventDefault();
-          togglePlay();
-          break;
-        case "Escape":
-          event.preventDefault();
-          closeOverlay();
-          break;
-      }
-    });
+    const HANDLED_KEYS = new Set(["ArrowLeft", "ArrowRight", " ", "Escape"]);
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        if (!overlay?.isOpen() || !HANDLED_KEYS.has(event.key)) return;
+        // Capture phase + stopImmediatePropagation so RES and old Reddit do not
+        // also act on these keys while the slideshow is open.
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        switch (event.key) {
+          case "ArrowLeft":
+            controller?.prev();
+            break;
+          case "ArrowRight":
+            controller?.next();
+            break;
+          case " ":
+            togglePlay();
+            break;
+          case "Escape":
+            closeOverlay();
+            break;
+        }
+      },
+      true,
+    );
 
     browser.runtime.onMessage.addListener((/** @type {any} */ message) => {
       if (message?.type !== "slideshow.startRequested") return undefined;
