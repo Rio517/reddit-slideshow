@@ -95,7 +95,9 @@
   max-width: 100vw;
   max-height: 100vh;
   object-fit: contain;
-  filter: drop-shadow(0 24px 60px rgba(0, 0, 0, 0.55));
+  /* box-shadow keeps GPU compositing; a drop-shadow filter would force a
+     software rasterization pass, costly for 4K images and every video frame. */
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
 }
 
 img.reddit-slideshow-media,
@@ -103,12 +105,6 @@ video.reddit-slideshow-media {
   width: auto;
   height: auto;
   border-radius: 4px;
-}
-
-/* box-shadow keeps GPU compositing; a drop-shadow filter re-renders per video frame */
-video.reddit-slideshow-media {
-  filter: none;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
 }
 
 iframe.reddit-slideshow-media {
