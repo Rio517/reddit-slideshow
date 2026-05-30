@@ -1,35 +1,45 @@
 import { getSettings, saveSettings } from "@/lib/settings.js";
 
-const timerSelect = /** @type {HTMLSelectElement} */ (
+const timerSlider = /** @type {HTMLInputElement} */ (
   document.querySelector("#imageTimerSeconds")
 );
-const mutedCheckbox = /** @type {HTMLInputElement} */ (
+const timerValue = /** @type {HTMLOutputElement} */ (
+  document.querySelector("#timerValue")
+);
+const autoplay = /** @type {HTMLInputElement} */ (
+  document.querySelector("#autoplay")
+);
+const startMuted = /** @type {HTMLInputElement} */ (
   document.querySelector("#startMuted")
 );
-const autoplayCheckbox = /** @type {HTMLInputElement} */ (
-  document.querySelector("#autoplay")
+const includeNsfw = /** @type {HTMLInputElement} */ (
+  document.querySelector("#includeNsfw")
 );
 
 async function load() {
   const settings = await getSettings();
-  timerSelect.value = String(settings.imageTimerSeconds);
-  mutedCheckbox.checked = settings.startMuted;
-  autoplayCheckbox.checked = settings.autoplay;
+  timerSlider.value = String(settings.imageTimerSeconds);
+  timerValue.textContent = String(settings.imageTimerSeconds);
+  autoplay.checked = settings.autoplay;
+  startMuted.checked = settings.startMuted;
+  includeNsfw.checked = settings.includeNsfw;
 }
 
 async function persist() {
-  const imageTimerSeconds = /** @type {3 | 5 | 10} */ (
-    Number(timerSelect.value)
-  );
   await saveSettings({
-    imageTimerSeconds,
-    startMuted: mutedCheckbox.checked,
-    autoplay: autoplayCheckbox.checked,
+    imageTimerSeconds: Number(timerSlider.value),
+    autoplay: autoplay.checked,
+    startMuted: startMuted.checked,
+    includeNsfw: includeNsfw.checked,
   });
 }
 
-timerSelect.addEventListener("change", persist);
-mutedCheckbox.addEventListener("change", persist);
-autoplayCheckbox.addEventListener("change", persist);
+timerSlider.addEventListener("input", () => {
+  timerValue.textContent = timerSlider.value;
+});
+timerSlider.addEventListener("change", persist);
+autoplay.addEventListener("change", persist);
+startMuted.addEventListener("change", persist);
+includeNsfw.addEventListener("change", persist);
 
 load();

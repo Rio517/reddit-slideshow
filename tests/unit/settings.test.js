@@ -12,21 +12,35 @@ describe("normalizeSettings", () => {
     expect(normalizeSettings({})).toEqual(DEFAULT_SETTINGS);
   });
 
-  it("accepts supported timer values", () => {
-    expect(normalizeSettings({ imageTimerSeconds: 10 }).imageTimerSeconds).toBe(
-      10,
+  it("accepts a custom timer value within range", () => {
+    expect(normalizeSettings({ imageTimerSeconds: 7 }).imageTimerSeconds).toBe(
+      7,
     );
   });
 
-  it("falls back when timer value is unsupported", () => {
+  it("clamps and rounds out-of-range timer values", () => {
     expect(
       normalizeSettings({ imageTimerSeconds: 999 }).imageTimerSeconds,
+    ).toBe(60);
+    expect(normalizeSettings({ imageTimerSeconds: 0 }).imageTimerSeconds).toBe(
+      1,
+    );
+    expect(
+      normalizeSettings({ imageTimerSeconds: 4.6 }).imageTimerSeconds,
+    ).toBe(5);
+    expect(
+      normalizeSettings({ imageTimerSeconds: "abc" }).imageTimerSeconds,
     ).toBe(5);
   });
 
   it("normalizes startMuted to a boolean", () => {
     expect(normalizeSettings({ startMuted: false }).startMuted).toBe(false);
     expect(normalizeSettings({ startMuted: "no" }).startMuted).toBe(true);
+  });
+
+  it("defaults includeNsfw to follow Reddit (true) and accepts a boolean", () => {
+    expect(normalizeSettings({}).includeNsfw).toBe(true);
+    expect(normalizeSettings({ includeNsfw: false }).includeNsfw).toBe(false);
   });
 });
 
@@ -41,19 +55,21 @@ describe("getSettings / saveSettings", () => {
 
   it("round-trips saved settings through normalization", async () => {
     await saveSettings({
-      imageTimerSeconds: 10,
+      imageTimerSeconds: 12,
       autoplay: false,
       startMuted: false,
+      includeNsfw: false,
     });
     expect(await getSettings()).toEqual({
-      imageTimerSeconds: 10,
+      imageTimerSeconds: 12,
       startMuted: false,
       autoplay: false,
+      includeNsfw: false,
     });
   });
 
-  it("repairs out-of-range stored values on read", async () => {
+  it("clamps out-of-range stored values on read", async () => {
     await browser.storage.local.set({ imageTimerSeconds: 999 });
-    expect((await getSettings()).imageTimerSeconds).toBe(5);
+    expect((await getSettings()).imageTimerSeconds).toBe(60);
   });
 });

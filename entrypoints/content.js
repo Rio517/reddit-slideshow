@@ -133,6 +133,12 @@ export default defineContentScript({
         return;
       }
 
+      /** @param {{ slides: import("@/lib/slides.js").Slide[] }} p */
+      const applyNsfw = (p) =>
+        settings.includeNsfw
+          ? p
+          : { ...p, slides: p.slides.filter((slide) => !slide.over18) };
+
       controller = new SlideshowController({
         imageTimerSeconds: settings.imageTimerSeconds,
         onRender: (slide, position) => {
@@ -148,11 +154,12 @@ export default defineContentScript({
           ui.setBuffering(true);
           const next = await requestPage(after);
           ui.setBuffering(false);
-          if (next?.ok && next.page) controller?.append(next.page);
+          if (next?.ok && next.page) controller?.append(applyNsfw(next.page));
         },
-        onEnd: () => ui.showStatus("End of slideshow."),
+        onEnd: () => ui.showStatus("No more media to show."),
       });
-      controller.start(page);
+      if (!settings.autoplay) controller.pause();
+      controller.start(applyNsfw(page));
       starting = false;
     }
 

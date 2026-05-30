@@ -223,6 +223,25 @@ describe("SlideshowController", () => {
     expect(rendered).toEqual(["a", "b"]);
   });
 
+  it("skips an empty page and fetches the next one", () => {
+    const { controller, rendered, requested } = makeController();
+    controller.start({
+      slides: [],
+      after: "t3_p2",
+      exhausted: false,
+      postsScanned: 50,
+    });
+    expect(rendered).toEqual([]);
+    expect(requested).toEqual(["t3_p2"]);
+    controller.append({
+      slides: [slideWithId("a")],
+      after: null,
+      exhausted: true,
+      postsScanned: 50,
+    });
+    expect(rendered).toEqual(["a"]);
+  });
+
   it("calls onEnd when advancing past the last slide of an exhausted queue", () => {
     const { controller, ended } = makeController();
     controller.start({

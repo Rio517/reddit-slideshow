@@ -4,25 +4,125 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Reddit Slideshow Options</title>
+    <style>
+      :root {
+        --fg: #f5f7fa;
+        --muted: #9aa4b2;
+        --accent: #f6b352;
+        --bg: #0b0d12;
+        --card: #141821;
+        --line: rgba(148, 163, 184, 0.22);
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(140% 120% at 50% 0%, #161a23, var(--bg));
+        color: var(--fg);
+        font:
+          15px/1.5 ui-sans-serif,
+          -apple-system,
+          "Segoe UI",
+          sans-serif;
+      }
+      main {
+        max-width: 460px;
+        margin: 0 auto;
+        padding: 40px 24px;
+      }
+      h1 {
+        margin: 0 0 4px;
+        font-size: 22px;
+        letter-spacing: -0.01em;
+      }
+      .sub {
+        margin: 0 0 28px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .field {
+        display: block;
+        padding: 18px;
+        margin-bottom: 14px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+      }
+      .field__label {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 12px;
+        font-weight: 550;
+      }
+      .field__label output {
+        font-family: ui-monospace, "SF Mono", Menlo, monospace;
+        color: var(--accent);
+        font-variant-numeric: tabular-nums;
+      }
+      input[type="range"] {
+        width: 100%;
+        accent-color: var(--accent);
+      }
+      .check {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 18px;
+        margin-bottom: 10px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        cursor: pointer;
+      }
+      .check input {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--accent);
+      }
+      .check .hint {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 2px;
+      }
+    </style>
   </head>
   <body>
     <main>
       <h1>Reddit Slideshow</h1>
-      <label>
-        Image timer
-        <select id="imageTimerSeconds">
-          <option value="3">3 seconds</option>
-          <option value="5">5 seconds</option>
-          <option value="10">10 seconds</option>
-        </select>
+      <p class="sub">Settings apply the next time you start a slideshow.</p>
+
+      <label class="field">
+        <span class="field__label">
+          <span>Image timer</span>
+          <span><output id="timerValue">5</output> seconds</span>
+        </span>
+        <input
+          id="imageTimerSeconds"
+          type="range"
+          min="1"
+          max="60"
+          step="1"
+          value="5"
+        />
       </label>
-      <label>
-        <input id="startMuted" type="checkbox" />
-        Start videos muted
-      </label>
-      <label>
+
+      <label class="check">
         <input id="autoplay" type="checkbox" />
-        Autoplay slideshow
+        <span>Autoplay slideshow</span>
+      </label>
+
+      <label class="check">
+        <input id="startMuted" type="checkbox" />
+        <span>Start videos muted</span>
+      </label>
+
+      <label class="check">
+        <input id="includeNsfw" type="checkbox" />
+        <span>
+          Include NSFW content
+          <span class="hint">As Reddit shows it for your session.</span>
+        </span>
       </label>
     </main>
     <script type="module" src="./main.js"></script>
