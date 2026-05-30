@@ -43,4 +43,16 @@ describe("toListingJsonUrl", () => {
       "Unsupported Reddit listing URL",
     );
   });
+
+  it("converts a www.reddit.com listing URL to JSON on the same host", () => {
+    expect(toListingJsonUrl("https://www.reddit.com/r/pics/")).toBe(
+      "https://www.reddit.com/r/pics/.json?raw_json=1",
+    );
+  });
+
+  it("preserves the host (no old/new cross-mapping)", () => {
+    expect(toListingJsonUrl("https://www.reddit.com/r/pics/top/?t=week")).toBe(
+      "https://www.reddit.com/r/pics/top/.json?t=week&raw_json=1",
+    );
+  });
 });
