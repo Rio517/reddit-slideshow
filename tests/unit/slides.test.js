@@ -41,6 +41,13 @@ describe("slidesFromListing", () => {
     });
   });
 
+  it("resolves permalinks against the given page origin", () => {
+    const slides = slidesFromListing(fixture, "https://www.reddit.com");
+    expect(slides[0].permalink).toBe(
+      "https://www.reddit.com/r/example/comments/alpha/ultra_high_resolution_landscape/",
+    );
+  });
+
   it("does not throw on a post with no title", () => {
     const listing = {
       data: {

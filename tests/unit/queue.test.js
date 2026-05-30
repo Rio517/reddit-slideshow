@@ -71,6 +71,20 @@ describe("fetchQueuePage", () => {
     expect(page.slides.map((s) => s.id)).toEqual(["t3_alpha:0", "t3_gamma:0"]);
   });
 
+  it("resolves slide permalinks against the page origin (no old.reddit dependency)", async () => {
+    /** @type {typeof fetch} */
+    const fetchImpl = async () =>
+      new Response(JSON.stringify(fixture), { status: 200 });
+    const page = await fetchQueuePage(
+      "https://www.reddit.com/r/example/",
+      {},
+      fetchImpl,
+    );
+    expect(
+      page.slides[0].permalink?.startsWith("https://www.reddit.com/"),
+    ).toBe(true);
+  });
+
   it("passes the after cursor through to pagination", async () => {
     /** @type {Array<string>} */
     const urls = [];
