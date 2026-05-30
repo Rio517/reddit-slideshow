@@ -12,6 +12,7 @@ afterEach(() => {
   for (const session of sessions) session.close();
   sessions = [];
   document.querySelectorAll(ROOT).forEach((el) => el.remove());
+  document.documentElement.style.overflow = "";
 });
 
 /**
@@ -73,7 +74,7 @@ function fakeRequest(pages) {
 }
 
 /**
- * @param {{ pages?: any[], settingsOverrides?: Record<string, unknown>, openUrl?: (url: string) => void, saveSettings?: (patch: object) => Promise<unknown>, computeImageHash?: (url: string) => Promise<string | null> }} [opts]
+ * @param {{ pages?: any[], settingsOverrides?: Record<string, unknown>, openUrl?: (url: string) => void, saveSettings?: (patch: object) => Promise<unknown>, computeImageHash?: (url: string) => Promise<string | null>, createImage?: () => { src: string, decoding?: string } }} [opts]
  */
 function makeSession({
   pages,
@@ -81,6 +82,7 @@ function makeSession({
   openUrl,
   saveSettings,
   computeImageHash,
+  createImage,
 } = {}) {
   const request = fakeRequest(
     pages ?? [
@@ -100,7 +102,7 @@ function makeSession({
     requestPage: request,
     getStartCursor: () => undefined,
     openUrl: openUrl ?? (() => {}),
-    createImage: () => ({ src: "", decoding: "" }),
+    createImage: createImage ?? (() => ({ src: "", decoding: "" })),
     computeImageHash,
   });
   sessions.push(session);
@@ -247,6 +249,66 @@ describe("createSlideshowSession", () => {
     session.handleKeydown(key("ArrowRight")); // -> "b", a perceptual dup of "a"
     await flush(); // "b" hashed → skipped → "c"
     expect(mediaSrc()).toBe("https://i.redd.it/c.jpg");
+  });
+
+  it("locks page scroll while open and restores it on close", async () => {
+    document.documentElement.style.overflow = "scroll";
+    const { session } = makeSession();
+    await session.start();
+    expect(document.documentElement.style.overflow).toBe("hidden");
+    session.close();
+    expect(document.documentElement.style.overflow).toBe("scroll");
+  });
+
+  it("bounds and cancels image preloads", async () => {
+    /** @type {Array<{ src: string }>} */
+    const created = [];
+    const { session } = makeSession({
+      pages: [
+        {
+          slides: ["a", "b", "c", "d", "e"].map((id) => imageSlide(id)),
+          after: null,
+          exhausted: true,
+          postsScanned: 5,
+        },
+      ],
+      createImage: () => {
+        const img = { src: "", decoding: "" };
+        created.push(img);
+        return img;
+      },
+    });
+    await session.start();
+    session.handleKeydown(key("ArrowRight"));
+    session.handleKeydown(key("ArrowRight"));
+    // Only the look-ahead window stays in flight; the rest were cancelled.
+    expect(created.filter((img) => img.src !== "").length).toBeLessThanOrEqual(
+      2,
+    );
+    session.close();
+    expect(created.every((img) => img.src === "")).toBe(true);
+  });
+
+  it("suppresses handled keys but not others", async () => {
+    const { session } = makeSession();
+    await session.start();
+    let prevented = 0;
+    let stopped = 0;
+    const ev = (/** @type {string} */ k) => ({
+      key: k,
+      preventDefault: () => {
+        prevented += 1;
+      },
+      stopImmediatePropagation: () => {
+        stopped += 1;
+      },
+    });
+    session.handleKeydown(/** @type {any} */ (ev("ArrowRight")));
+    expect(prevented).toBe(1);
+    expect(stopped).toBe(1);
+    session.handleKeydown(/** @type {any} */ (ev("x"))); // unhandled
+    expect(prevented).toBe(1);
+    expect(stopped).toBe(1);
   });
 
   it("persists the mute preference when toggled", async () => {
