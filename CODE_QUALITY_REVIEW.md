@@ -9,26 +9,58 @@ correctness risks in the v1 code.
 
 ## Findings
 
-### C2 — Content script is carrying too many responsibilities
+### C1 — New session tests pass at runtime but fail static checks
 
-Reference: `entrypoints/content.js:19`
+Reference: `tests/unit/session.test.js:1`
 
-The content script currently owns overlay creation, settings loading, scroll
+The newly added session tests are valuable and pass under Vitest, but the
+current local worktree fails the project’s static gates:
+
+- `npm run lint` fails because `vi` is imported but unused.
+- `npm run typecheck` fails because several helper arguments are implicitly
+  `any`, the fake key object is passed where a `KeyboardEvent` is expected, and
+  the `saved` array/patch callback are untyped.
+
+Why it matters: this is a small test-file cleanup, but it currently blocks the
+target development flow in `NEXT_STEP.md` before the code can be considered
+ready.
+
+Recommendation: keep the tests, remove the unused import, add narrow JSDoc
+typedefs for the `makeSession()` options and helpers, and cast the synthetic
+key object as `KeyboardEvent` at the helper boundary.
+
+### C2 — Content script extraction is a useful improvement; keep filling edge coverage
+
+References:
+
+- `entrypoints/content.js:11`
+- `lib/session.js:26`
+- `tests/unit/session.test.js:109`
+
+The original content script owned overlay creation, settings loading, scroll
 locking, preloading, page requests, NSFW filtering, duplicate tracking,
-controller wiring, keyboard capture, and lifecycle cleanup.
+controller wiring, keyboard capture, and lifecycle cleanup. The current local
+worktree extracts most of that orchestration into `lib/session.js`, leaving
+`entrypoints/content.js` closer to a page-integration adapter. It also adds a
+new `createSlideshowSession()` test suite that covers first render, no-media
+and fetch-error statuses, arrow navigation, closed-overlay key handling,
+pagination, NSFW filtering, key-based dedupe, and mute persistence.
 
 Why it matters: this file is the integration point most exposed to old Reddit
 and RES behavior. As v2 adds downloads, zoom/pan, audio, and more providers,
-this file will become harder to reason about and harder to test.
+the session orchestration should keep its direct coverage so regressions are
+caught away from the browser runtime.
 
-Recommendation: extract one or two small modules before the next feature push:
+Recommendation:
 
-- `lib/preload.js` for bounded image preloading.
-- `lib/slideshow-session.js` or similar for settings/filter/dedupe/controller
-  orchestration.
-
-Keep `entrypoints/content.js` focused on page integration and message/keyboard
-binding.
+- Keep the extraction and current session tests.
+- Add a couple of edge tests before calling this closed: scroll-lock restoration
+  on close, preload cancellation/replacement, and `preventDefault()` /
+  `stopImmediatePropagation()` for handled keys.
+- Consider extracting the preload map into a tiny helper only if those tests
+  feel noisy.
+- Keep `entrypoints/content.js` focused on page integration and
+  message/keyboard binding.
 
 ### C3 — Reddit listing shapes are typed as `any`
 
