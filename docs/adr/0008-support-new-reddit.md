@@ -41,6 +41,18 @@ a logged-in session, found:
    listing and paginate.
 5. **Add `www.reddit.com`** to `host_permissions` and the content-script
    `matches`.
+6. **Resolve relative listing URLs (post `permalink`) against the page's own
+   origin,** not a hardcoded `old.reddit.com`. Otherwise "open original" on a www
+   page links back to old Reddit — a live dependency the self-contained path must
+   not have.
+
+**Scope:** new Reddit means `www.reddit.com` only. `sh.reddit.com` is excluded —
+it is a share/redirect/login surface, not a primary listing-browsing host;
+revisit if users actually land there. Soft (client-side) navigation in the
+shreddit SPA does not re-run the content script, but the listing URL is read from
+`window.location.href` at launch time, so launching after a soft-nav fetches the
+correct listing; overlay reset across in-SPA route changes is a verification item
+(not built now).
 
 ## Consequences
 
@@ -53,7 +65,8 @@ a logged-in session, found:
 - Slightly broader install permissions (`www.reddit.com`), still narrow (no
   all-urls).
 - The data layer (`reddit-url.js`, `reddit-listing.js`, `queue.js`, `slides.js`)
-  is reused unchanged except for allowing the `www.reddit.com` host.
+  is reused, allowing the `www.reddit.com` host and threading the page origin
+  through to permalink resolution.
 
 ## Alternatives Considered
 
