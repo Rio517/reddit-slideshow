@@ -15,8 +15,6 @@
     rgba(12, 14, 20, 0.92),
     rgba(3, 4, 7, 0.985)
   );
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
   font:
     14px/1.45 ui-sans-serif,
     -apple-system,
@@ -105,6 +103,12 @@ video.reddit-slideshow-media {
   width: auto;
   height: auto;
   border-radius: 4px;
+}
+
+/* box-shadow keeps GPU compositing; a drop-shadow filter re-renders per video frame */
+video.reddit-slideshow-media {
+  filter: none;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
 }
 
 iframe.reddit-slideshow-media {
