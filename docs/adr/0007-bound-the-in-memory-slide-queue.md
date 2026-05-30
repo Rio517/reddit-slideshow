@@ -1,0 +1,56 @@
+# ADR 0007: Bound the in-memory slide queue
+
+Date: 2026-05-30
+Status: Accepted
+
+## Context
+
+The slideshow keeps every slide it has built in `SlideshowController.slides` so
+the user can navigate backward. Pagination appends a new page each time the
+queue nears its end, so over a long session this array grows without bound —
+hundreds of `Slide` objects, each holding several URL strings, a title, and
+dimensions, retained for the lifetime of the tab. A self-audit flagged this as
+the main source of session-long memory growth.
+
+Back-navigation is a real feature (left arrow), so the history cannot simply be
+dropped to zero. But in practice no one scrolls back hundreds of slides; the
+useful back-window is small.
+
+## Decision
+
+Cap the retained **already-shown** history at `maxBackHistory` slides (default
+**50**) behind the current slide. On each render, evict the excess from the
+front of `slides` and advance an `evicted` counter by the same amount.
+
+- `index` and `evicted` move together, so **absolute position is unchanged** —
+  the position counter still reads the true `N / total`.
+- Pagination (`shouldFetchNextPage`, `peekNext`) operates on the retained window
+  using the local `index`/`length`, which are consistent after eviction, so the
+  fetch-ahead logic is unaffected.
+- Look-ahead slides are never evicted; their count is naturally bounded by the
+  prefetch trigger (a page is only fetched when within ~2 unread slides of the
+  end), so total retention is roughly `maxBackHistory + one page`.
+
+The duplicate-detection keys/hashes (ADR 0006) are intentionally **not** evicted:
+correctness requires remembering everything already shown, and the keys are
+short strings, so their footprint is small even over a long session.
+
+## Consequences
+
+- Memory is bounded regardless of session length.
+- Back-navigation is limited to the retained window: in a very long session the
+  user cannot return to the very first slides. Going back to an evicted slide
+  would require re-fetching and re-deriving it anyway, so this is an acceptable
+  trade-off for a lean-back tool.
+- `position` reports absolute index/total via the `evicted` offset, so eviction
+  is invisible in the UI.
+
+## Alternatives Considered
+
+- **Unbounded retention (status quo):** simplest, but leaks memory on long
+  sessions. Rejected.
+- **Tombstones (replace evicted slides with light placeholders):** keeps the
+  array length stable for absolute indexing without an `evicted` counter, but is
+  more complex and the counter approach is simpler. Deferred.
+- **Persist the queue to storage:** unnecessary for a session-scoped tool and
+  adds storage/privacy surface. Rejected.

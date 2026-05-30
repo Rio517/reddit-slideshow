@@ -14,6 +14,7 @@ This directory holds planning material for a Firefox-first browser extension tha
 - [ADR 0004](adr/0004-minimize-and-stage-host-permissions.md): minimize install-time permissions and stage external-provider permissions.
 - [ADR 0005](adr/0005-manifest-v3-event-page-and-wxt-build.md): adopt Manifest V3 (event page) and a WXT-based build.
 - [ADR 0006](adr/0006-duplicate-detection.md): detect and skip duplicate media in the slideshow queue.
+- [ADR 0007](adr/0007-bound-the-in-memory-slide-queue.md): bound the in-memory slide queue with back-history eviction.
 - [Foundation plan](superpowers/plans/2026-05-29-foundation-wxt-mv3.md): task-by-task plan for the WXT/MV3 scaffold, shared core, and offline fixtures.
 
 ## Status
