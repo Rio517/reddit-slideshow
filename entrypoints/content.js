@@ -2,6 +2,7 @@ import "@/assets/overlay.css";
 import { createOverlay } from "@/lib/overlay-ui.js";
 import { SlideshowController } from "@/lib/slideshow.js";
 import { getSettings } from "@/lib/settings.js";
+import { afterCursorForViewport } from "@/lib/page-cursor.js";
 
 export default defineContentScript({
   matches: ["https://old.reddit.com/*"],
@@ -75,6 +76,20 @@ export default defineContentScript({
       return c.imageTimerSeconds;
     }
 
+    // Start the queue from the post nearest the top of the viewport so the
+    // slideshow begins where the user is, not at the top of the first page.
+    function startingAfter() {
+      const posts = Array.from(
+        document.querySelectorAll('div.thing[data-fullname^="t3_"]'),
+      )
+        .filter((el) => !el.classList.contains("promoted"))
+        .map((el) => ({
+          fullname: el.getAttribute("data-fullname") ?? "",
+          bottom: el.getBoundingClientRect().bottom,
+        }));
+      return afterCursorForViewport(posts);
+    }
+
     /**
      * @param {string} [after]
      */
@@ -102,7 +117,7 @@ export default defineContentScript({
       ui.showStatus("Loading slideshow…");
 
       const settings = await getSettings();
-      const response = await requestPage(undefined);
+      const response = await requestPage(startingAfter());
       if (!response?.ok) {
         ui.showStatus(
           response?.error?.message ?? "Could not load this listing.",
