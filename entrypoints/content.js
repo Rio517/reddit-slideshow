@@ -3,6 +3,7 @@ import { createOverlay } from "@/lib/overlay-ui.js";
 import { SlideshowController } from "@/lib/slideshow.js";
 import { getSettings } from "@/lib/settings.js";
 import { afterCursorForViewport } from "@/lib/page-cursor.js";
+import { DuplicateTracker } from "@/lib/dedup.js";
 
 export default defineContentScript({
   matches: ["https://old.reddit.com/*"],
@@ -133,11 +134,15 @@ export default defineContentScript({
         return;
       }
 
+      const tracker = settings.dedupe ? new DuplicateTracker() : null;
       /** @param {{ slides: import("@/lib/slides.js").Slide[] }} p */
-      const applyNsfw = (p) =>
-        settings.includeNsfw
-          ? p
-          : { ...p, slides: p.slides.filter((slide) => !slide.over18) };
+      const prepare = (p) => {
+        let slides = settings.includeNsfw
+          ? p.slides
+          : p.slides.filter((slide) => !slide.over18);
+        if (tracker) slides = tracker.filterNewByKey(slides);
+        return { ...p, slides };
+      };
 
       controller = new SlideshowController({
         imageTimerSeconds: settings.imageTimerSeconds,
@@ -154,12 +159,12 @@ export default defineContentScript({
           ui.setBuffering(true);
           const next = await requestPage(after);
           ui.setBuffering(false);
-          if (next?.ok && next.page) controller?.append(applyNsfw(next.page));
+          if (next?.ok && next.page) controller?.append(prepare(next.page));
         },
         onEnd: () => ui.showStatus("No more media to show."),
       });
       if (!settings.autoplay) controller.pause();
-      controller.start(applyNsfw(page));
+      controller.start(prepare(page));
       starting = false;
     }
 

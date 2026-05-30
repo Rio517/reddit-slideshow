@@ -15,6 +15,9 @@ const startMuted = /** @type {HTMLInputElement} */ (
 const includeNsfw = /** @type {HTMLInputElement} */ (
   document.querySelector("#includeNsfw")
 );
+const dedupe = /** @type {HTMLInputElement} */ (
+  document.querySelector("#dedupe")
+);
 
 async function load() {
   const settings = await getSettings();
@@ -23,6 +26,7 @@ async function load() {
   autoplay.checked = settings.autoplay;
   startMuted.checked = settings.startMuted;
   includeNsfw.checked = settings.includeNsfw;
+  dedupe.checked = settings.dedupe;
 }
 
 async function persist() {
@@ -31,6 +35,7 @@ async function persist() {
     autoplay: autoplay.checked,
     startMuted: startMuted.checked,
     includeNsfw: includeNsfw.checked,
+    dedupe: dedupe.checked,
   });
 }
 
@@ -41,5 +46,6 @@ timerSlider.addEventListener("change", persist);
 autoplay.addEventListener("change", persist);
 startMuted.addEventListener("change", persist);
 includeNsfw.addEventListener("change", persist);
+dedupe.addEventListener("change", persist);
 
 load();

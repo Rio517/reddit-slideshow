@@ -42,6 +42,11 @@ describe("normalizeSettings", () => {
     expect(normalizeSettings({}).includeNsfw).toBe(true);
     expect(normalizeSettings({ includeNsfw: false }).includeNsfw).toBe(false);
   });
+
+  it("defaults dedupe to on and accepts a boolean", () => {
+    expect(normalizeSettings({}).dedupe).toBe(true);
+    expect(normalizeSettings({ dedupe: false }).dedupe).toBe(false);
+  });
 });
 
 describe("getSettings / saveSettings", () => {
@@ -59,12 +64,14 @@ describe("getSettings / saveSettings", () => {
       autoplay: false,
       startMuted: false,
       includeNsfw: false,
+      dedupe: false,
     });
     expect(await getSettings()).toEqual({
       imageTimerSeconds: 12,
       startMuted: false,
       autoplay: false,
       includeNsfw: false,
+      dedupe: false,
     });
   });
 

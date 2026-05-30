@@ -20,6 +20,7 @@ export default [
         window: "readonly",
         Image: "readonly",
         Event: "readonly",
+        BigInt: "readonly",
         setTimeout: "readonly",
         clearTimeout: "readonly",
         defineBackground: "readonly",
