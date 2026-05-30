@@ -132,10 +132,26 @@ describe("createMessageRouter — fetchImage", () => {
       },
     });
     const result = await router(
-      { type: "slideshow.fetchImage", payload: { url: "https://x/a.jpg" } },
+      { type: "slideshow.fetchImage", payload: { url: "https://i.redd.it/a.jpg" } },
       OWN,
     );
     expect(result).toEqual({ ok: false });
+  });
+
+  it("rejects a non-Reddit-image host without fetching", async () => {
+    let called = false;
+    const router = makeRouter({
+      fetchImageBytes: async () => {
+        called = true;
+        return new ArrayBuffer(8);
+      },
+    });
+    const result = await router(
+      { type: "slideshow.fetchImage", payload: { url: "https://evil.example/x.jpg" } },
+      OWN,
+    );
+    expect(result).toEqual({ ok: false });
+    expect(called).toBe(false);
   });
 
   it("rejects a missing url", async () => {

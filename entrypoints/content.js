@@ -2,7 +2,7 @@ import "@/assets/overlay.css";
 import { createOverlay } from "@/lib/overlay-ui.js";
 import { getSettings, saveSettings } from "@/lib/settings.js";
 import { afterCursorForViewport } from "@/lib/page-cursor.js";
-import { listingPostFullnames } from "@/lib/reddit-dom.js";
+import { listingPostElements, postFullname } from "@/lib/reddit-dom.js";
 import { createSlideshowSession } from "@/lib/session.js";
 import { differenceHash, luminanceFromImageData } from "@/lib/dedup.js";
 
@@ -32,13 +32,10 @@ export default defineContentScript({
       // begins where the user is, not at the top of the first page. Works on
       // both old Reddit (div.thing) and new Reddit (shreddit-post).
       getStartCursor: () => {
-        const posts = listingPostFullnames(document).map((fullname) => {
-          const el =
-            document.querySelector(`div.thing[data-fullname="${fullname}"]`) ??
-            document.getElementById(fullname);
-          const bottom = el ? el.getBoundingClientRect().bottom : 0;
-          return { fullname, bottom };
-        });
+        const posts = listingPostElements(document).map((el) => ({
+          fullname: postFullname(el),
+          bottom: el.getBoundingClientRect().bottom,
+        }));
         return afterCursorForViewport(posts);
       },
       openUrl: (url) => window.open(url, "_blank", "noopener"),
