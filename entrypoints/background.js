@@ -5,7 +5,9 @@ export default defineBackground(() => {
     console.info("Reddit Slideshow installed");
   });
 
-  browser.runtime.onMessage.addListener((message) => {
+  browser.runtime.onMessage.addListener((message, sender) => {
+    // Only handle messages from this extension's own content scripts.
+    if (sender?.id !== browser.runtime.id) return undefined;
     if (message?.type === "slideshow.requestPage") {
       return handleRequestPage(message);
     }
