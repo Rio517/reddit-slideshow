@@ -8,6 +8,7 @@ This directory holds planning material for a Firefox-first browser extension tha
 - [Research notes](research/initial-research.md): source-backed notes on Firefox extensions, old Reddit behavior, Reddit listing pagination, RES, and external media providers.
 - [Extension development best practices](research/extension-development-best-practices.md): architecture, security, permissions, testing, Reddit access, and release guidance.
 - [Prior art and tool options](research/prior-art-and-tool-options.md): existing slideshow/gallery tools, reuse candidates, and gaps.
+- [New Reddit and Chrome feasibility](research/new-reddit-and-chrome-feasibility.md): supporting `www.reddit.com` and shipping a Chrome build.
 - [ADR 0001](adr/0001-standalone-firefox-webextension.md): build as a standalone Firefox WebExtension first.
 - [ADR 0002](adr/0002-provider-based-media-resolution.md): resolve media through provider adapters.
 - [ADR 0003](adr/0003-paginate-current-reddit-listing.md): keep the slideshow queue going through Reddit listing pagination.
