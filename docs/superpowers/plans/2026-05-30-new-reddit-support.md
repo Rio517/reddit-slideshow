@@ -140,7 +140,7 @@ Load the temporary add-on (`about:debugging` → Load Temporary Add-on → `.out
 
 - [ ] **Step 3: Record the outcome**
 
-If everything renders, update `docs/research/new-reddit-and-chrome-feasibility.md` (and `NEXT_STEP.md`) to mark new-Reddit rendering confirmed. If media is blocked, capture the failing CSP directive and open a follow-up for the extension-page-iframe overlay (ADR 0008).
+If everything renders, update `docs/research/new-reddit-support.md` (and `NEXT_STEP.md`) to mark new-Reddit rendering confirmed. If media is blocked, capture the failing CSP directive and open a follow-up for the extension-page-iframe overlay (ADR 0008).
 
 - [ ] **Step 4: Commit any doc updates**
 

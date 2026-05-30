@@ -10,8 +10,8 @@ fetch, and the overlay all assume it. Old Reddit is not deprecated today, but it
 is a legacy surface Reddit could remove, and the product should not depend on it
 surviving.
 
-Research (`docs/research/new-reddit-and-chrome-feasibility.md`), verified against
-a logged-in session, found:
+Research (`docs/research/new-reddit-support.md`), verified against a logged-in
+session, found:
 
 - `www.reddit.com/.../.json?raw_json=1` returns the **same** listing JSON as old
   Reddit (identical fields) when logged in. Logged out it is 403, but the

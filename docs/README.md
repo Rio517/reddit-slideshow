@@ -8,7 +8,8 @@ This directory holds planning material for a Firefox-first browser extension tha
 - [Research notes](research/initial-research.md): source-backed notes on Firefox extensions, old Reddit behavior, Reddit listing pagination, RES, and external media providers.
 - [Extension development best practices](research/extension-development-best-practices.md): architecture, security, permissions, testing, Reddit access, and release guidance.
 - [Prior art and tool options](research/prior-art-and-tool-options.md): existing slideshow/gallery tools, reuse candidates, and gaps.
-- [New Reddit and Chrome feasibility](research/new-reddit-and-chrome-feasibility.md): supporting `www.reddit.com` and shipping a Chrome build.
+- [New Reddit support](research/new-reddit-support.md): supporting `www.reddit.com` (shreddit) — data, CSP, and the start cursor.
+- [Chrome support](research/chrome-support.md): building a Chrome MV3 target from the same source.
 - [ADR 0001](adr/0001-standalone-firefox-webextension.md): build as a standalone Firefox WebExtension first.
 - [ADR 0002](adr/0002-provider-based-media-resolution.md): resolve media through provider adapters.
 - [ADR 0003](adr/0003-paginate-current-reddit-listing.md): keep the slideshow queue going through Reddit listing pagination.
@@ -17,6 +18,7 @@ This directory holds planning material for a Firefox-first browser extension tha
 - [ADR 0006](adr/0006-duplicate-detection.md): detect and skip duplicate media in the slideshow queue.
 - [ADR 0007](adr/0007-bound-the-in-memory-slide-queue.md): bound the in-memory slide queue with back-history eviction.
 - [ADR 0008](adr/0008-support-new-reddit.md): support new Reddit (www.reddit.com) with a self-contained data path.
+- [ADR 0009](adr/0009-build-for-chrome.md): build a Chrome MV3 target from the same source.
 - [Foundation plan](superpowers/plans/2026-05-29-foundation-wxt-mv3.md): task-by-task plan for the WXT/MV3 scaffold, shared core, and offline fixtures.
 
 ## Status
