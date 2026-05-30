@@ -1,14 +1,18 @@
 # Reddit Slideshow
 
-A Firefox-first WebExtension (Manifest V3) that turns the current
-`old.reddit.com` listing into a full-screen, keyboard-driven media slideshow. It
-reuses your existing logged-in Reddit session — no API keys — and resolves
-direct images, galleries, Reddit-hosted video, Redgifs, and crossposts.
+A Firefox-first WebExtension (Manifest V3) that turns the current Reddit
+listing — on `old.reddit.com` or `www.reddit.com` — into a full-screen,
+keyboard-driven media slideshow. It reuses your existing logged-in Reddit
+session — no API keys — and resolves direct images, galleries, Reddit-hosted
+video, Redgifs, and crossposts. Each frontend is self-contained (it fetches its
+own listing JSON), so the new-Reddit path never depends on old Reddit.
 
 ## Features
 
-- Launch a slideshow from any `old.reddit.com` listing (toolbar icon or
-  **Alt+Shift+S**); it starts from the post nearest your current scroll position.
+- Launch a slideshow from any `old.reddit.com` or `www.reddit.com` listing
+  (toolbar icon or **Alt+Shift+S**). On old Reddit it starts from the post
+  nearest your scroll position; on new Reddit it starts from the top of the
+  listing.
 - Auto-advance with a configurable timer; videos advance when they finish.
 - Automatic pagination — the queue keeps loading the next listing page.
 - Per-kind rendering: `<img>` for images/galleries, muted-by-default `<video>`
@@ -38,8 +42,8 @@ Then in Firefox:
 
 ## Use
 
-- Open an `old.reddit.com` listing, then click the toolbar icon or press
-  **Alt+Shift+S**.
+- Open an `old.reddit.com` or `www.reddit.com` listing, then click the toolbar
+  icon or press **Alt+Shift+S**.
 - Keys: **←/→** previous/next, **Space** play/pause, **M** mute, **Esc** close.
 - Settings live on the extension's options page (`about:addons` → Reddit
   Slideshow → Preferences).

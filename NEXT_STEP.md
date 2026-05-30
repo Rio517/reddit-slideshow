@@ -1,6 +1,6 @@
 # NEXT_STEP — Reddit Slideshow
 
-**Doc updated:** 2026-05-30 · **Branch:** `main` · **Status:** v1 is feature-complete and verified once in real Firefox (media, RES coexistence); pending another review pass on the latest polish.
+**Doc updated:** 2026-05-30 · **Branch:** `main` · **Status:** v1 feature-complete (verified once in real Firefox); new Reddit (`www.reddit.com`) support is now implemented (ADR 0008) and needs a logged-in Firefox check.
 
 > **Hard rule:** work directly on `main`. Do not create branches or worktrees unless the user explicitly asks. See `AGENTS.md`.
 
@@ -35,8 +35,9 @@ v1 is feature-complete, including mute/audio, duplicate detection (both layers),
 and the self-audit fixes. Remaining work needs a human or is optional:
 
 1. **Real-Firefox verification (needs a human).** Reload the built add-on and check: the side-rail controls/icons, custom-timer slider + max-load-wait, Include-NSFW filter, autoplay-off, start-from-scroll-position, the loading spinner, the toolbar icon, Redgifs playback **under the new iframe `sandbox`**, **audio on unmute** for a v.redd.it clip, and — after enabling "Also detect re-uploaded images" — that **Layer 2 dedup** actually skips a repost (the `createImageBitmap`/`OffscreenCanvas` + privileged-fetch chain).
-2. **Full HLS/DASH audio** — only if the unmute check shows many clips are silent (muxed-fallback assumption wrong).
-3. **Packaging:** `npm run zip` + AMO signing/listing when ready.
+2. **New Reddit check (needs a human).** On a logged-in `www.reddit.com/r/<sub>/` listing, launch the slideshow and confirm images / v.redd.it / Redgifs render under the www CSP, nav/pagination work, and "open original" stays on www. If media is blocked, capture the CSP directive (ADR 0008's iframe fallback). Optional follow-up: the shreddit start-from-viewport cursor (Task 4 in the new-Reddit plan).
+3. **Full HLS/DASH audio** — only if the unmute check shows many clips are silent (muxed-fallback assumption wrong).
+4. **Packaging:** `npm run zip` + AMO signing/listing when ready.
 
 The content↔overlay↔background glue now lives in `lib/session.js` (injected deps),
 covered by `tests/unit/session.test.js`.

@@ -9,14 +9,16 @@ surface from the data source.
 
 ## New Reddit
 
-### Recommended architecture: render on new, fetch from old
+### Chosen architecture: each frontend self-contained (ADR 0008)
 
-The frontend the user is on and the data source are independent. Reddit session
-cookies are scoped to `.reddit.com`, so the background can fetch
-`old.reddit.com/.../.json` regardless of whether the user is on `old` or `www`.
-So: run the content-script overlay on `www.reddit.com`, and have the background
-"reach out to old" for the listing JSON. This reuses the entire existing data
-layer (`reddit-url.js`, `reddit-listing.js`, `queue.js`, `slides.js`) unchanged.
+The frontend the user is on and the data source are independent — cookies are
+scoped to `.reddit.com`, so the background can fetch either host's `.json`. An
+earlier idea was "render on new, fetch from old," but to avoid depending on old
+Reddit surviving, **ADR 0008** instead has each frontend fetch **its own**
+`.json` (old → old, www → www). The new-Reddit path never calls old Reddit. This
+reuses the data layer (`reddit-url.js`, `reddit-listing.js`, `queue.js`,
+`slides.js`), allowing the www host and resolving permalinks against the page
+origin.
 
 ### Data layer — works
 
@@ -28,9 +30,8 @@ Logged in, both endpoints return identical listing JSON (HTTP 200,
 - `www.reddit.com/r/<sub>/.json?raw_json=1`
 
 Logged **out**, `www.reddit.com/.json` returns HTTP 403 with the SPA HTML — but
-the extension requires a logged-in session anyway, so this does not matter.
-Fetching `old.reddit.com/.json` from the background is the safest choice (it has
-no SPA/redirect ambiguity and is what the resolver already targets).
+the extension requires a logged-in session anyway, so this does not matter. A
+www page fetches `www.reddit.com/.json`; an old page fetches `old.reddit.com/.json`.
 
 ### Rendering / CSP — works when logged in, but Reddit-controlled
 
@@ -110,9 +111,10 @@ via WXT, a fetch-based background, no Firefox-only runtime APIs).
 
 ## Verdict
 
-- **New Reddit:** feasible. Best path is "render on new, fetch from old," reusing
-  the data layer as-is; the main real work is overlay/keyboard validation under
-  the shreddit SPA and the (Reddit-controlled) CSP, plus optional new DOM
-  selectors for the scroll-position start cursor.
+- **New Reddit:** feasible, and implemented per ADR 0008 — the content script
+  runs on `www.reddit.com`, fetches its own `.json`, and resolves permalinks
+  against the page origin (no old-Reddit dependency). The remaining real work is
+  overlay/keyboard validation under the shreddit SPA and the (Reddit-controlled)
+  CSP in a real logged-in session, plus the optional shreddit start cursor.
 - **Chrome:** feasible with modest work — PNG icons, a `chrome` target, and
   service-worker smoke testing. Nothing in the architecture blocks it.
