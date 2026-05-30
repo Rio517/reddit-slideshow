@@ -170,11 +170,12 @@ iframe.reddit-slideshow-media {
 /* Control bar */
 .rs-controls {
   position: absolute;
-  left: 50%;
-  bottom: 26px;
+  right: 16px;
+  top: 50%;
   z-index: 6;
-  transform: translateX(-50%);
+  transform: translateY(-50%);
   display: flex;
+  flex-direction: column;
   gap: 4px;
   padding: 7px;
   border-radius: 999px;
@@ -195,7 +196,7 @@ iframe.reddit-slideshow-media {
 }
 
 #reddit-slideshow-root.rs-idle .rs-controls {
-  transform: translateX(-50%) translateY(10px);
+  transform: translateY(-50%) translateX(12px);
 }
 
 .rs-btn {
@@ -212,6 +213,10 @@ iframe.reddit-slideshow-media {
   transition:
     background 0.2s ease,
     transform 0.12s ease;
+}
+
+.rs-btn--primary {
+  color: var(--rs-accent);
 }
 
 .rs-btn:hover {
