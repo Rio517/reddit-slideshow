@@ -13,8 +13,9 @@ This directory holds planning material for a Firefox-first browser extension tha
 - [ADR 0003](adr/0003-paginate-current-reddit-listing.md): keep the slideshow queue going through Reddit listing pagination.
 - [ADR 0004](adr/0004-minimize-and-stage-host-permissions.md): minimize install-time permissions and stage external-provider permissions.
 - [ADR 0005](adr/0005-manifest-v3-event-page-and-wxt-build.md): adopt Manifest V3 (event page) and a WXT-based build.
+- [ADR 0006](adr/0006-duplicate-detection.md): detect and skip duplicate media in the slideshow queue.
 - [Foundation plan](superpowers/plans/2026-05-29-foundation-wxt-mv3.md): task-by-task plan for the WXT/MV3 scaffold, shared core, and offline fixtures.
 
 ## Status
 
-These are living planning docs capturing current research and decisions. The foundation implementation plan is ready to execute.
+These are living planning docs capturing current research and decisions. v1 of the extension is built and feature-complete.
