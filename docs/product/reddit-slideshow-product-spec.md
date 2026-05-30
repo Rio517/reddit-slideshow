@@ -87,9 +87,9 @@ Other external hosts are out of v1 unless they are simple direct media links. Th
 
 ## Settings
 
-- Image timer: 3 seconds, 5 seconds, 10 seconds, and custom.
-- Start muted: on/off.
-- Autoplay slideshow: on/off.
+- Image timer: any value from 1 to 60 seconds via a slider (default 5).
+- Start muted: on/off (inert until an audio-capable playback path exists).
+- Autoplay slideshow: on/off (off starts the slideshow paused).
 - Include NSFW: follow Reddit / always hide. **Default: follow Reddit** — show over-18 content only insofar as the signed-in session already exposes it. This is the least-surprising default and avoids the extension becoming an NSFW-unlocking tool.
 - Provider permissions: Redgifs should be requested only if needed or clearly disclosed.
 

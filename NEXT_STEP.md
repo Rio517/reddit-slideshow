@@ -1,10 +1,10 @@
 # NEXT_STEP — Reddit Slideshow
 
-**Doc updated:** 2026-05-29 · **Branch:** `main` · **Status:** end-to-end slideshow is built (fetch → queue → overlay with navigation, timer, pagination, resilience); a real-Firefox validation pass is next.
+**Doc updated:** 2026-05-30 · **Branch:** `main` · **Status:** v1 is feature-complete and verified once in real Firefox (media, RES coexistence); pending another review pass on the latest polish.
 
 > **Hard rule:** work directly on `main`. Do not create branches or worktrees unless the user explicitly asks. See `AGENTS.md`.
 
-This project is a Firefox-first WebExtension for turning the current `old.reddit.com` feed into a media slideshow. The full v1 path is implemented and unit-tested: session-cookie `.json` access (validated against live Reddit), media resolvers (images, galleries, Reddit video, Redgifs, crossposts — run against ~400 real posts), a headless slideshow controller (navigation, timer auto-advance, pagination, a safety timer), and a designed overlay (per-kind rendering, control bar, position counter, per-slide timer sweep, failure placeholder, preload, buffering hint). old.reddit.com sets no CSP, so injected cross-origin media loads directly. What remains is verification in a real Firefox profile and settings polish.
+This project is a Firefox-first WebExtension for turning the current `old.reddit.com` feed into a media slideshow. The full v1 is implemented and unit-tested: session-cookie `.json` access (validated against live Reddit), media resolvers (images, galleries, Reddit video, Redgifs, crossposts — run against ~400 real posts), a headless controller (navigation, load-gated timer, pagination, safety timer), a designed overlay (per-kind rendering, side-rail controls, position counter, per-slide timer sweep, loading spinner, failure placeholder, preload, buffering hint), settings (custom timer slider, autoplay, Include-NSFW filter), start-from-current-scroll, and an SVG icon. A real-Firefox pass confirmed v.redd.it, Redgifs, navigation, pagination, and RES coexistence (with RES + Reddit Deduplicator). old.reddit.com sets no CSP, so injected cross-origin media loads directly.
 
 ---
 
@@ -25,18 +25,18 @@ Key decisions already made:
 - Keep v1 old-Reddit-only: `old.reddit.com`.
 - Use offline fixtures for unit tests instead of live Reddit.
 - Resolve Reddit images, galleries, videos, Redgifs, and crossposts via the provider dispatch in `lib/slides.js`.
-- Treat Redgifs iframe playback as a validation spike. Reddit session-cookie `.json` access is validated; the toolbar-triggered extension diagnostic still needs UI validation.
+- Launch from the toolbar action (icon) or Alt+Shift+S; the slideshow seeds from the post nearest the current viewport.
 
 ---
 
 ## 1. Immediate Todo
 
-The end-to-end slideshow is built (`lib/slides.js`, `lib/queue.js`, `lib/slideshow.js`, `lib/overlay-render.js`, `lib/overlay-ui.js`, the content/background entrypoints, and unit tests across all of them). The next work, in order:
+v1 is feature-complete. Remaining work is review-driven and a couple of deferred items:
 
-1. **Real-Firefox validation pass (needs a human).** `npm run dev`, open an `old.reddit.com` listing, launch the slideshow (toolbar or `?reddit_slideshow_probe`), and confirm: images/galleries paint, v.redd.it video plays muted and advances, the Redgifs `/ifr/<id>` iframe plays **without** a `redgifs.com` host permission, navigation/timer/pagination work, and there are no RES keyboard/DOM conflicts. Capture anything that breaks.
-2. **Settings polish.** Add the custom image-timer value and the Include-NSFW option (follow Reddit / always hide → filter `over_18` in the queue) to `lib/settings.js` + the options page.
-3. **Remove the `?reddit_slideshow_probe` content-script trigger** once toolbar launch is confirmed (it auto-starts on any matching URL).
-4. **Mute control** once an audio-capable (DASH/HLS) playback path exists — deferred while v1 plays the silent `fallback_url`.
+1. **Review pass on the latest polish (needs a human).** Reload the built add-on and check the side-rail controls/icons, the custom-timer slider, Include-NSFW filtering, autoplay-off start-paused, start-from-scroll-position, the load-gated timer + loading spinner, and the toolbar icon.
+2. **Mute control** once an audio-capable (DASH/HLS) playback path exists — deferred while v1 plays the silent `fallback_url`. Until then the start-muted setting is inert.
+3. **Audio playback (v2-ish):** bundle an HLS/DASH player so v.redd.it audio works.
+4. **Packaging:** `npm run zip` and AMO submission when ready.
 
 Keep small commits. Do not batch multiple slices into one giant commit.
 
@@ -148,30 +148,23 @@ Before calling provider/media work done:
 
 ---
 
-## 5. Near-Term Validation Spikes
+## 5. Validation Status
 
-Do these after the foundation scaffold exists:
+Confirmed in a real logged-in Firefox profile:
 
-- Live Firefox spike: background fetch diagnostic for current `old.reddit.com/.../.json?raw_json=1` with existing session.
-- Capture real sanitized fixtures for:
-  - Direct `i.redd.it` image.
-  - Reddit gallery with `gallery_data` + `media_metadata`.
-  - Reddit-hosted video with `secure_media.reddit_video`.
-  - Crosspost where media lives in `crosspost_parent_list[0]`.
-  - Redgifs link.
-- Redgifs iframe spike: embed `https://www.redgifs.com/ifr/<id>` in the overlay without `redgifs.com` host permission.
-- RES coexistence spike: overlay + keyboard behavior on old Reddit with RES installed.
+- Session-cookie `.json` access returns logged-in JSON (incl. NSFW), with `X-Ratelimit-*` headers.
+- v.redd.it video plays and Redgifs `/ifr/<id>` iframe plays **without** a `redgifs.com` host permission.
+- Navigation, automatic pagination to subsequent pages, and RES coexistence (with RES + Reddit Deduplicator) — no keyboard/DOM conflicts.
+- Sanitized fixtures exist for image/gallery/video/redgifs/crosspost (crosspost hand-authored; capture a real one if convenient).
 
 ---
 
 ## 6. Current Backlog Shape
 
-V1 path (foundation, resolvers, controller, and overlay complete; remaining):
+V1 is feature-complete. Open items:
 
-1. Real-Firefox validation pass (media playback, Redgifs iframe, RES coexistence).
-2. Settings polish: custom timer value + Include-NSFW filter.
-3. Remove the `?reddit_slideshow_probe` trigger after toolbar launch is confirmed.
-4. Mute control once an audio-capable (DASH/HLS) path exists.
+1. Mute control + audio playback (needs a bundled HLS/DASH player).
+2. Packaging and AMO submission (`npm run zip`).
 
 V2 backlog:
 
