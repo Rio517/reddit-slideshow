@@ -106,6 +106,16 @@ Source:
 
 Redgifs is a first-class provider, and a large share of real feeds: it was the single most common media domain on the sampled NSFW front page. The approach is to embed it inline via the Redgifs first-party iframe (`https://www.redgifs.com/ifr/<id>`), parsing `<id>` from the `redgifs.com/watch/<id>` post URL. The iframe is served by Redgifs, so its inner video behaves as Redgifs' own player rather than as a hotlinked direct `.mp4`. Aspect ratio comes free from `secure_media.oembed.width`/`height` in the listing, so no `api.redgifs.com` call is needed. Because an iframe does not expose a native `<video>` `ended` event to the extension, Redgifs slides advance on a duration timer. Iframe playback inside the extension overlay in Firefox (and that it needs no `redgifs.com` host permission) still needs a live validation spike. Unresolvable or removed posts fall back to a slide with title/source context and an open-original action.
 
+## Overlay Rendering
+
+`old.reddit.com` sends **no Content-Security-Policy** (no response header and no
+`<meta>` CSP). A content-script overlay can therefore load cross-origin media
+directly in injected elements — `<img>` from `i.redd.it`/`preview.redd.it`,
+`<video>` from `v.redd.it`, and the Redgifs `<iframe>` — with no host
+permission and no CSP relaxation. This matches old Reddit/RES expandos, which
+already embed these hosts inline. Actual playback (v.redd.it muted, Redgifs
+iframe) still wants a live Firefox confirmation.
+
 ## Current Research Conclusions
 
 - Build a standalone Firefox-first WebExtension first.

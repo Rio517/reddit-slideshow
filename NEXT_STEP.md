@@ -1,10 +1,10 @@
 # NEXT_STEP — Reddit Slideshow
 
-**Doc updated:** 2026-05-29 · **Branch:** `main` · **Status:** session-cookie access and all v1 media resolvers are validated; wiring the queue into the slideshow UI is next.
+**Doc updated:** 2026-05-29 · **Branch:** `main` · **Status:** end-to-end slideshow is built (fetch → queue → overlay with navigation, timer, pagination, resilience); a real-Firefox validation pass is next.
 
 > **Hard rule:** work directly on `main`. Do not create branches or worktrees unless the user explicitly asks. See `AGENTS.md`.
 
-This project is a Firefox-first WebExtension for turning the current `old.reddit.com` feed into a media slideshow. The foundation scaffold, the fetch/queue core, and the media resolvers are in place. Session-cookie `.json` access is validated against live Reddit (HTTP 200 logged-in JSON, including NSFW state, with `X-Ratelimit-*` headers present). The resolver turns direct images, galleries, Reddit-hosted video, Redgifs, and crossposts into slides; it was run against ~400 real posts (503 slides) to confirm shape fidelity. The next move is to wire the queue into the content/background flow and render real slides in the overlay.
+This project is a Firefox-first WebExtension for turning the current `old.reddit.com` feed into a media slideshow. The full v1 path is implemented and unit-tested: session-cookie `.json` access (validated against live Reddit), media resolvers (images, galleries, Reddit video, Redgifs, crossposts — run against ~400 real posts), a headless slideshow controller (navigation, timer auto-advance, pagination, a safety timer), and a designed overlay (per-kind rendering, control bar, position counter, per-slide timer sweep, failure placeholder, preload, buffering hint). old.reddit.com sets no CSP, so injected cross-origin media loads directly. What remains is verification in a real Firefox profile and settings polish.
 
 ---
 
@@ -31,12 +31,12 @@ Key decisions already made:
 
 ## 1. Immediate Todo
 
-The foundation scaffold, fetch/queue core, and media resolvers have landed (`lib/reddit-listing.js`, `lib/queue.js`, `lib/reddit-url.js`, `lib/slides.js`, `lib/settings.js`, WXT/MV3 entrypoints, sanitized fixtures for image/gallery/video/redgifs/crosspost). The next work, in order:
+The end-to-end slideshow is built (`lib/slides.js`, `lib/queue.js`, `lib/slideshow.js`, `lib/overlay-render.js`, `lib/overlay-ui.js`, the content/background entrypoints, and unit tests across all of them). The next work, in order:
 
-1. **Connect the queue to the slideshow flow.** `fetchListingJson()`, `buildQueuePage()`, and `shouldFetchNextPage()` are tested, but the content/background flow still only renders the diagnostic. The next slice should request a first queue page, hand normalized slides to the content script, and render the first real slide in the overlay.
-2. **Build the overlay renderer per kind.** Image (`<img>`), video (`<video>` on `fallback_url`, muted, advance on `ended`), and Redgifs (`<iframe>` on `embedUrl`, advance on a duration timer). Use `sourceWidth`/`sourceHeight` for layout.
-3. **Run the toolbar-triggered Firefox diagnostic.** Build/run the extension in real Firefox, open an `old.reddit.com` listing, click the action, and confirm the overlay reports listing JSON success. The request path is validated; this proves UI/extension wiring. (The `?reddit_slideshow_probe` content-script trigger is a temporary aid for this and should be removed before v1 ship.)
-4. Continue down the V1 backlog (§6): keyboard navigation, timer behavior, settings polish, RES coexistence.
+1. **Real-Firefox validation pass (needs a human).** `npm run dev`, open an `old.reddit.com` listing, launch the slideshow (toolbar or `?reddit_slideshow_probe`), and confirm: images/galleries paint, v.redd.it video plays muted and advances, the Redgifs `/ifr/<id>` iframe plays **without** a `redgifs.com` host permission, navigation/timer/pagination work, and there are no RES keyboard/DOM conflicts. Capture anything that breaks.
+2. **Settings polish.** Add the custom image-timer value and the Include-NSFW option (follow Reddit / always hide → filter `over_18` in the queue) to `lib/settings.js` + the options page.
+3. **Remove the `?reddit_slideshow_probe` content-script trigger** once toolbar launch is confirmed (it auto-starts on any matching URL).
+4. **Mute control** once an audio-capable (DASH/HLS) playback path exists — deferred while v1 plays the silent `fallback_url`.
 
 Keep small commits. Do not batch multiple slices into one giant commit.
 
@@ -166,15 +166,12 @@ Do these after the foundation scaffold exists:
 
 ## 6. Current Backlog Shape
 
-V1 path (foundation, fetch/queue core, and media resolvers complete; remaining):
+V1 path (foundation, resolvers, controller, and overlay complete; remaining):
 
-1. First queue page wired into the extension flow.
-2. Overlay shell and per-kind rendering (image, video, Redgifs iframe).
-3. Keyboard navigation.
-4. Timer behavior (image dwell + auto-advance after manual nav).
-5. Toolbar-triggered Firefox diagnostic / UI validation.
-6. Settings/options polish.
-7. RES coexistence verification.
+1. Real-Firefox validation pass (media playback, Redgifs iframe, RES coexistence).
+2. Settings polish: custom timer value + Include-NSFW filter.
+3. Remove the `?reddit_slideshow_probe` trigger after toolbar launch is confirmed.
+4. Mute control once an audio-capable (DASH/HLS) path exists.
 
 V2 backlog:
 
