@@ -162,6 +162,25 @@ describe("SlideshowController", () => {
     expect(requested).toEqual(["t3_next"]);
   });
 
+  it("resumes autoplay after the next page is appended", () => {
+    const { controller, rendered } = makeController();
+    controller.start({
+      slides: [slideWithId("a")],
+      after: "t3_next",
+      exhausted: false,
+      postsScanned: 50,
+    });
+    vi.advanceTimersByTime(5000); // timer hits the end, waits for more
+    expect(rendered).toEqual(["a"]);
+    controller.append({
+      slides: [slideWithId("b")],
+      after: null,
+      exhausted: true,
+      postsScanned: 50,
+    });
+    expect(rendered).toEqual(["a", "b"]);
+  });
+
   it("calls onEnd when advancing past the last slide of an exhausted queue", () => {
     const { controller, ended } = makeController();
     controller.start({
