@@ -129,4 +129,32 @@ describe("createOverlay", () => {
       "No supported media on this page.",
     );
   });
+
+  it("swaps in a placeholder when media fails to load", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.renderCurrent(imageSlide({ title: "Removed post" }), {
+      index: 0,
+      total: 1,
+      exhausted: true,
+      effectiveSeconds: 5,
+      playing: true,
+    });
+    const media = overlay.root.querySelector(".reddit-slideshow-media");
+    media?.dispatchEvent(new Event("error"));
+    expect(
+      overlay.root.querySelector(".rs-placeholder__title")?.textContent,
+    ).toBe("Removed post");
+  });
+
+  it("toggles the buffering hint", () => {
+    const overlay = createOverlay(noopHandlers());
+    const hint = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-buffering")
+    );
+    expect(hint?.hidden).toBe(true);
+    overlay.setBuffering(true);
+    expect(hint?.hidden).toBe(false);
+    overlay.setBuffering(false);
+    expect(hint?.hidden).toBe(true);
+  });
 });

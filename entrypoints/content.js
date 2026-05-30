@@ -42,6 +42,18 @@ export default defineContentScript({
       overlay?.hide();
     }
 
+    // Warm the browser cache for the next slides so transitions do not stutter.
+    function preloadUpcoming() {
+      if (!controller) return;
+      for (const slide of controller.peekNext(2)) {
+        if (slide.kind === "image") {
+          const img = new Image();
+          img.decoding = "async";
+          img.src = slide.mediaUrl;
+        }
+      }
+    }
+
     /**
      * @param {import("@/lib/slides.js").Slide} slide
      * @param {SlideshowController} c
@@ -102,9 +114,12 @@ export default defineContentScript({
             effectiveSeconds: effectiveSeconds(slide, controller),
             playing: !controller.paused,
           });
+          preloadUpcoming();
         },
         onRequestNextPage: async (after) => {
+          ui.setBuffering(true);
           const next = await requestPage(after);
+          ui.setBuffering(false);
           if (next?.ok && next.page) controller?.append(next.page);
         },
         onEnd: () => ui.showStatus("End of slideshow."),

@@ -99,20 +99,52 @@ describe("SlideshowController", () => {
     expect(controller.current?.id).toBe("a");
   });
 
-  it("does not run a timer for video slides; mediaEnded advances", () => {
+  it("advances video on mediaEnded, before the safety timer", () => {
     const { controller, rendered } = makeController();
     controller.start({
       slides: [
-        slideWithId("v", { kind: "video", durationMode: "media" }),
+        slideWithId("v", {
+          kind: "video",
+          durationMode: "media",
+          durationSeconds: 10,
+        }),
         slideWithId("b"),
       ],
       exhausted: true,
       postsScanned: 2,
     });
-    vi.advanceTimersByTime(60000);
-    expect(rendered).toEqual(["v"]); // no auto-advance from a timer
+    vi.advanceTimersByTime(5000); // image timer would have fired here
+    expect(rendered).toEqual(["v"]);
     controller.mediaEnded();
     expect(rendered).toEqual(["v", "b"]);
+  });
+
+  it("uses a safety timer when a video never ends", () => {
+    const { controller, rendered } = makeController();
+    controller.start({
+      slides: [
+        slideWithId("v", {
+          kind: "video",
+          durationMode: "media",
+          durationSeconds: 10,
+        }),
+        slideWithId("b"),
+      ],
+      exhausted: true,
+      postsScanned: 2,
+    });
+    vi.advanceTimersByTime(12 * 1000); // durationSeconds + safety buffer
+    expect(rendered).toEqual(["v", "b"]);
+  });
+
+  it("peeks upcoming slides for preloading", () => {
+    const { controller } = makeController();
+    controller.start({
+      slides: [slideWithId("a"), slideWithId("b"), slideWithId("c")],
+      exhausted: true,
+      postsScanned: 3,
+    });
+    expect(controller.peekNext(2).map((s) => s.id)).toEqual(["b", "c"]);
   });
 
   it("pauses and resumes the timer", () => {

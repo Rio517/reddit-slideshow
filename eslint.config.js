@@ -18,6 +18,8 @@ export default [
         URL: "readonly",
         URLSearchParams: "readonly",
         window: "readonly",
+        Image: "readonly",
+        Event: "readonly",
         setTimeout: "readonly",
         clearTimeout: "readonly",
         defineBackground: "readonly",
