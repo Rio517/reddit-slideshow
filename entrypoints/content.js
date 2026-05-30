@@ -61,17 +61,36 @@ export default defineContentScript({
       controller = null;
       overlay?.hide();
       unlockScroll();
+      cancelPreloads();
     }
 
-    // Warm the browser cache for the next slides so transitions do not stutter.
+    /** @type {Map<string, HTMLImageElement>} */
+    const preloads = new Map();
+    function cancelPreloads() {
+      for (const img of preloads.values()) img.src = "";
+      preloads.clear();
+    }
+
+    // Warm the browser cache for the next images. Bounded to the look-ahead
+    // window; preloads that fall out of it have their fetch cancelled.
     function preloadUpcoming() {
       if (!controller) return;
-      for (const slide of controller.peekNext(2)) {
-        if (slide.kind === "image") {
-          const img = new Image();
-          img.decoding = "async";
-          img.src = slide.mediaUrl;
+      const wanted = controller
+        .peekNext(2)
+        .filter((slide) => slide.kind === "image")
+        .map((slide) => slide.mediaUrl);
+      for (const [url, img] of preloads) {
+        if (!wanted.includes(url)) {
+          img.src = "";
+          preloads.delete(url);
         }
+      }
+      for (const url of wanted) {
+        if (preloads.has(url)) continue;
+        const img = new Image();
+        img.decoding = "async";
+        img.src = url;
+        preloads.set(url, img);
       }
     }
 

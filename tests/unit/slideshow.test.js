@@ -145,6 +145,24 @@ describe("SlideshowController", () => {
     expect(rendered).toEqual(["v", "b"]);
   });
 
+  it("caps retained back-history while preserving absolute position", () => {
+    const { controller } = makeController({ maxBackHistory: 5 });
+    const slides = Array.from({ length: 20 }, (_, i) => slideWithId(`s${i}`));
+    controller.start({
+      slides,
+      after: null,
+      exhausted: true,
+      postsScanned: 20,
+    });
+    for (let i = 0; i < 15; i += 1) controller.next();
+    expect(controller.current?.id).toBe("s15");
+    expect(controller.position.index).toBe(15);
+    expect(controller.position.total).toBe(20);
+    // Back-history is capped (local index), and the old slides were dropped.
+    expect(controller.index).toBeLessThanOrEqual(5);
+    expect(controller.evicted).toBe(10);
+  });
+
   it("peeks upcoming slides for preloading", () => {
     const { controller } = makeController();
     controller.start({
