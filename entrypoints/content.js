@@ -6,7 +6,7 @@ import { createSlideshowSession } from "@/lib/session.js";
 import { differenceHash, luminanceFromImageData } from "@/lib/dedup.js";
 
 export default defineContentScript({
-  matches: ["https://old.reddit.com/*"],
+  matches: ["https://old.reddit.com/*", "https://www.reddit.com/*"],
   cssInjectionMode: "manifest",
   main() {
     const session = createSlideshowSession({

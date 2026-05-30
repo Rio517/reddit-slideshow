@@ -8,6 +8,7 @@ export default defineConfig({
     permissions: ["storage"],
     host_permissions: [
       "https://old.reddit.com/*",
+      "https://www.reddit.com/*",
       "https://i.redd.it/*",
       "https://v.redd.it/*",
     ],

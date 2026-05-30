@@ -29,7 +29,7 @@ export default defineBackground(() => {
           payload: { source: "action" },
         });
       } catch {
-        console.info("Reddit Slideshow: open an old.reddit.com listing first");
+        console.info("Reddit Slideshow: open a Reddit listing first");
       }
     },
   );
