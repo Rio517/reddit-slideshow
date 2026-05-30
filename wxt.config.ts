@@ -11,7 +11,17 @@ export default defineConfig({
       "https://i.redd.it/*",
       "https://v.redd.it/*",
     ],
-    action: { default_title: "Start Reddit Slideshow" },
+    icons: {
+      16: "icon.svg",
+      32: "icon.svg",
+      48: "icon.svg",
+      96: "icon.svg",
+      128: "icon.svg",
+    },
+    action: {
+      default_title: "Start Reddit Slideshow",
+      default_icon: "icon.svg",
+    },
     commands: {
       _execute_action: {
         suggested_key: { default: "Alt+Shift+S" },

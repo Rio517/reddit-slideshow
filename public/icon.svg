@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="rs-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1b2331" />
+      <stop offset="1" stop-color="#0b0d12" />
+    </linearGradient>
+    <linearGradient id="rs-card" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffd089" />
+      <stop offset="1" stop-color="#f29d3c" />
+    </linearGradient>
+  </defs>
+
+  <rect x="4" y="4" width="120" height="120" rx="28" fill="url(#rs-bg)" stroke="#2a3340" stroke-width="2" />
+
+  <!-- back slide, peeking out to suggest a stack -->
+  <rect x="42" y="30" width="56" height="62" rx="9" fill="#ffffff" opacity="0.13" transform="rotate(10 64 64)" />
+
+  <!-- front slide -->
+  <g transform="rotate(-6 64 64)">
+    <rect x="33" y="34" width="62" height="60" rx="11" fill="url(#rs-card)" />
+
+    <!-- film perforations down the left edge -->
+    <g fill="#0b0d12" opacity="0.5">
+      <rect x="37" y="42" width="6" height="8" rx="2" />
+      <rect x="37" y="60" width="6" height="8" rx="2" />
+      <rect x="37" y="78" width="6" height="8" rx="2" />
+    </g>
+
+    <!-- a tiny landscape photo: sun + ridgeline -->
+    <circle cx="78" cy="51" r="8" fill="#0b0d12" opacity="0.82" />
+    <path d="M52 87 L66 66 L75 77 L83 69 L93 87 Z" fill="#0b0d12" opacity="0.82" />
+  </g>
+</svg>
