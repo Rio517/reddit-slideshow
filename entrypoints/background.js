@@ -1,4 +1,3 @@
-import { fetchListingJson } from "@/lib/reddit-listing.js";
 import { fetchQueuePage } from "@/lib/queue.js";
 
 export default defineBackground(() => {
@@ -7,9 +6,6 @@ export default defineBackground(() => {
   });
 
   browser.runtime.onMessage.addListener((message) => {
-    if (message?.type === "slideshow.probeListing") {
-      return handleProbe(message);
-    }
     if (message?.type === "slideshow.requestPage") {
       return handleRequestPage(message);
     }
@@ -30,27 +26,6 @@ export default defineBackground(() => {
     },
   );
 });
-
-/**
- * @param {any} message
- */
-function handleProbe(message) {
-  const pageUrl = message.payload?.pageUrl;
-  if (typeof pageUrl !== "string") {
-    return Promise.resolve(missingPageUrl());
-  }
-
-  return fetchListingJson(pageUrl)
-    .then(({ summary }) => {
-      console.info("Reddit Slideshow listing diagnostic", summary);
-      return { ok: true, summary };
-    })
-    .catch((error) => {
-      const payload = errorPayload(error);
-      console.info("Reddit Slideshow listing diagnostic failed", payload);
-      return { ok: false, error: payload };
-    });
-}
 
 /**
  * @param {any} message

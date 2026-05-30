@@ -195,13 +195,5 @@ export default defineContentScript({
       startSlideshow();
       return Promise.resolve({ ok: true });
     });
-
-    // Temporary aid: a plain navigation can launch the slideshow for validation
-    // without the toolbar. Remove before v1 ship.
-    if (
-      new URL(window.location.href).searchParams.has("reddit_slideshow_probe")
-    ) {
-      startSlideshow();
-    }
   },
 });
