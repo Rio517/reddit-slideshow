@@ -121,6 +121,30 @@ describe("luminanceFromImageData", () => {
   });
 });
 
+describe("DuplicateTracker FIFO cap", () => {
+  it("evicts the oldest key past the cap, so a distant repost is fresh again", () => {
+    const tracker = new DuplicateTracker({ maxTracked: 3 });
+    const ids = ["k1", "k2", "k3", "k4"].map((id) =>
+      slide({ mediaUrl: `https://i.redd.it/${id}.jpg` }),
+    );
+    tracker.filterNewByKey(ids); // k1 evicted (cap 3)
+    expect(tracker.keys.size).toBe(3);
+    const again = tracker.filterNewByKey([
+      slide({ mediaUrl: "https://i.redd.it/k1.jpg" }),
+    ]);
+    expect(again.length).toBe(1); // k1 is "new" again
+  });
+
+  it("bounds the hash list", () => {
+    const tracker = new DuplicateTracker({ maxTracked: 2 });
+    tracker.addHash("0000000000000001");
+    tracker.addHash("0000000000000002");
+    tracker.addHash("0000000000000004");
+    expect(tracker.hashes.length).toBe(2);
+    expect(tracker.hashes[0]).toBe("0000000000000002");
+  });
+});
+
 describe("DuplicateTracker hash matching", () => {
   it("matches hashes within the threshold", () => {
     const tracker = new DuplicateTracker({ hashThreshold: 4 });

@@ -31,9 +31,13 @@ front of `slides` and advance an `evicted` counter by the same amount.
   prefetch trigger (a page is only fetched when within ~2 unread slides of the
   end), so total retention is roughly `maxBackHistory + one page`.
 
-The duplicate-detection keys/hashes (ADR 0006) are intentionally **not** evicted:
-correctness requires remembering everything already shown, and the keys are
-short strings, so their footprint is small even over a long session.
+The duplicate-detection state (ADR 0006) is bounded separately. Its `keys` and
+`hashes` are capped to the most recent **50,000** media (FIFO), independent of
+the much smaller back-history window — dedup must span the whole session, not
+just what is navigable. Beyond the cap the oldest entries are dropped, so a
+repost seen tens of thousands of slides ago may re-appear; that is acceptable
+for a lean-back tool, and it keeps memory (~5 MB worst case) and the Layer-2
+Hamming scan bounded.
 
 ## Consequences
 
