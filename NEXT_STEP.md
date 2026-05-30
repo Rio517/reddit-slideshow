@@ -31,12 +31,15 @@ Key decisions already made:
 
 ## 1. Immediate Todo
 
-v1 is feature-complete. Remaining work is review-driven and a couple of deferred items:
+v1 is feature-complete, including mute/audio, duplicate detection (both layers),
+and the self-audit fixes. Remaining work needs a human or is optional:
 
-1. **Review pass on the latest polish (needs a human).** Reload the built add-on and check the side-rail controls/icons, the custom-timer slider, Include-NSFW filtering, autoplay-off start-paused, start-from-scroll-position, the load-gated timer + loading spinner, and the toolbar icon.
-2. **Mute control** once an audio-capable (DASH/HLS) playback path exists — deferred while v1 plays the silent `fallback_url`. Until then the start-muted setting is inert.
-3. **Audio playback (v2-ish):** bundle an HLS/DASH player so v.redd.it audio works.
-4. **Packaging:** `npm run zip` and AMO submission when ready.
+1. **Real-Firefox verification (needs a human).** Reload the built add-on and check: the side-rail controls/icons, custom-timer slider + max-load-wait, Include-NSFW filter, autoplay-off, start-from-scroll-position, the loading spinner, the toolbar icon, Redgifs playback **under the new iframe `sandbox`**, **audio on unmute** for a v.redd.it clip, and — after enabling "Also detect re-uploaded images" — that **Layer 2 dedup** actually skips a repost (the `createImageBitmap`/`OffscreenCanvas` + privileged-fetch chain).
+2. **Full HLS/DASH audio** — only if the unmute check shows many clips are silent (muxed-fallback assumption wrong).
+3. **Packaging:** `npm run zip` + AMO signing/listing when ready.
+
+The content↔overlay↔background glue now lives in `lib/session.js` (injected deps),
+covered by `tests/unit/session.test.js`.
 
 Keep small commits. Do not batch multiple slices into one giant commit.
 
