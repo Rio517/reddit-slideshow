@@ -20,11 +20,15 @@
     "@eslint/js": "^9.0.0",
     "eslint": "^9.0.0",
     "eslint-plugin-no-unsanitized": "^4.1.0",
-    "happy-dom": "^15.0.0",
+    "happy-dom": "^20.9.0",
     "prettier": "^3.3.0",
     "typescript": "^5.5.0",
     "vitest": "^3.2.0",
     "web-ext": "^10.0.0",
     "wxt": "^0.20.0"
+  },
+  "overrides": {
+    "tmp": "^0.2.6",
+    "uuid": "^11.1.1"
   }
 }
