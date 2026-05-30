@@ -1,4 +1,10 @@
+import { browser } from "wxt/browser";
 import { getSettings, saveSettings } from "@/lib/settings.js";
+
+const CONTENT_DEDUP_ORIGINS = [
+  "https://preview.redd.it/*",
+  "https://external-preview.redd.it/*",
+];
 
 const timerSlider = /** @type {HTMLInputElement} */ (
   document.querySelector("#imageTimerSeconds")
@@ -21,6 +27,9 @@ const dedupe = /** @type {HTMLInputElement} */ (
 const maxLoadWait = /** @type {HTMLSelectElement} */ (
   document.querySelector("#maxLoadWaitSeconds")
 );
+const contentDedup = /** @type {HTMLInputElement} */ (
+  document.querySelector("#contentDedup")
+);
 
 async function load() {
   const settings = await getSettings();
@@ -31,6 +40,7 @@ async function load() {
   includeNsfw.checked = settings.includeNsfw;
   dedupe.checked = settings.dedupe;
   maxLoadWait.value = String(settings.maxLoadWaitSeconds);
+  contentDedup.checked = settings.contentDedup;
 }
 
 async function persist() {
@@ -41,6 +51,7 @@ async function persist() {
     includeNsfw: includeNsfw.checked,
     dedupe: dedupe.checked,
     maxLoadWaitSeconds: Number(maxLoadWait.value),
+    contentDedup: contentDedup.checked,
   });
 }
 
@@ -53,5 +64,16 @@ startMuted.addEventListener("change", persist);
 includeNsfw.addEventListener("change", persist);
 dedupe.addEventListener("change", persist);
 maxLoadWait.addEventListener("change", persist);
+
+// Enabling content dedup requires an optional host permission (read pixels).
+contentDedup.addEventListener("change", async () => {
+  if (contentDedup.checked) {
+    const granted = await browser.permissions.request({
+      origins: CONTENT_DEDUP_ORIGINS,
+    });
+    if (!granted) contentDedup.checked = false;
+  }
+  await persist();
+});
 
 load();

@@ -11,6 +11,9 @@ export default defineBackground(() => {
     if (message?.type === "slideshow.requestPage") {
       return handleRequestPage(message);
     }
+    if (message?.type === "slideshow.fetchImage") {
+      return handleFetchImage(message);
+    }
     return undefined;
   });
 
@@ -52,6 +55,27 @@ function handleRequestPage(message) {
       },
     }))
     .catch((error) => ({ ok: false, error: errorPayload(error) }));
+}
+
+/**
+ * Fetch image bytes for perceptual dedup (Layer 2). Privileged so it works for
+ * hosts where the content script's page-CORS fetch would be blocked; degrades
+ * to { ok: false } if the host permission was not granted.
+ * @param {any} message
+ */
+function handleFetchImage(message) {
+  const url = message.payload?.url;
+  if (typeof url !== "string") {
+    return Promise.resolve({ ok: false });
+  }
+  return fetch(url, { credentials: "omit" })
+    .then((response) =>
+      response.ok
+        ? response.arrayBuffer()
+        : Promise.reject(new Error(`HTTP ${response.status}`)),
+    )
+    .then((bytes) => ({ ok: true, bytes }))
+    .catch(() => ({ ok: false }));
 }
 
 function missingPageUrl() {

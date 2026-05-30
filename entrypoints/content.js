@@ -3,6 +3,7 @@ import { createOverlay } from "@/lib/overlay-ui.js";
 import { getSettings, saveSettings } from "@/lib/settings.js";
 import { afterCursorForViewport } from "@/lib/page-cursor.js";
 import { createSlideshowSession } from "@/lib/session.js";
+import { differenceHash, luminanceFromImageData } from "@/lib/dedup.js";
 
 export default defineContentScript({
   matches: ["https://old.reddit.com/*"],
@@ -41,6 +42,32 @@ export default defineContentScript({
       },
       openUrl: (url) => window.open(url, "_blank", "noopener"),
       createImage: () => new Image(),
+      // Layer 2 dedup: the background fetches the bytes (privileged), then we
+      // downscale to 9x8 and difference-hash. Returns null on any failure.
+      computeImageHash: async (url) => {
+        let res;
+        try {
+          res = await browser.runtime.sendMessage({
+            type: "slideshow.fetchImage",
+            payload: { url },
+          });
+        } catch {
+          return null;
+        }
+        if (!res?.ok || !res.bytes) return null;
+        try {
+          const bitmap = await createImageBitmap(new Blob([res.bytes]));
+          const canvas = new OffscreenCanvas(9, 8);
+          const ctx = canvas.getContext("2d");
+          if (!ctx) return null;
+          ctx.drawImage(bitmap, 0, 0, 9, 8);
+          bitmap.close();
+          const imageData = ctx.getImageData(0, 0, 9, 8);
+          return differenceHash(luminanceFromImageData(imageData, 9, 8), 9, 8);
+        } catch {
+          return null;
+        }
+      },
     });
 
     document.addEventListener(

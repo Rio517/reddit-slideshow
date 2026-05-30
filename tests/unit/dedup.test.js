@@ -3,6 +3,7 @@ import {
   DuplicateTracker,
   differenceHash,
   hammingDistanceHex,
+  luminanceFromImageData,
   mediaKey,
 } from "../../lib/dedup.js";
 
@@ -96,6 +97,27 @@ describe("differenceHash + hammingDistanceHex", () => {
     );
     expect(distance).toBeGreaterThan(0);
     expect(distance).toBeLessThanOrEqual(2);
+  });
+});
+
+describe("luminanceFromImageData", () => {
+  it("converts RGBA pixels to grayscale luminance", () => {
+    // two pixels: white then black
+    const data = [255, 255, 255, 255, 0, 0, 0, 255];
+    expect(luminanceFromImageData({ data }, 2, 1)).toEqual([255, 0]);
+  });
+
+  it("feeds differenceHash from a downscaled grid", () => {
+    // 9x8 RGBA where luminance increases left-to-right per row → all "1" bits
+    const data = [];
+    for (let y = 0; y < 8; y += 1) {
+      for (let x = 0; x < 9; x += 1) {
+        const v = 255 - x * 20; // decreasing → left > right everywhere
+        data.push(v, v, v, 255);
+      }
+    }
+    const lum = luminanceFromImageData({ data }, 9, 8);
+    expect(differenceHash(lum, 9, 8)).toBe("ffffffffffffffff");
   });
 });
 

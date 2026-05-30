@@ -1,7 +1,7 @@
 # ADR 0006: Detect and skip duplicate media in the slideshow queue
 
 Date: 2026-05-30
-Status: Proposed
+Status: Accepted (both layers implemented; Layer 2 is opt-in)
 
 ## Context
 

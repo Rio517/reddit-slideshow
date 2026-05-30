@@ -46,6 +46,7 @@ function settings(overrides) {
     autoplay: false, // deterministic: no auto-advance timer in tests
     includeNsfw: true,
     dedupe: true,
+    contentDedup: false,
     maxLoadWaitSeconds: 5,
     ...overrides,
   };
@@ -72,9 +73,15 @@ function fakeRequest(pages) {
 }
 
 /**
- * @param {{ pages?: any[], settingsOverrides?: Record<string, unknown>, openUrl?: (url: string) => void, saveSettings?: (patch: object) => Promise<unknown> }} [opts]
+ * @param {{ pages?: any[], settingsOverrides?: Record<string, unknown>, openUrl?: (url: string) => void, saveSettings?: (patch: object) => Promise<unknown>, computeImageHash?: (url: string) => Promise<string | null> }} [opts]
  */
-function makeSession({ pages, settingsOverrides, openUrl, saveSettings } = {}) {
+function makeSession({
+  pages,
+  settingsOverrides,
+  openUrl,
+  saveSettings,
+  computeImageHash,
+} = {}) {
   const request = fakeRequest(
     pages ?? [
       {
@@ -94,6 +101,7 @@ function makeSession({ pages, settingsOverrides, openUrl, saveSettings } = {}) {
     getStartCursor: () => undefined,
     openUrl: openUrl ?? (() => {}),
     createImage: () => ({ src: "", decoding: "" }),
+    computeImageHash,
   });
   sessions.push(session);
   return { session, request };
@@ -212,6 +220,33 @@ describe("createSlideshowSession", () => {
     });
     await session.start();
     expect(text(".rs-meta__counter")).toBe("1 / 2"); // dupe removed
+  });
+
+  it("skips a perceptual duplicate image when content dedup is on", async () => {
+    /** @type {Record<string, string>} */
+    const hashes = {
+      "https://i.redd.it/a.jpg": "ffffffffffffffff",
+      "https://i.redd.it/b.jpg": "ffffffffffffffff", // same as a → duplicate
+      "https://i.redd.it/c.jpg": "0000000000000000",
+    };
+    const { session } = makeSession({
+      settingsOverrides: { contentDedup: true },
+      computeImageHash: async (url) => hashes[url] ?? null,
+      pages: [
+        {
+          slides: [imageSlide("a"), imageSlide("b"), imageSlide("c")],
+          after: null,
+          exhausted: true,
+          postsScanned: 3,
+        },
+      ],
+    });
+    await session.start();
+    await flush(); // "a" hashed and recorded
+    expect(mediaSrc()).toBe("https://i.redd.it/a.jpg");
+    session.handleKeydown(key("ArrowRight")); // -> "b", a perceptual dup of "a"
+    await flush(); // "b" hashed → skipped → "c"
+    expect(mediaSrc()).toBe("https://i.redd.it/c.jpg");
   });
 
   it("persists the mute preference when toggled", async () => {

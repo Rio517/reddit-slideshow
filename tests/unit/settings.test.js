@@ -48,6 +48,11 @@ describe("normalizeSettings", () => {
     expect(normalizeSettings({ dedupe: false }).dedupe).toBe(false);
   });
 
+  it("defaults contentDedup off (opt-in) and accepts a boolean", () => {
+    expect(normalizeSettings({}).contentDedup).toBe(false);
+    expect(normalizeSettings({ contentDedup: true }).contentDedup).toBe(true);
+  });
+
   it("defaults maxLoadWaitSeconds to 5 and only accepts preset values", () => {
     expect(normalizeSettings({}).maxLoadWaitSeconds).toBe(5);
     expect(
@@ -75,6 +80,7 @@ describe("getSettings / saveSettings", () => {
       startMuted: false,
       includeNsfw: false,
       dedupe: false,
+      contentDedup: true,
       maxLoadWaitSeconds: 10,
     });
     expect(await getSettings()).toEqual({
@@ -83,6 +89,7 @@ describe("getSettings / saveSettings", () => {
       autoplay: false,
       includeNsfw: false,
       dedupe: false,
+      contentDedup: true,
       maxLoadWaitSeconds: 10,
     });
   });

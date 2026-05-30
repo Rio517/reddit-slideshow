@@ -11,6 +11,12 @@ export default defineConfig({
       "https://i.redd.it/*",
       "https://v.redd.it/*",
     ],
+    // Requested at runtime only when the user enables content-based dedup
+    // (ADR 0006 Layer 2), so the background can fetch preview images to hash.
+    optional_host_permissions: [
+      "https://preview.redd.it/*",
+      "https://external-preview.redd.it/*",
+    ],
     icons: {
       16: "icon.svg",
       32: "icon.svg",
