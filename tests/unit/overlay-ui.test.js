@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createOverlay } from "../../lib/overlay-ui.js";
 
 /**
@@ -35,6 +35,7 @@ function noopHandlers() {
     onClose() {},
     onOpenOriginal() {},
     onMediaEnded() {},
+    onMediaReady() {},
   };
 }
 
@@ -50,6 +51,9 @@ function clickByLabel(root, prefix) {
 }
 
 describe("createOverlay", () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
   it("builds the chrome with five controls, hidden by default", () => {
     const overlay = createOverlay(noopHandlers());
     expect(overlay.root.querySelector(".rs-stage")).toBeTruthy();
@@ -107,6 +111,7 @@ describe("createOverlay", () => {
       onClose: () => calls.push("close"),
       onOpenOriginal: () => calls.push("open"),
       onMediaEnded: () => {},
+      onMediaReady: () => {},
     });
     overlay.renderCurrent(imageSlide(), {
       index: 0,

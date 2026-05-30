@@ -64,13 +64,17 @@ describe("SlideshowController", () => {
     expect(controller.current?.id).toBe("a");
   });
 
-  it("auto-advances image slides on the timer", () => {
+  it("auto-advances image slides on the timer once ready", () => {
     const { controller, rendered } = makeController();
     controller.start({
       slides: [slideWithId("a"), slideWithId("b")],
       exhausted: true,
       postsScanned: 2,
     });
+    // The dwell only starts once the media signals it is ready.
+    vi.advanceTimersByTime(5000);
+    expect(rendered).toEqual(["a"]);
+    controller.markReady();
     vi.advanceTimersByTime(5000);
     expect(rendered).toEqual(["a", "b"]);
   });
@@ -82,7 +86,9 @@ describe("SlideshowController", () => {
       exhausted: true,
       postsScanned: 3,
     });
-    controller.next(); // -> b, reschedules
+    controller.markReady();
+    controller.next(); // -> b
+    controller.markReady();
     expect(rendered).toEqual(["a", "b"]);
     vi.advanceTimersByTime(5000);
     expect(rendered).toEqual(["a", "b", "c"]);
@@ -113,6 +119,7 @@ describe("SlideshowController", () => {
       exhausted: true,
       postsScanned: 2,
     });
+    controller.markReady();
     vi.advanceTimersByTime(5000); // image timer would have fired here
     expect(rendered).toEqual(["v"]);
     controller.mediaEnded();
@@ -133,6 +140,7 @@ describe("SlideshowController", () => {
       exhausted: true,
       postsScanned: 2,
     });
+    controller.markReady();
     vi.advanceTimersByTime(12 * 1000); // durationSeconds + safety buffer
     expect(rendered).toEqual(["v", "b"]);
   });
@@ -154,6 +162,7 @@ describe("SlideshowController", () => {
       exhausted: true,
       postsScanned: 2,
     });
+    controller.markReady();
     controller.pause();
     vi.advanceTimersByTime(10000);
     expect(rendered).toEqual(["a"]);
@@ -202,6 +211,7 @@ describe("SlideshowController", () => {
       exhausted: false,
       postsScanned: 50,
     });
+    controller.markReady();
     vi.advanceTimersByTime(5000); // timer hits the end, waits for more
     expect(rendered).toEqual(["a"]);
     controller.append({

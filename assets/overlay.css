@@ -33,12 +33,13 @@
   cursor: none;
 }
 
-/* Top per-slide timer sweep */
+/* Top per-slide timer sweep — above the media so tall images can't cover it */
 .rs-timer {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
+  z-index: 6;
   height: 3px;
   background: rgba(255, 255, 255, 0.08);
   overflow: hidden;
@@ -119,6 +120,7 @@ iframe.reddit-slideshow-media {
   position: absolute;
   left: 26px;
   bottom: 30px;
+  z-index: 6;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -170,6 +172,7 @@ iframe.reddit-slideshow-media {
   position: absolute;
   left: 50%;
   bottom: 26px;
+  z-index: 6;
   transform: translateX(-50%);
   display: flex;
   gap: 4px;
@@ -325,5 +328,34 @@ iframe.reddit-slideshow-media {
   50% {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+/* Simple, quiet loading spinner shown while media loads */
+.rs-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.rs-loading[hidden] {
+  display: none;
+}
+
+.rs-loading span {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  border-top-color: var(--rs-accent);
+  animation: rs-spin 0.8s linear infinite;
+}
+
+@keyframes rs-spin {
+  to {
+    transform: rotate(360deg);
   }
 }

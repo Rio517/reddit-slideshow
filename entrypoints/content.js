@@ -26,6 +26,7 @@ export default defineContentScript({
           if (url) window.open(url, "_blank", "noopener");
         },
         onMediaEnded: () => controller?.mediaEnded(),
+        onMediaReady: () => controller?.markReady(),
       });
       document.documentElement.append(overlay.root);
       return overlay;
