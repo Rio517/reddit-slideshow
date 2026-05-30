@@ -25,7 +25,7 @@ export default defineContentScript({
         onClose: closeOverlay,
         onOpenOriginal: (slide) => {
           const url = slide.permalink ?? slide.sourceUrl;
-          if (url) window.open(url, "_blank", "noopener");
+          if (url && isHttpUrl(url)) window.open(url, "_blank", "noopener");
         },
         onMediaEnded: () => controller?.mediaEnded(),
         onMediaReady: () => controller?.markReady(),
@@ -86,6 +86,19 @@ export default defineContentScript({
       return c.imageTimerSeconds;
     }
 
+    /**
+     * Guard against non-http(s) schemes (e.g. javascript:) from listing fields.
+     * @param {string} url
+     */
+    function isHttpUrl(url) {
+      try {
+        const { protocol } = new URL(url);
+        return protocol === "https:" || protocol === "http:";
+      } catch {
+        return false;
+      }
+    }
+
     // Start the queue from the post nearest the top of the viewport so the
     // slideshow begins where the user is, not at the top of the first page.
     function startingAfter() {
@@ -120,63 +133,75 @@ export default defineContentScript({
     async function startSlideshow() {
       if (starting) return;
       starting = true;
-      const wasOpen = overlay?.isOpen() ?? false;
-      const ui = ensureOverlay();
-      ui.show();
-      if (!wasOpen) lockScroll();
-      ui.showStatus("Loading slideshow…");
+      try {
+        const wasOpen = overlay?.isOpen() ?? false;
+        const ui = ensureOverlay();
+        ui.show();
+        if (!wasOpen) lockScroll();
+        ui.showStatus("Loading slideshow…");
 
-      const settings = await getSettings();
-      muted = settings.startMuted;
-      ui.setMuted(muted);
-      const response = await requestPage(startingAfter());
-      if (!response?.ok) {
-        ui.showStatus(
-          response?.error?.message ?? "Could not load this listing.",
-        );
+        const settings = await getSettings();
+        muted = settings.startMuted;
+        ui.setMuted(muted);
+        const response = await requestPage(startingAfter());
+        if (!response?.ok) {
+          ui.showStatus(
+            response?.error?.message ?? "Could not load this listing.",
+          );
+          return;
+        }
+        const page = response.page;
+        if (!page?.slides?.length) {
+          ui.showStatus("No supported media on this page.");
+          return;
+        }
+
+        const tracker = settings.dedupe ? new DuplicateTracker() : null;
+        /** @param {{ slides: import("@/lib/slides.js").Slide[] }} p */
+        const prepare = (p) => {
+          let slides = settings.includeNsfw
+            ? p.slides
+            : p.slides.filter((slide) => !slide.over18);
+          if (tracker) slides = tracker.filterNewByKey(slides);
+          return { ...p, slides };
+        };
+
+        controller = new SlideshowController({
+          imageTimerSeconds: settings.imageTimerSeconds,
+          onRender: (slide, position) => {
+            if (!controller) return;
+            ui.renderCurrent(slide, {
+              ...position,
+              effectiveSeconds: effectiveSeconds(slide, controller),
+              loadWaitMs: settings.maxLoadWaitSeconds * 1000,
+              playing: !controller.paused,
+            });
+            preloadUpcoming();
+          },
+          onRequestNextPage: async (after) => {
+            ui.setBuffering(true);
+            const next = await requestPage(after);
+            ui.setBuffering(false);
+            if (next?.ok && next.page) {
+              controller?.append(prepare(next.page));
+            } else {
+              // Unblock the controller so it ends instead of hanging on a
+              // failed mid-session fetch.
+              controller?.append({
+                slides: [],
+                after: null,
+                exhausted: true,
+                postsScanned: 0,
+              });
+            }
+          },
+          onEnd: () => ui.showStatus("No more media to show."),
+        });
+        if (!settings.autoplay) controller.pause();
+        controller.start(prepare(page));
+      } finally {
         starting = false;
-        return;
       }
-      const page = response.page;
-      if (!page?.slides?.length) {
-        ui.showStatus("No supported media on this page.");
-        starting = false;
-        return;
-      }
-
-      const tracker = settings.dedupe ? new DuplicateTracker() : null;
-      /** @param {{ slides: import("@/lib/slides.js").Slide[] }} p */
-      const prepare = (p) => {
-        let slides = settings.includeNsfw
-          ? p.slides
-          : p.slides.filter((slide) => !slide.over18);
-        if (tracker) slides = tracker.filterNewByKey(slides);
-        return { ...p, slides };
-      };
-
-      controller = new SlideshowController({
-        imageTimerSeconds: settings.imageTimerSeconds,
-        onRender: (slide, position) => {
-          if (!controller) return;
-          ui.renderCurrent(slide, {
-            ...position,
-            effectiveSeconds: effectiveSeconds(slide, controller),
-            loadWaitMs: settings.maxLoadWaitSeconds * 1000,
-            playing: !controller.paused,
-          });
-          preloadUpcoming();
-        },
-        onRequestNextPage: async (after) => {
-          ui.setBuffering(true);
-          const next = await requestPage(after);
-          ui.setBuffering(false);
-          if (next?.ok && next.page) controller?.append(prepare(next.page));
-        },
-        onEnd: () => ui.showStatus("No more media to show."),
-      });
-      if (!settings.autoplay) controller.pause();
-      controller.start(prepare(page));
-      starting = false;
     }
 
     const HANDLED_KEYS = new Set([

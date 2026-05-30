@@ -242,6 +242,53 @@ describe("SlideshowController", () => {
     expect(rendered).toEqual(["a"]);
   });
 
+  it("keeps paging when an all-filtered page arrives while waiting", () => {
+    const { controller, rendered, requested } = makeController();
+    controller.start({
+      slides: [slideWithId("a")],
+      after: "t3_p2",
+      exhausted: false,
+      postsScanned: 50,
+    });
+    controller.markReady();
+    vi.advanceTimersByTime(5000); // hits the end, waits for more
+    expect(rendered).toEqual(["a"]);
+    controller.append({
+      slides: [], // entirely filtered out
+      after: "t3_p3",
+      exhausted: false,
+      postsScanned: 50,
+    });
+    expect(requested).toEqual(["t3_p2", "t3_p3"]);
+    controller.append({
+      slides: [slideWithId("b")],
+      after: null,
+      exhausted: true,
+      postsScanned: 50,
+    });
+    expect(rendered).toEqual(["a", "b"]);
+  });
+
+  it("ends gracefully when an exhausted empty page arrives while waiting", () => {
+    const { controller, rendered, ended } = makeController();
+    controller.start({
+      slides: [slideWithId("a")],
+      after: "t3_p2",
+      exhausted: false,
+      postsScanned: 50,
+    });
+    controller.markReady();
+    vi.advanceTimersByTime(5000);
+    controller.append({
+      slides: [],
+      after: null,
+      exhausted: true,
+      postsScanned: 50,
+    });
+    expect(ended()).toBe(1);
+    expect(rendered).toEqual(["a"]);
+  });
+
   it("calls onEnd when advancing past the last slide of an exhausted queue", () => {
     const { controller, ended } = makeController();
     controller.start({
