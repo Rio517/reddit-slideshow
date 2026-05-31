@@ -56,19 +56,19 @@ describe("renderSlide", () => {
     expect(el.muted).toBe(true);
     expect(el.autoplay).toBe(true);
     expect(el.loop).toBe(false);
-    expect(el.controls).toBe(true);
+    // No native control bar - videos follow the slideshow's own mute state.
+    expect(el.controls).toBe(false);
     expect(el.getAttribute("src")).toBe(
       "https://v.redd.it/x/CMAF_720.mp4?source=fallback",
     );
     expect(el.style.aspectRatio).toBe("1000 / 500");
   });
 
-  it("loops GIF-like Reddit video without native controls", () => {
+  it("loops GIF-like Reddit video", () => {
     const el = /** @type {HTMLVideoElement} */ (
       renderSlide(slide({ kind: "video", isGif: true }))
     );
     expect(el.loop).toBe(true);
-    expect(el.controls).toBe(false);
   });
 
   it("refuses a non-HTTPS or data: image URL at the sink", () => {
