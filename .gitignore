@@ -7,3 +7,4 @@ stats.html
 coverage/
 web-ext-artifacts/
 .playwright-mcp/
+TODO.local.md
