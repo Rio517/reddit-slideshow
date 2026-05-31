@@ -48,6 +48,7 @@ function settings(overrides) {
     includeNsfw: true,
     dedupe: true,
     contentDedup: false,
+    alwaysShowMeta: true,
     maxLoadWaitSeconds: 5,
     panZoom: false,
     panZoomScale: 2,

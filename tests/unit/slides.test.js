@@ -130,6 +130,15 @@ describe("gallery posts", () => {
     const slides = slidesFromListing(galleryFixture);
     expect(slides).toHaveLength(3);
   });
+
+  it("numbers gallery items so they are distinguishable in the jump list", () => {
+    const slides = slidesFromListing(galleryFixture);
+    expect(slides.map((s) => [s.galleryIndex, s.galleryTotal])).toEqual([
+      [1, 3],
+      [2, 3],
+      [3, 3],
+    ]);
+  });
 });
 
 describe("Reddit-hosted video posts", () => {

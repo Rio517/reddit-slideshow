@@ -201,6 +201,12 @@ iframe.reddit-slideshow-media {
   transform: translateY(-50%) translateX(12px);
 }
 
+/* "Always show count & title": the meta bar survives the idle fade. It stays
+   non-interactive while idle (the cursor is hidden); a mousemove wakes it. */
+#reddit-slideshow-root.rs-pin-meta.rs-idle .rs-meta {
+  opacity: 1;
+}
+
 .rs-btn {
   width: 42px;
   height: 42px;

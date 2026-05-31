@@ -111,6 +111,7 @@ describe("getSettings / saveSettings", () => {
       includeNsfw: false,
       dedupe: false,
       contentDedup: true,
+      alwaysShowMeta: true,
       maxLoadWaitSeconds: 10,
       panZoom: false,
       panZoomScale: 2,

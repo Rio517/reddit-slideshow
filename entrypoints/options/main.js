@@ -24,6 +24,9 @@ const includeNsfw = /** @type {HTMLInputElement} */ (
 const dedupe = /** @type {HTMLInputElement} */ (
   document.querySelector("#dedupe")
 );
+const alwaysShowMeta = /** @type {HTMLInputElement} */ (
+  document.querySelector("#alwaysShowMeta")
+);
 const maxLoadWait = /** @type {HTMLSelectElement} */ (
   document.querySelector("#maxLoadWaitSeconds")
 );
@@ -66,6 +69,7 @@ async function load() {
   startMuted.checked = settings.startMuted;
   includeNsfw.checked = settings.includeNsfw;
   dedupe.checked = settings.dedupe;
+  alwaysShowMeta.checked = settings.alwaysShowMeta;
   maxLoadWait.value = String(settings.maxLoadWaitSeconds);
   contentDedup.checked = settings.contentDedup;
   panZoom.checked = settings.panZoom;
@@ -85,6 +89,7 @@ async function persist() {
     startMuted: startMuted.checked,
     includeNsfw: includeNsfw.checked,
     dedupe: dedupe.checked,
+    alwaysShowMeta: alwaysShowMeta.checked,
     maxLoadWaitSeconds: Number(maxLoadWait.value),
     contentDedup: contentDedup.checked,
     panZoom: panZoom.checked,
@@ -106,6 +111,7 @@ autoplay.addEventListener("change", persist);
 startMuted.addEventListener("change", persist);
 includeNsfw.addEventListener("change", persist);
 dedupe.addEventListener("change", persist);
+alwaysShowMeta.addEventListener("change", persist);
 maxLoadWait.addEventListener("change", persist);
 panZoom.addEventListener("change", () => {
   syncPanZoomEnabled();
