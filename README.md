@@ -12,6 +12,9 @@ entirely in your browser. No analytics, no tracking, no developer servers (there
 are none); your settings stay on your device. It plays direct images, galleries,
 Reddit-hosted video, Redgifs, Imgur, Streamable, Giphy, Catbox, and crossposts.
 
+**Made for the big screen.** Pop the slideshow out into its own window, then
+AirPlay or Chromecast that window to your TV for a hands-off, lean-back feed.
+
 <a href="docs/slideshow-demo.png">
   <img src="docs/slideshow-demo.png" width="820"
     alt="A full-screen slideshow over r/aww: a sleeping cat with the position counter, open-original, and the control rail (prev/play/next, mute, fullscreen, settings, close)">

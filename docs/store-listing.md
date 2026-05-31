@@ -89,8 +89,8 @@ NICE TOUCHES
 - Optional top countdown timer bar (on video slides, every slide, or never)
 - Optional slow pan & zoom for images too big to see at once
 - A pinned position counter and post title so you always know where you are
-- "Open in a window" reopens the slideshow in a minimal popup window - handy for
-  AirPlay / casting to a second screen
+- "Open in a window" reopens the slideshow in a minimal popup window, ready to
+  AirPlay or Chromecast to a TV or second screen for a lean-back, big-screen feed
 - Duplicate skipping: reposts, crossposts, and repeated galleries are skipped;
   an optional perceptual-hash mode can also skip re-uploaded images
 - "Open original" jumps to the source post
