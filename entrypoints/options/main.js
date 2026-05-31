@@ -14,7 +14,11 @@ const startMuted = requiredElement("#startMuted", HTMLInputElement);
 const includeNsfw = requiredElement("#includeNsfw", HTMLInputElement);
 const dedupe = requiredElement("#dedupe", HTMLInputElement);
 const alwaysShowMeta = requiredElement("#alwaysShowMeta", HTMLInputElement);
-const maxLoadWait = requiredElement("#maxLoadWaitSeconds", HTMLSelectElement);
+const maxLoadWait = requiredElement("#maxLoadWaitSeconds", HTMLInputElement);
+const maxLoadWaitValue = requiredElement(
+  "#maxLoadWaitValue",
+  HTMLOutputElement,
+);
 const transition = requiredElement("#transition", HTMLSelectElement);
 const timerBarRadios = /** @type {NodeListOf<HTMLInputElement>} */ (
   document.querySelectorAll('input[name="timerBar"]')
@@ -56,6 +60,7 @@ async function load() {
   dedupe.checked = settings.dedupe;
   alwaysShowMeta.checked = settings.alwaysShowMeta;
   maxLoadWait.value = String(settings.maxLoadWaitSeconds);
+  maxLoadWaitValue.textContent = String(settings.maxLoadWaitSeconds);
   transition.value = settings.transition;
   for (const radio of timerBarRadios) {
     radio.checked = radio.value === settings.timerBar;
@@ -107,6 +112,9 @@ startMuted.addEventListener("change", persist);
 includeNsfw.addEventListener("change", persist);
 dedupe.addEventListener("change", persist);
 alwaysShowMeta.addEventListener("change", persist);
+maxLoadWait.addEventListener("input", () => {
+  maxLoadWaitValue.textContent = maxLoadWait.value;
+});
 maxLoadWait.addEventListener("change", persist);
 transition.addEventListener("change", persist);
 for (const radio of timerBarRadios) radio.addEventListener("change", persist);

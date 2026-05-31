@@ -53,13 +53,19 @@ describe("normalizeSettings", () => {
     expect(normalizeSettings({ contentDedup: true }).contentDedup).toBe(true);
   });
 
-  it("defaults maxLoadWaitSeconds to 5 and only accepts preset values", () => {
+  it("defaults maxLoadWaitSeconds to 5 and clamps to 1-30", () => {
     expect(normalizeSettings({}).maxLoadWaitSeconds).toBe(5);
     expect(
-      normalizeSettings({ maxLoadWaitSeconds: 20 }).maxLoadWaitSeconds,
-    ).toBe(20);
-    expect(
       normalizeSettings({ maxLoadWaitSeconds: 7 }).maxLoadWaitSeconds,
+    ).toBe(7);
+    expect(
+      normalizeSettings({ maxLoadWaitSeconds: 999 }).maxLoadWaitSeconds,
+    ).toBe(30);
+    expect(
+      normalizeSettings({ maxLoadWaitSeconds: 0 }).maxLoadWaitSeconds,
+    ).toBe(1);
+    expect(
+      normalizeSettings({ maxLoadWaitSeconds: "x" }).maxLoadWaitSeconds,
     ).toBe(5);
   });
 
