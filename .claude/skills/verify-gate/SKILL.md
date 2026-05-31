@@ -27,7 +27,7 @@ so the build steps must run before it.
 
 - typecheck / lint / format: no error output, exit 0.
 - tests: every test passes (no `failed`).
-- builds: both finish with `✔ Built extension`.
+- builds: both finish with a `Built extension` success line.
 - web-ext: `0 errors`, `0 warnings`, `0 notices`.
 
 ## On failure
