@@ -15,38 +15,67 @@ own listing JSON), so the new-Reddit path never depends on old Reddit.
   listing.
 - Auto-advance with a configurable timer; videos advance when they finish.
 - Automatic pagination — the queue keeps loading the next listing page.
-- Per-kind rendering: `<img>` for images/galleries, muted-by-default `<video>`
-  for `v.redd.it`, first-party `<iframe>` for Redgifs.
+- Per-kind rendering: `<img>` for images/galleries and native `<video>` for
+  `v.redd.it` and Redgifs (Redgifs is resolved to its direct mp4 so it times and
+  unmutes like any other video).
 - A refined dark overlay: side-rail controls, a per-slide timer bar, a position
-  counter, a loading spinner, and a graceful placeholder for media that fails.
+  counter, and a loading spinner. Click the dark backdrop to close.
+- Broken media (a dead clip, a 404 image) is skipped automatically and collected
+  in a clickable "N skipped" list so you can revisit what was dropped.
 - Settings: image timer, max load wait, autoplay, start-muted, Include-NSFW
-  filter, and duplicate skipping.
+  filter, and duplicate skipping — open them from the overlay's gear, and
+  changes apply live without a reload.
 - Skips duplicate media within a session (reposts, crossposts, repeated
   galleries).
 
-## Install for development
+## Install
 
-This loads the extension into **your** Firefox, so it uses your real Reddit
-session.
+It isn't on the Firefox Add-ons site or the Chrome Web Store yet, so you load the
+built extension yourself. This runs it in **your** browser, using your real
+(logged-in) Reddit session.
+
+First build it:
 
 ```sh
 npm install
-npm run build
+npm run build         # Firefox → .output/firefox-mv3/
+npm run build:chrome  # Chrome  → .output/chrome-mv3/
 ```
 
-Then in Firefox:
+### Firefox
 
 1. Open `about:debugging#/runtime/this-firefox`.
-2. **Load Temporary Add-on…** and pick `.output/firefox-mv3/manifest.json`.
-3. After code changes, re-run `npm run build` and hit **Reload** there.
+2. Click **Load Temporary Add-on…** and pick
+   `.output/firefox-mv3/manifest.json`.
+3. After code changes, re-run `npm run build` and click **Reload**.
+
+Temporary add-ons are removed when you restart Firefox — just load it again. For
+a permanent install, use Firefox Developer Edition / Nightly / ESR, set
+`xpinstall.signatures.required` to `false` in `about:config`, then install the
+`npm run zip` package from `about:addons` → **Install Add-on From File…**.
+
+### Chrome (also Edge, Brave, other Chromium browsers)
+
+1. Open `chrome://extensions`.
+2. Turn on **Developer mode** (toggle, top-right).
+3. Click **Load unpacked** and select the **folder** `.output/chrome-mv3/`
+   (the folder itself, not a file inside it).
+4. Click the toolbar's puzzle-piece icon and pin **Reddit Slideshow**.
+5. After code changes, re-run `npm run build:chrome` and click the **↻ reload**
+   icon on the extension's card in `chrome://extensions`.
+
+Unlike a Firefox temporary add-on, a Chrome unpacked extension stays installed
+across restarts (Chrome shows a "disable developer-mode extensions" prompt on
+startup that you can dismiss).
 
 ## Use
 
 - Open an `old.reddit.com` or `www.reddit.com` listing, then click the toolbar
   icon or press **Alt+Shift+S**.
 - Keys: **←/→** previous/next, **Space** play/pause, **M** mute, **Esc** close.
-- Settings live on the extension's options page (`about:addons` → Reddit
-  Slideshow → Preferences).
+  You can also click the dark backdrop to close.
+- Open settings from the **gear** in the overlay's control rail (or the
+  extension's options page); changes apply to the running slideshow immediately.
 
 ## Commands
 
