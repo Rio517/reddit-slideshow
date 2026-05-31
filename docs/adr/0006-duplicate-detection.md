@@ -1,7 +1,7 @@
 # ADR 0006: Detect and skip duplicate media in the slideshow queue
 
-Date: 2026-05-30
-Status: Accepted (both layers implemented; Layer 2 is opt-in)
+Date: 2026-06-01
+Status: Accepted (both layers implemented and on by default)
 
 ## Context
 
@@ -50,7 +50,7 @@ This is synchronous, runs in the queue alongside the NSFW filter, and catches
 exact reposts, crossposts, repeated galleries, and preview-vs-original of the
 same post. It covers the large majority of real duplicates at zero cost.
 
-### Layer 2 - perceptual hash for images (optional, staged)
+### Layer 2 - perceptual hash for images (on by default)
 
 To also catch re-uploads and resizes (different ids, visually identical),
 compute a **64-bit difference hash (dHash)**: downscale to 9×8 grayscale,
@@ -69,11 +69,18 @@ Because of the CORS/canvas constraints above, Layer 2 obtains pixels by having
 the **background** script fetch the image bytes (privileged) and returning an
 `ArrayBuffer`; the content script decodes it with `createImageBitmap` and draws
 to a 9×8 `OffscreenCanvas` to read luminance. That requires host permissions for
-the image hosts (`i.redd.it`, `preview.redd.it`). To keep install-time
-permissions minimal (ADR 0004), Layer 2 is **opt-in** and requests
-`preview.redd.it` (and uses the existing `i.redd.it`) via
-`optional_host_permissions` only when the user enables aggressive de-duplication.
-Videos are deduped by Layer 1 only; hashing video frames is out of scope.
+the image hosts (`i.redd.it`, `preview.redd.it`, `external-preview.redd.it`).
+
+Layer 2 is **on by default**, because identity-only dedup misses a common real
+case: the same image posted once as a solo link and again inside a gallery gets
+two different Reddit upload ids, so only a content hash catches it - without
+Layer 2 "skip duplicates" visibly fails on exactly the repeats users notice.
+The image-host permissions are therefore **install-time** `host_permissions`,
+accepting a slightly larger install prompt (a documented exception to ADR 0004's
+minimize-and-stage default) for dedup that actually works out of the box. A
+"Also skip re-uploaded images" toggle (default on) disables Layer 2 if its rare
+false matches ever bother a user. Videos are deduped by Layer 1 only; hashing
+video frames is out of scope.
 
 ## Consequences
 
@@ -87,9 +94,10 @@ Benefits:
 
 Costs / risks:
 
-- Layer 2's pixel access depends on background-routed fetching and an added
-  (optional) `preview.redd.it` permission; it is staged behind a user opt-in and
-  needs Firefox verification before being treated as settled.
+- Layer 2's pixel access depends on background-routed fetching and the
+  install-time `i.redd.it` / `preview.redd.it` / `external-preview.redd.it`
+  permissions, which widen the install prompt; this is the cost of dedup that
+  catches re-uploads without a setup step.
 - dHash yields occasional false positives (distinct images within the threshold)
   and false negatives (crops, heavy edits). The threshold is conservative and
   the cost of a rare wrongly-skipped slide is low for a lean-back tool.

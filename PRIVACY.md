@@ -45,27 +45,28 @@ operated by the developer (there is none):
   information or tracking of its own. (If Redgifs or Streamable can't be reached,
   the clip falls back to the provider's standard `<iframe>` embed, loaded by your
   browser the same way Reddit embeds it.)
-- **Optional re-upload detection (off by default).** If you turn on "Also detect
-  re-uploaded images," the extension fetches preview images from
-  `preview.redd.it` / `external-preview.redd.it` to compute a local perceptual
-  hash so repeats can be skipped. These image fetches are made **without cookies**
-  (`credentials: "omit"`), the hashing happens entirely in your browser, and no
-  image or hash leaves your device. This feature requests its host permission
-  only when you enable it.
+- **Re-upload detection (on by default).** To catch the same image re-posted
+  under a new link (which the basic skip can't see), the extension fetches the
+  image and its previews from `i.redd.it` / `preview.redd.it` /
+  `external-preview.redd.it` to compute a local perceptual hash. These fetches
+  are made **without cookies** (`credentials: "omit"`), the hashing happens
+  entirely in your browser, and no image or hash leaves your device. You can turn
+  this off with the "Also skip re-uploaded images" setting.
 
 ## Permissions and why they are needed
 
 - **`storage`** - to save your settings locally (above).
 - **Host access to `old.reddit.com`, `www.reddit.com`** - to read the listing
-  JSON for the page you are on. (Reddit media on `i.redd.it` / `v.redd.it` and
-  other image hosts loads directly in the page and needs no permission.)
+  JSON for the page you are on. (Reddit video on `v.redd.it` and external image
+  hosts load directly in the page and need no permission.)
+- **Host access to `i.redd.it`, `preview.redd.it`, `external-preview.redd.it`** -
+  so the background can fetch Reddit-hosted images and previews to compute the
+  local perceptual hash used for on-by-default re-upload detection. These fetches
+  are made without cookies; nothing leaves your device.
 - **Host access to `api.redgifs.com`, `media.redgifs.com`, `i.imgur.com`,
   `*.streamable.com`, `*.giphy.com`** - so the background can resolve and fetch
   provider clips (Redgifs, Imgur, Streamable, Giphy) and play them as native
   video. These fetches are made without cookies.
-- **Optional host access to `i.redd.it`, `preview.redd.it`,
-  `external-preview.redd.it`** - requested only if you enable re-upload
-  detection, to fetch images for local perceptual hashing.
 
 The extension requests no other permissions: no browsing history, no bookmarks,
 no access to other sites, and no remote code.

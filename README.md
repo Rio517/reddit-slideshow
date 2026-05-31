@@ -42,8 +42,9 @@ live, no reload:
 - **Top countdown bar** - on video slides, every slide, or never
 - **Autoplay videos** and **start muted**
 - **Include NSFW** - follows your logged-in Reddit session by default
-- **Skip duplicates** - reposts, crossposts, repeated galleries; optionally also
-  re-uploaded images via a local perceptual hash (opt-in)
+- **Skip duplicates** - reposts, crossposts, repeated galleries, and (on by
+  default) the same image re-uploaded under a new link, via a local perceptual
+  hash
 - **Pan & zoom** for images too big to see at once - a slow push-in and drift
   across, with full control of the sequence
 - **Always show the position counter & title**

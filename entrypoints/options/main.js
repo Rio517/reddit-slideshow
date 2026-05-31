@@ -1,4 +1,3 @@
-import { browser } from "wxt/browser";
 import {
   getSettings,
   saveSettings,
@@ -7,15 +6,6 @@ import {
   formatImageTimer,
 } from "@/lib/settings.js";
 import { requiredElement } from "@/lib/dom.js";
-
-// Origins the content-dedup toggle grants/removes at runtime. Must stay in sync
-// with optional_host_permissions in wxt.config.ts. i.redd.it is optional (not a
-// default host permission) because it's fetched only for this opt-in hashing.
-const CONTENT_DEDUP_ORIGINS = [
-  "https://i.redd.it/*",
-  "https://preview.redd.it/*",
-  "https://external-preview.redd.it/*",
-];
 
 const timerSlider = requiredElement("#imageTimerSeconds", HTMLInputElement);
 const timerValue = requiredElement("#timerValue", HTMLOutputElement);
@@ -158,20 +148,6 @@ for (const [id, outId] of PAN_ZOOM_RANGES) {
   input.addEventListener("change", persist);
 }
 
-// Enabling content dedup requires an optional host permission (read pixels);
-// disabling it drops that permission again.
-contentDedup.addEventListener("change", async () => {
-  if (contentDedup.checked) {
-    const granted = await browser.permissions.request({
-      origins: CONTENT_DEDUP_ORIGINS,
-    });
-    if (!granted) contentDedup.checked = false;
-  } else {
-    await browser.permissions
-      .remove({ origins: CONTENT_DEDUP_ORIGINS })
-      .catch(() => {});
-  }
-  await persist();
-});
+contentDedup.addEventListener("change", persist);
 
 load();

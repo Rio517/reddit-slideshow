@@ -12,6 +12,13 @@ export default defineConfig({
       // Listing JSON is fetched (with the session cookie) from these two.
       "https://old.reddit.com/*",
       "https://www.reddit.com/*",
+      // Reddit image bytes, background-fetched for the perceptual-hash dedup that
+      // is on by default (ADR 0006 Layer 2): the on-screen image (i.redd.it) and
+      // its smaller previews. Display images load directly without a permission;
+      // this access is only for hashing them to catch re-uploads.
+      "https://i.redd.it/*",
+      "https://preview.redd.it/*",
+      "https://external-preview.redd.it/*",
       // Redgifs: resolve the direct mp4 (api) and fetch its bytes (media) in the
       // background, so the clip plays as a native, correctly-timed video.
       "https://api.redgifs.com/*",
@@ -26,16 +33,6 @@ export default defineConfig({
       // Giphy: background-fetch the transformed .mp4 from the media CDN subdomain
       // (media./media2./…), played as a blob (ADR 0014).
       "https://*.giphy.com/*",
-    ],
-    // Requested at runtime only when the user enables content-based dedup
-    // (ADR 0006 Layer 2), so the background can fetch images to hash. i.redd.it
-    // is here (not required) because it's reached *only* by that opt-in hashing;
-    // display images load directly on CSP-less old.reddit without a permission.
-    // Keep this list in sync with CONTENT_DEDUP_ORIGINS in entrypoints/options/main.js.
-    optional_host_permissions: [
-      "https://i.redd.it/*",
-      "https://preview.redd.it/*",
-      "https://external-preview.redd.it/*",
     ],
     // PNG (not SVG) so the same icons work on Chrome, which rejects SVG icons.
     // Regenerate from public/icon.svg with: npm run icons

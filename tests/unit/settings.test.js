@@ -51,9 +51,9 @@ describe("normalizeSettings", () => {
     expect(normalizeSettings({ dedupe: false }).dedupe).toBe(false);
   });
 
-  it("defaults contentDedup off (opt-in) and accepts a boolean", () => {
-    expect(normalizeSettings({}).contentDedup).toBe(false);
-    expect(normalizeSettings({ contentDedup: true }).contentDedup).toBe(true);
+  it("defaults contentDedup on (core dedup) and accepts a boolean", () => {
+    expect(normalizeSettings({}).contentDedup).toBe(true);
+    expect(normalizeSettings({ contentDedup: false }).contentDedup).toBe(false);
   });
 
   it("defaults maxLoadWaitSeconds to 5 and clamps to 1-30", () => {

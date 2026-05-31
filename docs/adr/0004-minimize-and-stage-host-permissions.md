@@ -17,21 +17,22 @@ Use the narrowest practical install-time host permissions and stage the rest.
 to function:
 
 - `old.reddit.com`, `www.reddit.com` - listing JSON for both frontends (ADR 0008).
-- `i.redd.it`, `v.redd.it` - Reddit-hosted images and video.
+- `i.redd.it`, `preview.redd.it`, `external-preview.redd.it` - background-fetch
+  Reddit images and previews to compute the perceptual hash for re-upload
+  detection, which is on by default (ADR 0006 Layer 2). Display of these images
+  needs no permission; this access is only for hashing.
 - `api.redgifs.com`, `media.redgifs.com` - Redgifs is played as native video
   (ADR 0010): the background resolves the clip's direct mp4 from the API and
   fetches the bytes, because the CDN hotlink-protects against a reddit `Referer`.
   That is an extension-initiated fetch, so it needs the host permission. (The
   iframe fallback, used only when resolution fails, is a page element and needs
   no host permission - just the page's `frame-src`.)
+- `i.imgur.com`, `*.streamable.com`, `*.giphy.com` - background-fetch provider
+  clips played as native video (ADRs 0011, 0013, 0014).
 
-**Optional `optional_host_permissions`**, requested from a user gesture only when
-the feature is enabled and removed when it is disabled:
-
-- `preview.redd.it`, `external-preview.redd.it` - read pixels for the opt-in
-  content-based duplicate detection (ADR 0006 Layer 2).
-
-No all-URLs or broad host access is requested.
+Reddit video (`v.redd.it`) and external image hosts load directly in the page as
+`<img>`/`<video>` and need no host permission. No optional host permissions are
+used, and no all-URLs or broad host access is requested.
 
 ## Consequences
 

@@ -91,8 +91,9 @@ NICE TOUCHES
 - A pinned position counter and post title so you always know where you are
 - "Open in a window" reopens the slideshow in a minimal popup window, ready to
   AirPlay or Chromecast to a TV or second screen for a lean-back, big-screen feed
-- Duplicate skipping: reposts, crossposts, and repeated galleries are skipped;
-  an optional perceptual-hash mode can also skip re-uploaded images
+- Duplicate skipping: reposts, crossposts, and repeated galleries are skipped,
+  and a perceptual hash (on by default) also catches the same image re-uploaded
+  under a new link - solo vs. in a gallery
 - "Open original" jumps to the source post
 
 SETTINGS (apply live, no reload)
@@ -104,7 +105,7 @@ SETTINGS (apply live, no reload)
 - Autoplay videos on/off, start muted on/off
 - Include NSFW - by default follows your Reddit session, showing over-18 content
   only insofar as your account already does
-- Skip duplicate media; optionally also detect re-uploaded images
+- Skip duplicate media, including re-uploaded images (on by default)
 - Pan & zoom large images (or all images), with full control over the sequence
 
 PRIVACY
@@ -166,15 +167,14 @@ Host permissions (install-time):
 - **https://\*.giphy.com/\*** - Fetch a Giphy clip's mp4 from its media CDN and
   play it as a looping video. Without cookies.
 
-Reddit media (`i.redd.it`, `v.redd.it`) and Catbox files (`files.catbox.moe`)
-load directly in the page as `<img>`/`<video>` and need no host permission.
+Reddit video (`v.redd.it`) and Catbox files (`files.catbox.moe`) load directly
+in the page as `<img>`/`<video>` and need no host permission.
 
-Optional host permissions (requested at runtime only when the user enables the
-"Also detect re-uploaded images" setting, to fetch images for local perceptual
-hashing; the hash never leaves the device):
+Host permissions for the on-by-default re-upload detection (fetch Reddit images
+to compute a local perceptual hash; the hash never leaves the device):
 
-- **https://i.redd.it/\*** - Fetch Reddit-hosted images to hash. (Display of
-  i.redd.it images needs no permission; this is only for the opt-in hashing.)
+- **https://i.redd.it/\*** - Fetch the displayed Reddit-hosted image to hash.
+  (Display itself needs no permission; this access is only for hashing.)
 - **https://preview.redd.it/\* , https://external-preview.redd.it/\*** - Fetch
   Reddit preview images (incl. externally-hosted post previews) to hash.
 
@@ -276,13 +276,12 @@ want a third tile.)
 - **api.redgifs.com / media.redgifs.com / i.imgur.com / \*.streamable.com /
   \*.giphy.com** - Resolve and fetch provider clips (Redgifs, Imgur `.gifv`,
   Streamable, Giphy) in the background so they play as native, correctly-timed
-  video instead of an opaque embed (all requested without cookies). Reddit media
-  (i.redd.it, v.redd.it) and Catbox files load directly in the page and need no
-  permission.
-- **i.redd.it / preview.redd.it / external-preview.redd.it (optional)** -
-  Requested only at runtime, and only if the user turns on "Also detect
-  re-uploaded images," to fetch images for an on-device perceptual hash so
-  duplicate re-uploads can be skipped.
+  video instead of an opaque embed (all requested without cookies). Reddit video
+  (v.redd.it) and Catbox files load directly in the page and need no permission.
+- **i.redd.it / preview.redd.it / external-preview.redd.it** - Fetch
+  Reddit-hosted images and previews (without cookies) to compute an on-device
+  perceptual hash, so the same image re-uploaded under a new link is skipped.
+  This duplicate detection is on by default; the hash never leaves the device.
 
 ---
 
@@ -301,8 +300,8 @@ want a third tile.)
 > click the "Reddit Slideshow Spectacular!" toolbar icon (or press Alt+Shift+S). A
 > full-screen slideshow opens over the page. Use Left/Right to navigate, Space
 > to play/pause, M to mute, F for fullscreen, and Esc to close. The gear icon
-> opens settings, which apply live. The optional "Also detect re-uploaded
-> images" setting is what triggers the runtime request for the optional
-> preview.redd.it / external-preview.redd.it host permissions.
+> opens settings, which apply live. Re-upload detection (the perceptual hash that
+> fetches i.redd.it / preview.redd.it images) is on by default and can be turned
+> off with the "Also skip re-uploaded images" setting.
 >
 > Source: https://github.com/Rio517/reddit-slideshow-spectacular
