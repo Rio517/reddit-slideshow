@@ -65,6 +65,33 @@ describe("renderSlide", () => {
     expect(el.loop).toBe(true);
   });
 
+  it("refuses a non-HTTPS or data: image URL at the sink", () => {
+    expect(
+      renderSlide(slide({ mediaUrl: "http://i.redd.it/x.jpg" })).hasAttribute(
+        "src",
+      ),
+    ).toBe(false);
+    expect(
+      renderSlide(
+        slide({ mediaUrl: "data:image/png;base64,AAAA" }),
+      ).hasAttribute("src"),
+    ).toBe(false);
+  });
+
+  it("refuses a non-Reddit (or non-HTTPS) host for direct video", () => {
+    const video = (/** @type {string} */ url) =>
+      renderSlide(
+        slide({ provider: "reddit-video", kind: "video", mediaUrl: url }),
+      );
+    expect(video("https://evil.example/x.mp4").hasAttribute("src")).toBe(false);
+    expect(video("http://v.redd.it/x/CMAF_720.mp4").hasAttribute("src")).toBe(
+      false,
+    );
+    expect(video("https://v.redd.it/x/CMAF_720.mp4").getAttribute("src")).toBe(
+      "https://v.redd.it/x/CMAF_720.mp4",
+    );
+  });
+
   it("renders Redgifs as a fullscreen-capable iframe using embedUrl", () => {
     const el = renderSlide(
       slide({

@@ -494,6 +494,21 @@ describe("createOverlay", () => {
     expect(onOpenOriginal).toHaveBeenCalledTimes(1);
   });
 
+  it("skips a slide whose media URL is unsafe (non-HTTPS)", async () => {
+    const onMediaFailed = vi.fn();
+    const overlay = createOverlay({ ...noopHandlers(), onMediaFailed });
+    overlay.renderCurrent(imageSlide({ mediaUrl: "http://i.redd.it/x.jpg" }), {
+      index: 0,
+      total: 2,
+      exhausted: false,
+      effectiveSeconds: 5,
+      playing: true,
+    });
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(onMediaFailed).toHaveBeenCalledTimes(1);
+  });
+
   it("swaps in a placeholder when media fails to load", () => {
     const overlay = createOverlay(noopHandlers());
     overlay.renderCurrent(imageSlide({ title: "Removed post" }), {
