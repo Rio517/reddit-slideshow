@@ -1,10 +1,10 @@
 # NEXT_STEP — Reddit Slideshow
 
-**Doc updated:** 2026-05-30 · **Branch:** `main` · **Status:** v1 feature-complete (verified once in real Firefox); new Reddit (`www.reddit.com`) support is now implemented (ADR 0008) and needs a logged-in Firefox check.
+**Doc updated:** 2026-05-31 · **Branch:** `main` · **Status:** shipped-ready on `old.reddit.com` + `www.reddit.com`; CI green; store-listing copy drafted. Next: more media providers (Imgur / Streamable / Giphy / Catbox).
 
 > **Hard rule:** work directly on `main`. Do not create branches or worktrees unless the user explicitly asks. See `AGENTS.md`.
 
-This project is a Firefox-first WebExtension for turning the current `old.reddit.com` feed into a media slideshow. The full v1 is implemented and unit-tested: session-cookie `.json` access (validated against live Reddit), media resolvers (images, galleries, Reddit video, Redgifs, crossposts — run against ~400 real posts), a headless controller (navigation, load-gated timer, pagination, safety timer), a designed overlay (per-kind rendering, side-rail controls, position counter, per-slide timer sweep, loading spinner, failure placeholder, preload, buffering hint), settings (custom timer slider, autoplay, Include-NSFW filter), start-from-current-scroll, and an SVG icon. A real-Firefox pass confirmed v.redd.it, Redgifs, navigation, pagination, and RES coexistence (with RES + Reddit Deduplicator). old.reddit.com sets no CSP, so injected cross-origin media loads directly.
+This is a Firefox-first (also Chrome) WebExtension that turns the current `old.reddit.com` or `www.reddit.com` feed into a keyboard-driven media slideshow. It reuses the logged-in session (no API keys) and resolves images, galleries, v.redd.it video, Redgifs, and crossposts via the provider dispatch in `lib/slides.js`. The overlay does a gap-free, decode-gated slide swap with six transitions (none/fade/slide/push/zoom/flip), a top-right close + a backdrop close-confirm with countdown, an idle auto-hide that respects focus, a popout/AirPlay window, a jump-to-post list, a skipped list, a position counter, and ARIA + focus management. Settings (per-image timer, transition, top-timer-bar mode, load-wait, autoplay, mute, Include-NSFW, dedup, pan & zoom) live in an in-overlay gear panel and a light/dark options page, applied live. A DEV-gated logger (`lib/log.js`) aids debugging; CI runs typecheck/lint/format/test + build (both browsers) + web-ext lint; `npm run screenshots` regenerates the options screenshots. old.reddit.com sets no CSP, so injected cross-origin media loads directly; the image/video sinks are still host/HTTPS-gated (`safeMediaUrl`).
 
 ---
 
@@ -29,41 +29,43 @@ Key decisions already made:
 
 ---
 
-## 1. Immediate Todo
+## 1. Next up — media providers
 
-1. Is there a runtime introspection tool we could use to improve iteration speed and debugging speed?
-2. please add build/publishing instructions to readme if not there already.
-3. Slide transitions: bbetween images i see a roughly 1s delay between one image going away and a new one coming in.... i dont want that. Ideally we could have a transition preference. with 6 options, including fade, slide, none, and maybe you can suggest others that users might like. i think this would be best in the full settings section.
-4. Please create a new popout button in the control slider that opens the slideshow in a dedicated minimal window. i would use this for airplay. Ideally no browser bar or url bar or title. very minmal.
-5. Please audit our test suite speed, can it be faster, especially when we go to CI
-6. go to CI.
-   CHECK IF DONE
+Add more providers so the slideshow isn't Redgifs-centric. Each mirrors the
+Redgifs pattern: detection in the `lib/slides.js` provider dispatch, a background
+resolver (`lib/redgifs.js`-style) where a network resolve is needed, then play as
+a proxied `<video>` blob or render as images. Every new fetch host needs a scoped
+`host_permission` + an ADR, plus a fixture and a resolver test.
 
-7. **Full HLS/DASH audio** — only if the unmute check shows many clips are silent (muxed-fallback assumption wrong).
-8. **Packaging:** `npm run zip` (Firefox/AMO) and `npm run zip:chrome` (Chrome Web Store) when ready.
+- **Imgur** — `.gifv` → `.mp4` native video (sync URL transform, proxied blob).
+  Then Imgur **albums** (`imgur.com/a/…`, `/gallery/…`) → resolve to the image
+  list (a 1→N async resolve — a queue change; do after gifv). Direct
+  `i.imgur.com` images already work via the generic image path.
+- **Streamable** — `streamable.com/<id>` → resolve the mp4 via the public API
+  (`api.streamable.com/videos/<id>`, no key); play as native video.
+- **Giphy** — `giphy.com/gifs/<id>` / `media.giphy.com` → the direct mp4 (or gif).
+- **Catbox** — `files.catbox.moe/*.mp4` direct files (host-allowlist entry for
+  video; images already work).
 
-MIGHT BE DONE ALREDY:
+Skip: Gfycat (shut down 2023 → Redgifs); YouTube / Vimeo / Twitter (poor
+slideshow fit).
 
-### Quality follow-ups (lower priority)
+### Also deferred (lower priority)
 
-- **Content-dedup hashing:** hash from a Reddit preview URL (or HEAD-gate on
-  size) instead of the full display image, to cut bandwidth/decode for the opt-in
-  re-upload detection.
-- **Redgifs lazy resolution:** deliver a page before its Redgifs embeds resolve,
-  pushing upgraded native-video slides as they arrive, so a Redgifs-heavy page
-  isn't delayed.
-- **Redgifs streaming:** avoid buffering the whole mp4 (background → blob) before
-  playback — investigate a streaming or extension-served-URL path.
-- **Narrow typedefs for Reddit listing JSON** (`lib/slides.js` et al. currently
-  use `any`).
-- **`requiredElement(selector, ctor)` helper** for the options-page lookups.
-- **Split `lib/overlay-ui.js`** if it keeps growing — candidate seams are the
-  jump-list panel, the skipped-list panel, and a media-lifecycle module (object
-  URL revoke, video stop, ready fallback, listener aborts), with `createOverlay`
-  as the assembly point.
-
-The content↔overlay↔background glue now lives in `lib/session.js` (injected deps),
-covered by `tests/unit/session.test.js`.
+- **Overlay shadow-root migration** — isolate overlay CSS from host/RES styles and
+  get a real focus trap (inert host). High value; a deliberate architecture change.
+- **Real-Firefox re-check:** the dropped iframe `allow-same-origin` (security M1)
+  — confirm Redgifs `/ifr/` playback still works while logged in; revert that one
+  line if it regresses.
+- **Mute control + real audio** (needs a bundled HLS/DASH player).
+- **Redgifs lazy resolution** (push a page before its embeds resolve) and
+  **Redgifs streaming** (avoid buffering the whole mp4 to a blob first).
+- **Content-dedup hashing** from a Reddit preview URL (or HEAD-gate on size)
+  instead of the full display image.
+- **Split `lib/overlay-ui.js`** if it keeps growing — jump-list, skipped-list, and
+  media-lifecycle seams, with `createOverlay` as the assembly point.
+- **AMO + Chrome Web Store submission** — copy is ready in `docs/store-listing.md`;
+  package with `npm run zip` / `npm run zip:chrome`.
 
 Keep small commits. Do not batch multiple slices into one giant commit.
 
@@ -186,27 +188,19 @@ Confirmed in a real logged-in Firefox profile:
 
 ---
 
-## 6. Current Backlog Shape
+## 6. Longer-term (V2)
 
-V1 is feature-complete. Open items:
+Near-term work is in §1. Further out:
 
-1. Mute control + audio playback (needs a bundled HLS/DASH player).
-2. Packaging and AMO submission (`npm run zip`).
-
-V2 backlog:
-
-- Download current media.
+- Download the current media.
 - Highest-resolution inspection indicators.
-- Pan and zoom for large images.
-- More providers beyond Redgifs.
 
 ---
 
 ## 7. Things Not To Do Yet
 
-- Do not start with Redgifs native `.mp4` embedding.
-- Do not add all-URLs host permissions.
+- Do not add all-URLs host permissions (each new provider host is scoped + ADR'd).
 - Do not add analytics.
-- Do not build a downloader in v1.
+- Do not build the downloader yet (it's V2).
 - Do not rely on live Reddit in unit tests.
-- Do not create a branch unless explicitly asked.
+- Do not create a branch/worktree unless explicitly asked.
