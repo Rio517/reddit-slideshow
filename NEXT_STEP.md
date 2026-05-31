@@ -64,6 +64,10 @@ slideshow fit).
   instead of the full display image.
 - **Split `lib/overlay-ui.js`** if it keeps growing — jump-list, skipped-list, and
   media-lifecycle seams, with `createOverlay` as the assembly point.
+- **Tip jar** — a small "support / tip" link (Ko-fi / GitHub Sponsors / Buy Me a
+  Coffee) in the options-page footer (and maybe by the overlay's "Full
+  preferences" link). Keep it a plain external link; mind each store's donation
+  policy.
 - **AMO + Chrome Web Store submission** — copy is ready in `docs/store-listing.md`;
   package with `npm run zip` / `npm run zip:chrome`.
 
