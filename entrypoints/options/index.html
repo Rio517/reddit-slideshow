@@ -10,13 +10,37 @@
         --muted: #9aa4b2;
         --accent: #f6b352;
         --bg: #0b0d12;
+        --bg-top: #161a23;
         --card: #141821;
         --line: rgba(148, 163, 184, 0.22);
+        --input-bg: #0c0f15;
+        --toggle-off: rgba(255, 255, 255, 0.1);
+        --toggle-knob: rgba(255, 255, 255, 0.6);
+      }
+      /* The slideshow overlay keeps its own fixed dark theme; only this
+         preferences page follows the OS light/dark setting. */
+      @media (prefers-color-scheme: light) {
+        :root {
+          --fg: #1b1f27;
+          --muted: #5b6573;
+          --accent: #c9760f;
+          --bg: #eef1f6;
+          --bg-top: #ffffff;
+          --card: #ffffff;
+          --line: rgba(15, 23, 42, 0.16);
+          --input-bg: #f1f4f9;
+          --toggle-off: rgba(15, 23, 42, 0.18);
+          --toggle-knob: #ffffff;
+        }
       }
       body {
         margin: 0;
         min-height: 100vh;
-        background: radial-gradient(140% 120% at 50% 0%, #161a23, var(--bg));
+        background: radial-gradient(
+          140% 120% at 50% 0%,
+          var(--bg-top),
+          var(--bg)
+        );
         color: var(--fg);
         font:
           15px/1.5 ui-sans-serif,
@@ -67,7 +91,7 @@
         width: 100%;
         padding: 9px 10px;
         color: var(--fg);
-        background: #0c0f15;
+        background: var(--input-bg);
         border: 1px solid var(--line);
         border-radius: 8px;
         font: inherit;
@@ -111,7 +135,7 @@
         height: 23px;
         margin: 0;
         border-radius: 999px;
-        background: rgba(255, 255, 255, 0.1);
+        background: var(--toggle-off);
         border: 1px solid var(--line);
         cursor: pointer;
         transition:
@@ -127,7 +151,7 @@
         width: 17px;
         height: 17px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.6);
+        background: var(--toggle-knob);
         transition:
           transform 0.2s ease,
           background 0.2s ease;
@@ -274,7 +298,7 @@
         font-size: 12px;
         font-variant-numeric: tabular-nums;
         color: var(--accent);
-        background: #0c0f15;
+        background: var(--input-bg);
         border: 1px solid rgba(246, 179, 82, 0.4);
         position: relative;
         z-index: 1;
