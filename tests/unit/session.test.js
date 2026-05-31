@@ -2,8 +2,18 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { createOverlay } from "../../lib/overlay-ui.js";
 import { createSlideshowSession } from "../../lib/session.js";
 
-const ROOT = "#reddit-slideshow-root";
+const HOST = "#reddit-slideshow-host";
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+// The overlay UI lives inside the host's open shadow root; query through it.
+function shadow() {
+  const host = document.querySelector(HOST);
+  return /** @type {ShadowRoot | null} */ (host?.shadowRoot ?? null);
+}
+/** @param {string} sel */
+const q = (sel) => shadow()?.querySelector(sel) ?? null;
+/** @param {string} sel */
+const qa = (sel) => [...(shadow()?.querySelectorAll(sel) ?? [])];
 
 /** @type {Array<{ close: () => void }>} */
 let sessions = [];
@@ -11,8 +21,9 @@ let sessions = [];
 afterEach(() => {
   for (const session of sessions) session.close();
   sessions = [];
-  document.querySelectorAll(ROOT).forEach((el) => el.remove());
+  document.querySelectorAll(HOST).forEach((el) => el.remove());
   document.documentElement.style.overflow = "";
+  document.body.inert = false;
 });
 
 /**
@@ -136,12 +147,12 @@ function makeSession({
 }
 
 /** @param {string} sel */
-const text = (sel) => document.querySelector(sel)?.textContent;
+const text = (sel) => q(sel)?.textContent;
 // The current slide is the newest frame: a render layers it over the previous
 // one, which is only retired once the new media is ready (it never "loads" in
 // these DOM-less tests, so read the last frame).
 const mediaSrc = () => {
-  const imgs = document.querySelectorAll(`${ROOT} img.reddit-slideshow-media`);
+  const imgs = qa("img.reddit-slideshow-media");
   return imgs[imgs.length - 1]?.getAttribute("src");
 };
 /** @param {string} k @returns {any} */
@@ -189,9 +200,7 @@ describe("createSlideshowSession", () => {
     const { session } = makeSession({ openPopout });
     await session.start();
     expect(session.isOpen()).toBe(true);
-    /** @type {HTMLElement} */ (
-      document.querySelector(`${ROOT} [aria-label^="Open in a window"]`)
-    ).click();
+    /** @type {HTMLElement} */ (q('[aria-label^="Open in a window"]')).click();
     expect(openPopout).toHaveBeenCalledTimes(1);
     expect(session.isOpen()).toBe(false);
   });
@@ -440,9 +449,7 @@ describe("createSlideshowSession", () => {
     session.applyLiveSettings(
       /** @type {any} */ (settings({ imageTimerSeconds: 20 })),
     );
-    const fill = /** @type {HTMLElement | null} */ (
-      document.querySelector(".rs-timer__fill")
-    );
+    const fill = /** @type {HTMLElement | null} */ (q(".rs-timer__fill"));
     expect(fill?.style.animation).toContain("20s");
   });
 
@@ -460,9 +467,7 @@ describe("createSlideshowSession", () => {
     await session.start();
     expect(mediaSrc()).toBe("https://i.redd.it/a.jpg");
 
-    document
-      .querySelector(`${ROOT} .reddit-slideshow-media`)
-      ?.dispatchEvent(new Event("error"));
+    q(".reddit-slideshow-media")?.dispatchEvent(new Event("error"));
 
     expect(mediaSrc()).toBe("https://i.redd.it/b.jpg"); // advanced past the broken one
     expect(text(".rs-skipped")).toBe("1 skipped");
@@ -476,19 +481,13 @@ describe("createSlideshowSession", () => {
     });
     await session.start();
     // Open the inline settings panel and bump the per-image timer.
-    /** @type {HTMLElement} */ (
-      document.querySelector(`${ROOT} [aria-label^="Settings"]`)
-    ).click();
-    const range = /** @type {HTMLInputElement} */ (
-      document.querySelector(`${ROOT} .rs-set__range`)
-    );
+    /** @type {HTMLElement} */ (q('[aria-label^="Settings"]')).click();
+    const range = /** @type {HTMLInputElement} */ (q(".rs-set__range"));
     range.value = "20";
     range.dispatchEvent(new Event("change", { bubbles: true }));
 
     expect(saved.at(-1)).toEqual({ imageTimerSeconds: 20 });
-    const fill = /** @type {HTMLElement | null} */ (
-      document.querySelector(`${ROOT} .rs-timer__fill`)
-    );
+    const fill = /** @type {HTMLElement | null} */ (q(".rs-timer__fill"));
     expect(fill?.style.animation).toContain("20s");
   });
 
@@ -497,6 +496,9 @@ describe("createSlideshowSession", () => {
     const renders = [];
     const fakeOverlay = () => ({
       root: document.createElement("div"),
+      host: Object.assign(document.createElement("div"), {
+        id: "reddit-slideshow-host",
+      }),
       show() {},
       hide() {},
       isOpen: () => true,
@@ -573,10 +575,8 @@ describe("createSlideshowSession", () => {
     expect(mediaSrc()).toBe("https://i.redd.it/c.jpg");
 
     // Open the jump list from the counter, then click the first post.
-    /** @type {HTMLElement} */ (
-      document.querySelector(`${ROOT} .rs-meta__counter`)
-    ).click();
-    const items = document.querySelectorAll(`${ROOT} .rs-jump-panel__item`);
+    /** @type {HTMLElement} */ (q(".rs-meta__counter")).click();
+    const items = qa(".rs-jump-panel__item");
     expect(items.length).toBe(3);
     /** @type {HTMLElement} */ (items[0]).click();
     expect(mediaSrc()).toBe("https://i.redd.it/a.jpg");
@@ -589,12 +589,8 @@ describe("createSlideshowSession", () => {
     expect(session.isOpen()).toBe(true);
 
     // Open the inline settings panel via the gear.
-    /** @type {HTMLElement} */ (
-      document.querySelector(`${ROOT} [aria-label^="Settings"]`)
-    ).click();
-    const panel = /** @type {HTMLElement | null} */ (
-      document.querySelector(`${ROOT} .rs-settings-panel`)
-    );
+    /** @type {HTMLElement} */ (q('[aria-label^="Settings"]')).click();
+    const panel = /** @type {HTMLElement | null} */ (q(".rs-settings-panel"));
     expect(panel?.hidden).toBe(false);
 
     // First Escape closes the panel, not the show.
@@ -610,9 +606,7 @@ describe("createSlideshowSession", () => {
   it("lets Space act natively on a focused control instead of toggling play", async () => {
     const { session } = makeSession();
     await session.start();
-    const range = /** @type {HTMLInputElement} */ (
-      document.querySelector(`${ROOT} .rs-set__range`)
-    );
+    const range = /** @type {HTMLInputElement} */ (q(".rs-set__range"));
     let prevented = false;
     session.handleKeydown(
       /** @type {any} */ ({

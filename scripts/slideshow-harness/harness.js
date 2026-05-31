@@ -9,6 +9,9 @@
 import { createOverlay } from "../../lib/overlay-ui.js";
 import { createSlideshowSession } from "../../lib/session.js";
 import { normalizeSettings } from "../../lib/settings.js";
+// esbuild loads this as a string (loader { ".css": "text" }); it's injected into
+// the overlay's shadow root, mirroring how the content script styles the overlay.
+import overlayCss from "../../assets/overlay.css";
 
 const ORIGIN = "https://old.reddit.com";
 
@@ -67,7 +70,7 @@ const settings = normalizeSettings({
 
 const session = createSlideshowSession({
   doc: document,
-  createOverlay,
+  createOverlay: (handlers) => createOverlay(handlers, document, overlayCss),
   getSettings: async () => settings,
   saveSettings: async () => settings,
   // One page, fully exhausted: the controller never asks for more.

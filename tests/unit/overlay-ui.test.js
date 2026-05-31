@@ -82,7 +82,11 @@ function clickByLabel(root, prefix) {
 
 describe("createOverlay", () => {
   beforeEach(() => vi.useFakeTimers());
-  afterEach(() => vi.useRealTimers());
+  afterEach(() => {
+    vi.useRealTimers();
+    // show() makes the page inert; tests that don't hide() must not leak it.
+    document.body.inert = false;
+  });
 
   it("builds the chrome with nine controls, hidden by default", () => {
     const overlay = createOverlay(noopHandlers());
@@ -90,6 +94,33 @@ describe("createOverlay", () => {
     expect(overlay.root.querySelector(".rs-timer")).toBeTruthy();
     expect(overlay.root.querySelectorAll(".rs-btn").length).toBe(9);
     expect(overlay.isOpen()).toBe(false);
+  });
+
+  it("mounts the UI inside an open shadow root on the host, with the CSS", () => {
+    const overlay = createOverlay(
+      noopHandlers(),
+      document,
+      "#reddit-slideshow-root .rs-stage{color:red}",
+    );
+    // The mounted element is the host; the UI container lives in its shadow,
+    // isolating the overlay from host/RES page styles.
+    expect(overlay.host).toBeTruthy();
+    const shadow = overlay.host.shadowRoot;
+    expect(shadow).toBeTruthy();
+    expect(shadow?.querySelector("#reddit-slideshow-root")).toBe(overlay.root);
+    expect(shadow?.querySelector("style")?.textContent).toContain(".rs-stage");
+    // Nothing leaks into the light DOM.
+    expect(overlay.host.querySelector(".rs-stage")).toBeNull();
+  });
+
+  it("makes the page inert while shown and restores it on hide", () => {
+    const overlay = createOverlay(noopHandlers());
+    document.documentElement.append(overlay.host);
+    overlay.show();
+    expect(document.body.inert).toBe(true);
+    overlay.hide();
+    expect(document.body.inert).toBe(false);
+    overlay.host.remove();
   });
 
   it("wires the popout control to onPopout", () => {

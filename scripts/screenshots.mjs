@@ -145,10 +145,12 @@ async function captureSlideshow() {
       format: "esm",
       outfile: join(dir, "harness.js"),
       alias: { "wxt/browser": join(harnessSrc, "stub-browser.js") },
+      // The overlay CSS is imported as a string and injected into the shadow
+      // root (as the content script does), not linked into the page.
+      loader: { ".css": "text" },
       logLevel: "silent",
     });
     await cp(join(harnessSrc, "index.html"), join(dir, "index.html"));
-    await cp(join(root, "assets", "overlay.css"), join(dir, "overlay.css"));
 
     const { server, port } = await serve(dir);
     try {

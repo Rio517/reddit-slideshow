@@ -1,4 +1,6 @@
-import "@/assets/overlay.css";
+// Imported as a string (not injected globally) so it can be scoped inside the
+// overlay's shadow root, isolating it from old.reddit / RES page styles.
+import overlayCss from "@/assets/overlay.css?inline";
 import { createOverlay } from "@/lib/overlay-ui.js";
 import { getSettings, saveSettings } from "@/lib/settings.js";
 import { afterCursorForViewport } from "@/lib/page-cursor.js";
@@ -18,7 +20,9 @@ export default defineContentScript({
   main() {
     const session = createSlideshowSession({
       doc: document,
-      createOverlay,
+      // Mount the overlay in a shadow root carrying its own stylesheet.
+      createOverlay: (handlers) =>
+        createOverlay(handlers, document, overlayCss),
       getSettings,
       saveSettings,
       requestPage: async (after) => {

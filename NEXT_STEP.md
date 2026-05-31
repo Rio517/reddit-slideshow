@@ -4,7 +4,7 @@
 
 > **Hard rule:** work directly on `main`. Do not create branches or worktrees unless the user explicitly asks. See `AGENTS.md`.
 
-This is a Firefox-first (also Chrome) WebExtension that turns the current `old.reddit.com` or `www.reddit.com` feed into a keyboard-driven media slideshow. It reuses the logged-in session (no API keys) and resolves images, galleries, v.redd.it video, Redgifs, and crossposts via the provider dispatch in `lib/slides.js`. The overlay does a gap-free, decode-gated slide swap with six transitions (none/fade/slide/push/zoom/flip), a top-right close + a backdrop close-confirm with countdown, an idle auto-hide that respects focus, a popout/AirPlay window, a jump-to-post list, a skipped list, a position counter, and ARIA + focus management. Settings (per-image timer, transition, top-timer-bar mode, load-wait, autoplay, mute, Include-NSFW, dedup, pan & zoom) live in an in-overlay gear panel and a light/dark options page, applied live. A DEV-gated logger (`lib/log.js`) aids debugging; CI runs typecheck/lint/format/test + build (both browsers) + web-ext lint; `npm run screenshots` regenerates the options shots and an offline, deterministic slideshow shot (the real overlay + session over fixture slides in `scripts/slideshow-harness/`). old.reddit.com sets no CSP, so injected cross-origin media loads directly; the image/video sinks are still host/HTTPS-gated (`safeMediaUrl`).
+This is a Firefox-first (also Chrome) WebExtension that turns the current `old.reddit.com` or `www.reddit.com` feed into a keyboard-driven media slideshow. It reuses the logged-in session (no API keys) and resolves images, galleries, v.redd.it video, Redgifs, and crossposts via the provider dispatch in `lib/slides.js`. The overlay does a gap-free, decode-gated slide swap with six transitions (none/fade/slide/push/zoom/flip), a top-right close + a backdrop close-confirm with countdown, an idle auto-hide that respects focus, a popout/AirPlay window, a jump-to-post list, a skipped list, a position counter, and ARIA + a real focus trap. The overlay mounts inside a shadow root (its CSS injected there, isolated from old.reddit/RES page styles) and makes the page `inert` while open. Settings (per-image timer, transition, top-timer-bar mode, load-wait, autoplay, mute, Include-NSFW, dedup, pan & zoom) live in an in-overlay gear panel and a light/dark options page, applied live. A DEV-gated logger (`lib/log.js`) aids debugging; CI runs typecheck/lint/format/test + build (both browsers) + web-ext lint; `npm run screenshots` regenerates the options shots and an offline, deterministic slideshow shot (the real overlay + session over fixture slides in `scripts/slideshow-harness/`). old.reddit.com sets no CSP, so injected cross-origin media loads directly; the image/video sinks are still host/HTTPS-gated (`safeMediaUrl`).
 
 ---
 
@@ -31,13 +31,10 @@ Key decisions already made:
 
 ## 1. Do first
 
-- **Overlay shadow-root migration** — isolate overlay CSS from host/RES styles and
-  get a real focus trap (inert host). High value; a deliberate architecture change.
 - **Redgifs streaming** (avoid buffering the whole mp4 to a blob first).
-- **Tip jar** — a small "support / tip" link (Ko-fi / GitHub Sponsors / Buy Me a
-  Coffee) in the options-page footer (and maybe by the overlay's "Full
-  preferences" link). Keep it a plain external link; mind each store's donation
-  policy.
+- **Tip jar** — GitHub Sponsors (`github.com/sponsors/Rio517`) link in the
+  options-page footer and a small one in the overlay (by the "Full preferences"
+  link). Keep it a plain external link; mind each store's donation policy.
 
 ## 2. Next up — media providers
 
@@ -65,6 +62,11 @@ slideshow fit).
 - **Real-Firefox re-check:** the dropped iframe `allow-same-origin` (security M1)
   — confirm Redgifs `/ifr/` playback still works while logged in; revert that one
   line if it regresses.
+- **Real-Firefox re-check (shadow-root overlay):** the migration is code-complete
+  and green (unit suite + the offline screenshot renders the overlay styled inside
+  the shadow). Confirm in a logged-in profile what headless can't: CSS isolation
+  against real RES/old.reddit, the `inert` focus trap (Tab can't escape the
+  overlay), backdrop/control clicks, and `f` fullscreen from inside the shadow.
 - **Mute control + real audio** (needs a bundled HLS/DASH player).
 - **Redgifs lazy resolution** (push a page before its embeds resolve) and
 - **Content-dedup hashing** from a Reddit preview URL (or HEAD-gate on size)
