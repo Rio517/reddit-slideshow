@@ -962,8 +962,7 @@ iframe.reddit-slideshow-media {
 .rs-set__check {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
   font-size: 13px;
   color: var(--rs-fg);
   cursor: pointer;
