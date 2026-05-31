@@ -35,14 +35,12 @@ describe("createSettingsPanel", () => {
     const range = /** @type {HTMLInputElement} */ (
       document.querySelector(".rs-set__range")
     );
-    const select = /** @type {HTMLSelectElement} */ (
-      document.querySelector(".rs-set__select")
-    );
     const checks = /** @type {NodeListOf<HTMLInputElement>} */ (
       document.querySelectorAll(".rs-set__check input")
     );
     expect(range.value).toBe("8");
-    expect(select.value).toBe("10");
+    // Max load wait now lives only in the full options page.
+    expect(document.querySelector(".rs-set__select")).toBeNull();
     // autoplay, start-muted, NSFW, dedupe, pan-zoom, always-show-meta — all false here
     expect([...checks].map((c) => c.checked)).toEqual([
       false,
