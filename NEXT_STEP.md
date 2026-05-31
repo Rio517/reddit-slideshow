@@ -1,4 +1,4 @@
-# NEXT_STEP — Slideshow Spectacular for Reddit
+# NEXT_STEP — Reddit Slideshow Spectacular!
 
 **Doc updated:** 2026-05-31 · **Branch:** `main` · **Status:** shipped-ready on `old.reddit.com` + `www.reddit.com`; CI green; store-listing copy drafted. The single-clip providers (Redgifs, Imgur `.gifv`, Streamable, Giphy, Catbox) and the shadow-root overlay have landed. Open: tip jar, Imgur albums, Redgifs streaming (§1). The shadow-root overlay and the new providers still need a real-Firefox pass (§5).
 

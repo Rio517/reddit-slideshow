@@ -71,7 +71,7 @@ no access to other sites, and no remote code.
 ## Contact
 
 Questions about this policy: **mario@knyflores.com**, or open an issue at
-<https://github.com/Rio517/slideshow-spectacular-for-reddit/issues>.
+<https://github.com/Rio517/reddit-slideshow-spectacular/issues>.
 
 ## Changes
 

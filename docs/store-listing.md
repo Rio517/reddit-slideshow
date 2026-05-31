@@ -13,16 +13,18 @@ as-is.
 
 ## 1. Name
 
-**Name (both stores):** Slideshow Spectacular for Reddit
+**Name (both stores):** Reddit Slideshow Spectacular!
 
 There is no separate store/display name; the manifest `name` is
-"Slideshow Spectacular for Reddit" and the same name works on both stores.
+"Reddit Slideshow Spectacular!" and the same name works on both stores.
 
-The "… for Reddit" phrasing is deliberate: a name that _leads_ with "Reddit" can
-draw store scrutiny about implying official affiliation (it's allowable — Reddit
-Enhancement Suite does it — but "for Reddit" is the conventional, lower-risk form
-and matches Reddit's brand guidance against implying endorsement). In running
-prose the short form "Slideshow Spectacular" reads better.
+Leading with "Reddit" is deliberate: it's the de-facto Chrome-store convention
+(Reddit Enhancement Suite and dozens of others lead with it), it matches the
+companion subreddit r/redditslideshowspectacular, and it surfaces for the "reddit
+slideshow" searches people actually type. The affiliation risk is low and the
+same one those extensions carry; if a reviewer ever pushes back, "(unofficial)"
+or a "… for Reddit" rename is a cheap fallback. The "!" is part of the name —
+keep it (Yahoo!-style mid-sentence).
 
 ---
 
@@ -46,8 +48,8 @@ prose the short form "Slideshow Spectacular" reads better.
 
 ## 3. Detailed description (plain text — paste as-is)
 
-Slideshow Spectacular turns the Reddit listing you're already viewing into a
-full-screen, keyboard-driven media slideshow. Open a feed, subreddit,
+Reddit Slideshow Spectacular! turns the Reddit listing you're already viewing
+into a full-screen, keyboard-driven media slideshow. Open a feed, subreddit,
 multireddit, or search results on old.reddit.com or www.reddit.com, click the
 toolbar icon (or press Alt+Shift+S), and lean back.
 
@@ -197,7 +199,7 @@ Use these answers:
 
 Plain-language summary to paste where a free-text box is offered:
 
-> Slideshow Spectacular collects nothing and sends nothing to the developer — there
+> Reddit Slideshow Spectacular! collects nothing and sends nothing to the developer — there
 > is no developer server, no analytics, no telemetry, no tracking, no ads, and
 > no accounts. It makes network requests only to Reddit, Reddit's media hosts,
 > and (for Redgifs posts) Redgifs, to fetch the media you're viewing. Redgifs
@@ -216,7 +218,7 @@ item's single purpose, and (3) we do not use or transfer user data to determine
 creditworthiness or for lending.
 
 **Privacy policy URL:** the `PRIVACY.md` in this repository
-(https://github.com/Rio517/slideshow-spectacular-for-reddit/blob/main/PRIVACY.md), or a hosted
+(https://github.com/Rio517/reddit-slideshow-spectacular/blob/main/PRIVACY.md), or a hosted
 copy of it.
 
 ---
@@ -251,7 +253,7 @@ want a third tile.)
 
 **Single purpose (paste into the Chrome "single purpose" field):**
 
-> Slideshow Spectacular has one purpose: to turn the Reddit listing the user is
+> Reddit Slideshow Spectacular! has one purpose: to turn the Reddit listing the user is
 > currently viewing into a full-screen, keyboard-driven media slideshow of that
 > listing's images and videos.
 
@@ -283,11 +285,11 @@ want a third tile.)
 >
 > How to test: sign in to Reddit, open any media-heavy listing on
 > old.reddit.com or www.reddit.com (e.g. https://old.reddit.com/r/aww/), and
-> click the "Slideshow Spectacular for Reddit" toolbar icon (or press Alt+Shift+S). A
+> click the "Reddit Slideshow Spectacular!" toolbar icon (or press Alt+Shift+S). A
 > full-screen slideshow opens over the page. Use Left/Right to navigate, Space
 > to play/pause, M to mute, F for fullscreen, and Esc to close. The gear icon
 > opens settings, which apply live. The optional "Also detect re-uploaded
 > images" setting is what triggers the runtime request for the optional
 > preview.redd.it / external-preview.redd.it host permissions.
 >
-> Source: https://github.com/Rio517/slideshow-spectacular-for-reddit
+> Source: https://github.com/Rio517/reddit-slideshow-spectacular

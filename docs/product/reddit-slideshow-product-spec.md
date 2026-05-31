@@ -1,4 +1,4 @@
-# Slideshow Spectacular for Reddit — Product Spec Draft
+# Reddit Slideshow Spectacular! — Product Spec Draft
 
 Date: 2026-05-29
 Status: Draft

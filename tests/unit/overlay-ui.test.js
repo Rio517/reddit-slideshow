@@ -418,7 +418,7 @@ describe("createOverlay", () => {
     overlay.showLoading();
     expect(overlay.root.querySelector(".rs-logo__mark")).toBeTruthy();
     expect(overlay.root.querySelector(".rs-logo__name")?.textContent).toBe(
-      "Slideshow Spectacular for Reddit",
+      "Reddit Slideshow Spectacular!",
     );
     expect(overlay.root.querySelector(".rs-logo__sub")?.textContent).toBe(
       "Loading…",

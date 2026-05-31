@@ -1,4 +1,4 @@
-# Slideshow Spectacular for Reddit
+# Reddit Slideshow Spectacular!
 
 Slideshow for videos and images in your reddit feed. Uses your current page/feed view.
 
@@ -37,7 +37,7 @@ enlarge):
 <p>
   <a href="docs/screenshots/options-light.png">
     <img src="docs/screenshots/options-light.png" width="360"
-      alt="Slideshow Spectacular for Reddit options page">
+      alt="Reddit Slideshow Spectacular! options page">
   </a>
 </p>
 
@@ -81,7 +81,7 @@ a permanent install, use Firefox Developer Edition / Nightly / ESR, set
 2. Turn on **Developer mode** (toggle, top-right).
 3. Click **Load unpacked** and select the **folder** `.output/chrome-mv3/`
    (the folder itself, not a file inside it).
-4. Click the toolbar's puzzle-piece icon and pin **Slideshow Spectacular for Reddit**.
+4. Click the toolbar's puzzle-piece icon and pin **Reddit Slideshow Spectacular!**.
 5. After code changes, re-run `npm run build:chrome` and click the **↻ reload**
    icon on the extension's card in `chrome://extensions`.
 
