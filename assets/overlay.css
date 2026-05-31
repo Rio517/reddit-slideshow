@@ -1289,6 +1289,7 @@ iframe.reddit-slideshow-media {
 .rs-jump-panel__item:focus-visible,
 .rs-skipped-panel__item:focus-visible,
 .rs-skipped:focus-visible,
+.rs-help-panel__close:focus-visible,
 .rs-settings-panel__close:focus-visible,
 .rs-settings-panel__more:focus-visible,
 .rs-meta__counter:focus-visible,

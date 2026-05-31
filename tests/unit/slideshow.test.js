@@ -389,3 +389,82 @@ describe("SlideshowController", () => {
     expect(ended()).toBe(1);
   });
 });
+
+describe("skip(n)", () => {
+  const makeSlides = (n) =>
+    Array.from({ length: n }, (_, i) => slideWithId(`s${i}`));
+  const page = (slides) => ({
+    slides,
+    after: null,
+    exhausted: true,
+    postsScanned: slides.length,
+  });
+
+  it("skips forward n raw indices", () => {
+    const { controller } = makeController();
+    controller.start(page(makeSlides(25)));
+    controller.skip(10);
+    expect(controller.current?.id).toBe("s10");
+    expect(controller.position.index).toBe(10);
+  });
+
+  it("skips back n raw indices", () => {
+    const { controller } = makeController();
+    controller.start(page(makeSlides(25)));
+    controller.skip(15);
+    controller.skip(-10);
+    expect(controller.current?.id).toBe("s5");
+  });
+
+  it("clamps a forward skip at the last loaded slide", () => {
+    const { controller } = makeController();
+    controller.start(page(makeSlides(5)));
+    controller.skip(10);
+    expect(controller.current?.id).toBe("s4");
+  });
+
+  it("clamps a back skip at the first slide", () => {
+    const { controller } = makeController();
+    controller.start(page(makeSlides(5)));
+    controller.skip(-10);
+    expect(controller.current?.id).toBe("s0");
+  });
+
+  it("skip(0) is a no-op (no re-render)", () => {
+    const { controller, rendered } = makeController();
+    controller.start(page(makeSlides(5)));
+    controller.next(); // s1
+    const before = rendered.length;
+    controller.skip(0);
+    expect(controller.current?.id).toBe("s1");
+    expect(rendered.length).toBe(before);
+  });
+
+  it("a clamped skip that can't move doesn't re-render", () => {
+    const { controller, rendered } = makeController();
+    controller.start(page(makeSlides(5))); // at s0
+    const before = rendered.length;
+    controller.skip(-10);
+    expect(controller.current?.id).toBe("s0");
+    expect(rendered.length).toBe(before);
+  });
+
+  it("lands on a raw index even if it is a skipped slide (coarse seek)", () => {
+    const { controller } = makeController();
+    controller.start(page(makeSlides(12)));
+    controller.slides[10].skipReason = "dupe";
+    controller.skip(10);
+    expect(controller.current?.id).toBe("s10");
+    expect(controller.current?.skipReason).toBe("dupe");
+  });
+
+  it("keeps the absolute position correct across eviction", () => {
+    const { controller } = makeController({ maxBackHistory: 5 });
+    controller.start(page(makeSlides(25)));
+    controller.skip(15); // trims the front; position stays absolute
+    expect(controller.position.index).toBe(15);
+    controller.skip(-3);
+    expect(controller.position.index).toBe(12);
+    expect(controller.current?.id).toBe("s12");
+  });
+});

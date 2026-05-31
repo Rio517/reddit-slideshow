@@ -736,3 +736,83 @@ describe("createSlideshowSession", () => {
     expect(saved.at(-1)).toEqual({ startMuted: false });
   });
 });
+
+describe("PageUp / PageDown ±10", () => {
+  const slidesPage = (n) => ({
+    slides: Array.from({ length: n }, (_, i) => imageSlide(String(i))),
+    after: null,
+    exhausted: true,
+    postsScanned: n,
+  });
+
+  it("skips ahead 10 on PageDown and back 10 on PageUp", async () => {
+    const { session } = makeSession({ pages: [slidesPage(15)] });
+    await session.start();
+    await flush();
+    expect(mediaSrc()).toContain("/0.jpg");
+    session.handleKeydown(key("PageDown"));
+    await flush();
+    expect(mediaSrc()).toContain("/10.jpg");
+    session.handleKeydown(key("PageUp"));
+    await flush();
+    expect(mediaSrc()).toContain("/0.jpg");
+  });
+
+  it("clamps PageDown at the last slide and PageUp at the first", async () => {
+    const { session } = makeSession({ pages: [slidesPage(5)] });
+    await session.start();
+    await flush();
+    session.handleKeydown(key("PageDown"));
+    await flush();
+    expect(mediaSrc()).toContain("/4.jpg");
+    session.handleKeydown(key("PageUp"));
+    await flush();
+    expect(mediaSrc()).toContain("/0.jpg");
+  });
+
+  it("suppresses PageUp/PageDown so the page can't also scroll", async () => {
+    let prevented = 0;
+    let stopped = 0;
+    const ev = {
+      key: "PageDown",
+      preventDefault: () => (prevented += 1),
+      stopImmediatePropagation: () => (stopped += 1),
+      target: document.body,
+    };
+    const { session } = makeSession({ pages: [slidesPage(15)] });
+    await session.start();
+    await flush();
+    session.handleKeydown(/** @type {any} */ (ev));
+    await flush();
+    expect(prevented).toBe(1);
+    expect(stopped).toBe(1);
+  });
+
+  it("ignores PageDown when the overlay is closed", async () => {
+    const { session } = makeSession({ pages: [slidesPage(15)] });
+    await session.start();
+    await flush();
+    session.close();
+    expect(session.isOpen()).toBe(false);
+    session.handleKeydown(key("PageDown")); // no throw, no effect
+    expect(session.isOpen()).toBe(false);
+  });
+
+  it("does not restart from the end card on PageDown", async () => {
+    const { session } = makeSession({ pages: [slidesPage(3)] });
+    await session.start();
+    await flush();
+    session.handleKeydown(key("ArrowRight")); // s1
+    session.handleKeydown(key("ArrowRight")); // s2
+    session.handleKeydown(key("ArrowRight")); // end card
+    await flush();
+    expect(q(".rs-logo")).not.toBeNull();
+    session.handleKeydown(key("PageDown"));
+    await flush();
+    expect(q(".rs-logo")).not.toBeNull(); // still the end card, not restarted
+    // ArrowRight still restarts from the top, proving the queue is intact.
+    session.handleKeydown(key("ArrowRight"));
+    await flush();
+    expect(mediaSrc()).toContain("/0.jpg");
+  });
+});
