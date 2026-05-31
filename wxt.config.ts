@@ -19,6 +19,10 @@ export default defineConfig({
       // Imgur .gifv → .mp4: background-fetched and played as a blob, because
       // Imgur hotlink-protects against a reddit Referer (ADR 0011).
       "https://i.imgur.com/*",
+      // Streamable: resolve the mp4 via the public API (api.) and fetch the bytes
+      // from the per-video CDN subdomain (cdn-*.). One wildcard covers both,
+      // scoped to the streamable.com domain (ADR 0013).
+      "https://*.streamable.com/*",
     ],
     // Requested at runtime only when the user enables content-based dedup
     // (ADR 0006 Layer 2), so the background can fetch images to hash. i.redd.it

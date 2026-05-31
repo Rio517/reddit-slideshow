@@ -1,0 +1,23 @@
+{
+  "kind": "Listing",
+  "data": {
+    "after": "t3_streamable_after",
+    "before": null,
+    "children": [
+      {
+        "kind": "t3",
+        "data": {
+          "name": "t3_st1",
+          "title": "Streamable clip",
+          "permalink": "/r/example/comments/st1/streamable_clip/",
+          "domain": "streamable.com",
+          "post_hint": "rich:video",
+          "is_video": false,
+          "over_18": false,
+          "url": "https://streamable.com/abc123",
+          "url_overridden_by_dest": "https://streamable.com/abc123"
+        }
+      }
+    ]
+  }
+}

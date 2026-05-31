@@ -2,6 +2,10 @@ import { fetchQueuePage } from "@/lib/queue.js";
 import { createMessageRouter } from "@/lib/background-router.js";
 import { createRedgifsResolver, resolveRedgifsSlides } from "@/lib/redgifs.js";
 import {
+  createStreamableResolver,
+  resolveStreamableSlides,
+} from "@/lib/streamable.js";
+import {
   fetchCappedBytes,
   MAX_IMAGE_BYTES,
   MAX_MEDIA_BYTES,
@@ -16,22 +20,28 @@ export default defineBackground(() => {
   });
 
   const redgifs = createRedgifsResolver();
+  const streamable = createStreamableResolver();
 
   /**
-   * Build a queue page, then upgrade any Redgifs iframe embeds to native
-   * (proxied) video slides so they time and unmute correctly.
+   * Build a queue page, then upgrade provider iframe embeds (Redgifs, Streamable)
+   * to native (proxied) video slides so they time and unmute correctly. Each
+   * resolver leaves the iframe fallback in place when its lookup fails.
    * @param {string} pageUrl
    * @param {{ after?: string }} options
    */
-  const fetchQueuePageWithRedgifs = async (pageUrl, options) => {
+  const fetchQueuePageWithProviders = async (pageUrl, options) => {
     const page = await fetchQueuePage(pageUrl, options);
     page.slides = await resolveRedgifsSlides(page.slides, redgifs.resolve);
+    page.slides = await resolveStreamableSlides(
+      page.slides,
+      streamable.resolve,
+    );
     return page;
   };
 
   const router = createMessageRouter({
     runtimeId: browser.runtime.id,
-    fetchQueuePage: fetchQueuePageWithRedgifs,
+    fetchQueuePage: fetchQueuePageWithProviders,
     // Layer 2 dedup image bytes (hosts the content script's page-CORS fetch
     // can't reach), capped + timed out.
     fetchImageBytes: (url) => fetchCappedBytes(url, MAX_IMAGE_BYTES),

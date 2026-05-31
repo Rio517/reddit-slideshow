@@ -251,6 +251,41 @@ describe("createMessageRouter — fetchMedia", () => {
     expect(result.bytes).toBeInstanceOf(ArrayBuffer);
   });
 
+  it("returns bytes for a Streamable per-video CDN subdomain", async () => {
+    const router = makeRouter({
+      fetchMediaBytes: async () => new ArrayBuffer(16),
+    });
+    const result = await router(
+      {
+        type: "slideshow.fetchMedia",
+        payload: {
+          url: "https://cdn-cf-east.streamable.com/video/mp4/abc123.mp4",
+        },
+      },
+      OWN,
+    );
+    expect(result.ok).toBe(true);
+  });
+
+  it("rejects a look-alike host that only ends with the brand, not the domain", async () => {
+    let called = false;
+    const router = makeRouter({
+      fetchMediaBytes: async () => {
+        called = true;
+        return new ArrayBuffer(8);
+      },
+    });
+    const result = await router(
+      {
+        type: "slideshow.fetchMedia",
+        payload: { url: "https://evilstreamable.com/x.mp4" },
+      },
+      OWN,
+    );
+    expect(result).toEqual({ ok: false });
+    expect(called).toBe(false);
+  });
+
   it("rejects a non-allowlisted media host without fetching", async () => {
     let called = false;
     const router = makeRouter({

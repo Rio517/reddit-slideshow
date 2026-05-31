@@ -6,6 +6,7 @@ import videoFixture from "../fixtures/reddit-json/reddit-video.json";
 import redgifsFixture from "../fixtures/reddit-json/redgifs.json";
 import imgurGifvFixture from "../fixtures/reddit-json/imgur-gifv.json";
 import catboxVideoFixture from "../fixtures/reddit-json/catbox-video.json";
+import streamableFixture from "../fixtures/reddit-json/streamable.json";
 import crosspostFixture from "../fixtures/reddit-json/crosspost.json";
 
 describe("slidesFromListing", () => {
@@ -316,6 +317,25 @@ describe("Catbox video posts", () => {
     expect(slides[0]).toMatchObject({
       kind: "image",
       provider: "reddit-image",
+    });
+  });
+});
+
+describe("Streamable posts", () => {
+  it("emits an embed slide (resolved to native video in the background)", () => {
+    const slides = slidesFromListing(streamableFixture);
+    expect(slides[0]).toMatchObject({
+      id: "t3_st1:0",
+      postId: "t3_st1",
+      provider: "streamable",
+      kind: "embed",
+      embedUrl: "https://streamable.com/e/abc123",
+      mediaUrl: "https://streamable.com/e/abc123",
+      sourceUrl: "https://streamable.com/abc123",
+      permalink:
+        "https://old.reddit.com/r/example/comments/st1/streamable_clip/",
+      title: "Streamable clip",
+      durationMode: "timer",
     });
   });
 });
