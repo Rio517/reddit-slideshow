@@ -39,7 +39,7 @@ keep it (Yahoo!-style mid-sentence).
 
 **AMO - short "summary" field:**
 
-> Turn the Reddit listing you're already viewing into a full-screen,
+> Turn the Reddit feed you're already viewing into a full-screen,
 > keyboard-driven media slideshow. Works on old and new Reddit, reuses your
 > logged-in session (no API keys), and plays images, galleries, video, and clips
 > from Redgifs, Imgur, Streamable, Giphy, and Catbox. No analytics, no tracking,
@@ -49,14 +49,14 @@ keep it (Yahoo!-style mid-sentence).
 
 ## 3. Detailed description (plain text - paste as-is)
 
-Reddit Slideshow Spectacular! turns the Reddit listing you're already viewing
+Reddit Slideshow Spectacular! turns the Reddit feed you're already viewing
 into a full-screen, keyboard-driven media slideshow. Open a feed, subreddit,
 multireddit, or search results on old.reddit.com or www.reddit.com, click the
 toolbar icon (or press Alt+Shift+S), and lean back.
 
 It reuses your existing logged-in Reddit session - no API keys, no sign-in, no
-extra account. It walks media posts in the order Reddit returns them and fetches
-further listing pages automatically, so the slideshow keeps going past the first
+extra account. It walks media posts in the order Reddit returns them and pages
+through the feed automatically, so the slideshow keeps going past the first
 page.
 
 WHAT IT PLAYS
@@ -109,7 +109,7 @@ SETTINGS (apply live, no reload)
 
 PRIVACY
 No analytics, no tracking, no ads, no accounts, and no developer servers (there
-are none). The extension only fetches the media you're viewing: the listing and
+are none). The extension only fetches the media you're viewing: the feed and
 its media from Reddit, and provider clips from Imgur, Redgifs, Streamable, Giphy,
 and Catbox. Your settings are stored locally on your device, and it ships no
 remote code. Full policy: see the privacy policy link.
@@ -196,7 +196,7 @@ Use these answers:
 - Health information - **Not collected**
 - Financial / payment information - **Not collected**
 - Authentication information - **Not collected** (it reuses the browser's
-  existing Reddit session cookies to fetch the listing you can already see; it
+  existing Reddit session cookies to fetch the feed you can already see; it
   never reads, stores, or transmits those cookies itself)
 - Personal communications - **Not collected**
 - Location - **Not collected**
@@ -264,9 +264,9 @@ want a third tile.)
 
 **Single purpose (paste into the Chrome "single purpose" field):**
 
-> Reddit Slideshow Spectacular! has one purpose: to turn the Reddit listing the user is
+> Reddit Slideshow Spectacular! has one purpose: to turn the Reddit feed the user is
 > currently viewing into a full-screen, keyboard-driven media slideshow of that
-> listing's images and videos.
+> feed's images and videos.
 
 **Why each host permission is needed (Chrome requires per-host justification):**
 
@@ -296,7 +296,7 @@ want a third tile.)
 > (Imgur, Redgifs, Streamable, Giphy, Catbox), to fetch the media being viewed.
 > Settings are stored locally via storage.local.
 >
-> How to test: sign in to Reddit, open any media-heavy listing on
+> How to test: sign in to Reddit, open any media-heavy feed on
 > old.reddit.com or www.reddit.com (e.g. https://old.reddit.com/r/aww/), and
 > click the "Reddit Slideshow Spectacular!" toolbar icon (or press Alt+Shift+S). A
 > full-screen slideshow opens over the page. Use Left/Right to navigate, Space

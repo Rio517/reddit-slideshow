@@ -4,7 +4,7 @@ _Last updated: 2026-05-31_
 
 **Short version: Reddit Slideshow Spectacular! collects nothing, sends nothing to
 the developer, and has no analytics, tracking, ads, or accounts. Everything it
-does happens locally in your browser.** The extension turns a Reddit listing you are
+does happens locally in your browser.** The extension turns a Reddit feed you are
 already viewing into a full-screen media slideshow.
 
 ## What the extension stores
@@ -21,8 +21,8 @@ Requests go only to Reddit, Reddit's own media servers, and the content provider
 a post links to (Imgur, Redgifs, Streamable, Giphy, Catbox). Never to any server
 operated by the developer (there is none):
 
-- **Listing data.** To build the slideshow, the extension fetches the JSON for
-  the listing you are on (`old.reddit.com` / `www.reddit.com`). This request
+- **Feed data.** To build the slideshow, the extension fetches the JSON for
+  the feed you are on (`old.reddit.com` / `www.reddit.com`). This request
   includes your existing Reddit session cookies (`credentials: "include"`) so it
   returns exactly what you can already see while logged in - including over-18
   content only if your own Reddit account/session allows it. The request is made

@@ -95,7 +95,7 @@ startup that you can dismiss).
 
 ## Use
 
-- Open an `old.reddit.com` or `www.reddit.com` listing, then click the toolbar
+- Open an `old.reddit.com` or `www.reddit.com` feed, then click the toolbar
   icon or press **Alt+Shift+S**.
 - Keys: **←/→** previous/next, **Space** play/pause, **M** mute, **Esc** close.
   You can also click the dark backdrop to close.
