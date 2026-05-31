@@ -40,6 +40,20 @@ and the self-audit fixes. Remaining work needs a human or is optional:
 4. **Full HLS/DASH audio** — only if the unmute check shows many clips are silent (muxed-fallback assumption wrong).
 5. **Packaging:** `npm run zip` (Firefox/AMO) and `npm run zip:chrome` (Chrome Web Store) when ready.
 
+### Quality follow-ups (lower priority)
+
+- **Content-dedup hashing:** hash from a Reddit preview URL (or HEAD-gate on
+  size) instead of the full display image, to cut bandwidth/decode for the opt-in
+  re-upload detection.
+- **Redgifs lazy resolution:** deliver a page before its Redgifs embeds resolve,
+  pushing upgraded native-video slides as they arrive, so a Redgifs-heavy page
+  isn't delayed.
+- **Redgifs streaming:** avoid buffering the whole mp4 (background → blob) before
+  playback — investigate a streaming or extension-served-URL path.
+- **Narrow typedefs for Reddit listing JSON** (`lib/slides.js` et al. currently
+  use `any`).
+- **`requiredElement(selector, ctor)` helper** for the options-page lookups.
+
 The content↔overlay↔background glue now lives in `lib/session.js` (injected deps),
 covered by `tests/unit/session.test.js`.
 

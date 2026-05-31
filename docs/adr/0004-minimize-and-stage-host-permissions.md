@@ -1,7 +1,7 @@
 # ADR 0004: Minimize And Stage Host Permissions
 
 Date: 2026-05-29
-Status: Proposed
+Status: Accepted
 
 ## Context
 
@@ -11,11 +11,27 @@ The tempting shortcut is to request broad host access, such as all websites, so 
 
 ## Decision
 
-Use the narrowest practical install-time host permissions and stage external provider permissions.
+Use the narrowest practical install-time host permissions and stage the rest.
 
-Core Reddit permissions should be required for v1. External providers such as Redgifs should either be declared narrowly at install time or requested as optional host permissions when the user enables or encounters that provider.
+**Install-time `host_permissions`** are the hosts the extension must fetch from
+to function:
 
-Redgifs is expected to be embedded via its first-party iframe (`/ifr/<id>`). Because the iframe is a page element rather than an extension-initiated fetch, playback should not require a `redgifs.com` host permission. That needs to be validated in Firefox on a real old Reddit page before this ADR is accepted. A Redgifs host permission should only be added if we fetch optional metadata from a Redgifs API endpoint, and that permission should be requested from a user gesture via `optional_host_permissions`.
+- `old.reddit.com`, `www.reddit.com` — listing JSON for both frontends (ADR 0008).
+- `i.redd.it`, `v.redd.it` — Reddit-hosted images and video.
+- `api.redgifs.com`, `media.redgifs.com` — Redgifs is played as native video
+  (ADR 0010): the background resolves the clip's direct mp4 from the API and
+  fetches the bytes, because the CDN hotlink-protects against a reddit `Referer`.
+  That is an extension-initiated fetch, so it needs the host permission. (The
+  iframe fallback, used only when resolution fails, is a page element and needs
+  no host permission — just the page's `frame-src`.)
+
+**Optional `optional_host_permissions`**, requested from a user gesture only when
+the feature is enabled and removed when it is disabled:
+
+- `preview.redd.it`, `external-preview.redd.it` — read pixels for the opt-in
+  content-based duplicate detection (ADR 0006 Layer 2).
+
+No all-URLs or broad host access is requested.
 
 ## Consequences
 
@@ -42,4 +58,5 @@ Costs:
 
 ## Follow-Up
 
-Create real Firefox prototypes for Redgifs iframe playback and any metadata permission flow before accepting this ADR as final.
+When submitting to the stores, justify each install-time host in the listing's
+permission rationale (see the privacy policy for the same list).

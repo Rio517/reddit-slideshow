@@ -136,7 +136,7 @@ describe("DuplicateTracker FIFO cap", () => {
   });
 
   it("bounds the hash list", () => {
-    const tracker = new DuplicateTracker({ maxTracked: 2 });
+    const tracker = new DuplicateTracker({ maxHashes: 2 });
     tracker.addHash("0000000000000001");
     tracker.addHash("0000000000000002");
     tracker.addHash("0000000000000004");

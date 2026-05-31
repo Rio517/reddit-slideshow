@@ -36,16 +36,19 @@ The five phases and their durations are settings
 `panZoomZoomOutSeconds`, `panZoomShowEndSeconds`), plus a `panZoomScale` zoom
 factor. The whole feature is gated by `panZoom` (off by default).
 
-**Advance stays in lock-step by construction:** when `panZoom` is on, an image
-slide's dwell becomes the _sum_ of the phase durations (the session sets the
-controller's per-image dwell to `panZoomTotalSeconds`). The animation's total
-duration is that same sum, so the existing image-dwell timer advances exactly as
-the animation finishes — no `ended` event, no second timer, no double-advance.
-The visual countdown bar uses the same total.
+**Only "UHD" images move.** It runs only on images whose longest side is at
+least `panZoomMinOversize` × the display window's longest side (in device
+pixels; default 1.5×, range 1.25–3 — configurable). An image that already fits
+the screen has no extra detail to reveal, so it shows for the normal image timer
+instead. The gate uses the slide's source dimensions, so it's known before the
+image loads.
 
-When enabled it applies to **all** image slides (not only "UHD" ones): per-image
-opt-in would mean mixed dwells in one queue, and small images still animate
-acceptably. Videos and embeds are unaffected (they keep their own duration).
+**Advance:** a pan-zoomed image advances on the animation's `finish` event. The
+session simply does not start the controller's per-image dwell timer for that
+slide (it skips `onMediaReady`), so there is no second timer and no
+double-advance race — the animation is the single source of truth. The visual
+countdown bar uses the same total (sum of the phase durations). Non-oversized
+images keep the ordinary dwell timer. Videos and embeds are unaffected.
 
 ## Consequences
 
@@ -71,9 +74,10 @@ acceptably. Videos and embeds are unaffected (they keep their own duration).
 - **CSS `@keyframes` classes:** keyframe percentages depend on the per-render
   phase durations, so the rules would have to be generated dynamically into a
   `<style>` tag. WAAPI takes computed offsets directly and is cleaner. Rejected.
-- **Advance on an animation `finish` event (like video `ended`):** workable, but
-  then the controller's safety timer and the finish event both advance and must
-  be de-raced. Setting the dwell equal to the animation total removes the second
-  timer entirely. Rejected in favor of the single-source-of-truth dwell.
-- **Per-image (UHD-only) application:** mixes dwell lengths within one queue and
-  needs a resolution threshold. Deferred.
+- **Global dwell = animation total (advance on the controller timer):** simpler,
+  but it forces every image to the same long dwell, so non-oversized images would
+  sit static for the whole sequence. Replaced by per-image gating + advancing on
+  the animation `finish` (and not starting a dwell timer for pan-zoomed images,
+  which avoids the double-advance the global-dwell approach was meant to dodge).
+- **Configurable pan direction / random Ken Burns paths:** deferred to keep the
+  settings surface small; the path is fixed (top → bottom, zoom anchored top).

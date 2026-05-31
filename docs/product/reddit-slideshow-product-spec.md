@@ -71,15 +71,23 @@ v.redd.it is DASH/HLS with separated tracks. The listing's `secure_media.reddit_
 
 ### Redgifs
 
-Redgifs is a first-class provider — the single most common media domain on real NSFW feeds. The resolver embeds it inline via the Redgifs first-party iframe:
+Redgifs is a first-class provider — the single most common media domain on real
+NSFW feeds. It plays as **native `<video>`** (ADR 0010):
 
-- Parse the id from `redgifs.com/watch/<id>` (or `/ifr/<id>`) and embed `<iframe src="https://www.redgifs.com/ifr/<id>">`.
-- The iframe is served by Redgifs itself, so the `<video>` inside is a same-origin request from `redgifs.com` to its own CDN. It carries the Origin/Referer Redgifs whitelists, so it does not hit the cross-origin hotlink HTTP 403 that direct `.mp4` embedding triggers. The hotlink-protected CDN `.mp4` URLs are never touched.
-- Aspect ratio comes from `secure_media.oembed.width`/`height` in the listing, so no `api.redgifs.com` call is needed. The iframe should not require `redgifs.com` host permission because it is a page element, not an extension-initiated fetch — this (and that the iframe plays inside the overlay in Firefox) still needs a live validation spike.
+- Parse the id from `redgifs.com/watch/<id>` (or `/ifr/<id>`). The background
+  resolves the clip's direct mp4 plus `duration` and `hasAudio` from the Redgifs
+  API (`api.redgifs.com`, token cached, concurrency-limited and timed out).
+- The CDN (`media.redgifs.com`) hotlink-protects against a reddit `Referer`, so
+  the background fetches the bytes (no Referer, no cookies, with a byte cap) and
+  the content script plays them as a `blob:` URL — which also satisfies the
+  www-Reddit CSP. This gives correct timing (advances on the real clip end),
+  global mute/unmute, and no per-clip unmute.
+- If resolution fails (API down, timeout), the slide falls back to the Redgifs
+  first-party iframe embed (`<iframe src="…/ifr/<id>">`), which carries the
+  Origin/Referer Redgifs whitelists and needs no host permission.
 
-Because an iframe does not fire a native `<video>` `ended` event, Redgifs slides auto-advance on a duration timer. The listing oembed carries no clip duration, so v1 uses a fixed dwell (an optional `api.redgifs.com` lookup could supply real duration later). Mute/scrub control is limited to what the iframe player exposes. Do not embed the direct v2-API `.mp4` in a `<video>` (the path that fights hotlink protection) unless precise native `ended`/mute/scrub control becomes a hard requirement.
-
-Unresolvable or removed Redgifs items degrade gracefully to a placeholder slide with title/source context and an action to open the original Redgifs page.
+Unresolvable or removed Redgifs items degrade gracefully to a placeholder slide
+with title/source context and an action to open the original Redgifs page.
 
 ### Other hosts
 
@@ -95,15 +103,21 @@ Other external hosts are out of v1 unless they are simple direct media links. Th
 
 ## Permissions
 
-v1 is `old.reddit.com`-only, so install-time host permissions are scoped to the Reddit hosts the extension actually fetches:
+Install-time host permissions are scoped to the hosts the extension actually
+fetches from (see ADR 0004):
 
-- `https://old.reddit.com/*` — listing pages and listing JSON.
-- `https://i.redd.it/*` — direct image media.
-- `https://v.redd.it/*` — Reddit-hosted video media.
+- `https://old.reddit.com/*`, `https://www.reddit.com/*` — listing JSON for both
+  frontends (ADR 0008).
+- `https://i.redd.it/*`, `https://v.redd.it/*` — Reddit image and video media.
+- `https://api.redgifs.com/*`, `https://media.redgifs.com/*` — resolve and fetch
+  native Redgifs video (ADR 0010).
 
 Plus the `storage` API permission for settings.
 
-`www.reddit.com` is intentionally not requested: v1 reads the current old Reddit context only. Redgifs playback is expected to avoid a `redgifs.com` host permission because it plays through a first-party iframe (a page element, not an extension-initiated fetch), but that remains a Firefox validation spike before final implementation. An optional `api.redgifs.com` permission would only be added later for best-effort aspect-ratio metadata, and playback must not depend on it. Any additional provider host stays out of install-time permissions and is requested optionally if and when it is needed.
+`preview.redd.it` / `external-preview.redd.it` are **optional** host permissions,
+requested from a user gesture only when content-based duplicate detection is
+enabled and removed when it is disabled. No all-URLs or broad host access is
+requested.
 
 ## Error Handling
 
