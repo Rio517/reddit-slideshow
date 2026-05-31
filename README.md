@@ -26,6 +26,16 @@ video, Redgifs, and crossposts.
   filter, and duplicate skipping — open them from the overlay's gear, and
   changes apply live without a reload.
 
+## Screenshots
+
+The options page in light and dark mode:
+
+![Reddit Slideshow options page](docs/screenshots/options-light.png)
+
+Regenerate the shots anytime with `npm run screenshots` — it builds the Firefox
+extension, serves the output, and uses Playwright/Chromium to capture
+`docs/screenshots/options-{light,dark}.png`.
+
 ## Install
 
 It isn't on the Firefox Add-ons site or the Chrome Web Store yet, so you load the
