@@ -110,6 +110,13 @@
   opacity: 0;
 }
 
+/* While a manual Next/Prev is still loading, dim the held frame so it reads as
+   "loading the next one", not frozen. */
+.rs-nav-loading .rs-slide:not(.rs-slide--pending) {
+  opacity: 0.45;
+  transition: opacity 0.15s ease;
+}
+
 /* The incoming frame sits above the outgoing one during a transition. */
 .rs-slide--enter {
   z-index: 1;
@@ -340,7 +347,8 @@
     animation: rs-exit-fade var(--rs-tx-dur) var(--rs-tx-ease) both !important;
   }
   .rs-logo__mark,
-  .rs-buffering__dot {
+  .rs-buffering__dot,
+  .rs-meta__counter--pulse {
     animation: none !important;
   }
 }
@@ -421,7 +429,7 @@ iframe.reddit-slideshow-media {
   text-overflow: ellipsis;
   /* A light glow for legibility over a bright image - small enough that it
      reads as a faint edge, not a filled background behind the text. */
-  text-shadow: 0 0 0.1rem #999;
+  text-shadow: 0 0 0.2rem #000;
 }
 
 /* Control bar */
@@ -1119,6 +1127,25 @@ iframe.reddit-slideshow-media {
 .rs-meta__counter:hover {
   background: rgba(255, 122, 24, 0.16);
   color: #ffcf9e;
+}
+
+/* A quick scale + accent flash so a manual Next/Prev always registers, even
+   while the next slide is still loading. */
+@keyframes rs-counter-pulse {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.18);
+    color: var(--rs-accent);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.rs-meta__counter--pulse {
+  animation: rs-counter-pulse 0.4s var(--rs-tx-ease);
 }
 
 /* Open-original lives in the meta bar now; size it down from the rail buttons. */

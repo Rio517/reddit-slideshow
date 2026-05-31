@@ -588,6 +588,14 @@ describe("createOverlay", () => {
     );
   });
 
+  it("pulses the position counter on a manual nav", () => {
+    const overlay = createOverlay(noopHandlers());
+    const counter = overlay.root.querySelector(".rs-meta__counter");
+    expect(counter?.classList.contains("rs-meta__counter--pulse")).toBe(false);
+    overlay.notifyManualNav();
+    expect(counter?.classList.contains("rs-meta__counter--pulse")).toBe(true);
+  });
+
   it("skips a slide whose media URL is unsafe (non-HTTPS)", async () => {
     const onMediaFailed = vi.fn();
     const overlay = createOverlay({ ...noopHandlers(), onMediaFailed });
