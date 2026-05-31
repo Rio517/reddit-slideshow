@@ -323,6 +323,28 @@ describe("createSlideshowSession", () => {
     expect(fill?.style.animation).toContain("20s");
   });
 
+  it("skips broken media and records it in the skipped list", async () => {
+    const { session } = makeSession({
+      pages: [
+        {
+          slides: [imageSlide("a"), imageSlide("b")],
+          after: null,
+          exhausted: true,
+          postsScanned: 2,
+        },
+      ],
+    });
+    await session.start();
+    expect(mediaSrc()).toBe("https://i.redd.it/a.jpg");
+
+    document
+      .querySelector(`${ROOT} .reddit-slideshow-media`)
+      ?.dispatchEvent(new Event("error"));
+
+    expect(mediaSrc()).toBe("https://i.redd.it/b.jpg"); // advanced past the broken one
+    expect(text(".rs-skipped")).toBe("1 skipped");
+  });
+
   it("persists the mute preference when toggled", async () => {
     /** @type {object[]} */
     const saved = [];

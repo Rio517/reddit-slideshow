@@ -197,6 +197,44 @@ describe("createOverlay", () => {
     );
   });
 
+  it("skips broken media via onMediaFailed instead of dwelling", () => {
+    const onMediaFailed = vi.fn();
+    const overlay = createOverlay({ ...noopHandlers(), onMediaFailed });
+    overlay.renderCurrent(imageSlide({ title: "Broken" }), {
+      index: 0,
+      total: 2,
+      exhausted: false,
+      effectiveSeconds: 5,
+      playing: true,
+    });
+    overlay.root
+      .querySelector(".reddit-slideshow-media")
+      ?.dispatchEvent(new Event("error"));
+    expect(onMediaFailed).toHaveBeenCalledTimes(1);
+    expect(overlay.root.querySelector(".rs-placeholder")).toBeNull();
+  });
+
+  it("shows a clickable skipped count and lists the skipped items", () => {
+    const onOpenOriginal = vi.fn();
+    const overlay = createOverlay({ ...noopHandlers(), onOpenOriginal });
+    const badge = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-skipped")
+    );
+    expect(badge?.hidden).toBe(true);
+
+    overlay.setSkipped([
+      imageSlide({ title: "Dead clip", sourceUrl: "https://v.redd.it/x" }),
+    ]);
+    expect(badge?.hidden).toBe(false);
+    expect(badge?.textContent).toBe("1 skipped");
+
+    badge?.dispatchEvent(new Event("click", { bubbles: true }));
+    const item = overlay.root.querySelector(".rs-skipped-panel__item");
+    expect(item?.textContent).toBe("Dead clip");
+    item?.dispatchEvent(new Event("click", { bubbles: true }));
+    expect(onOpenOriginal).toHaveBeenCalledTimes(1);
+  });
+
   it("swaps in a placeholder when media fails to load", () => {
     const overlay = createOverlay(noopHandlers());
     overlay.renderCurrent(imageSlide({ title: "Removed post" }), {
