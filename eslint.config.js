@@ -13,7 +13,7 @@ export default [
   },
   js.configs.recommended,
   {
-    files: ["**/*.{js,ts}"],
+    files: ["**/*.{js,ts,mjs}"],
     languageOptions: {
       ecmaVersion: 2023,
       sourceType: "module",
