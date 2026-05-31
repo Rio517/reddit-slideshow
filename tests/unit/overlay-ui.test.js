@@ -168,6 +168,27 @@ describe("createOverlay", () => {
     expect(video?.getAttribute("src")).toBe("blob:fake-123");
   });
 
+  it("closes on a backdrop click, but not on the media or a control", () => {
+    const onClose = vi.fn();
+    const overlay = createOverlay({ ...noopHandlers(), onClose });
+    overlay.renderCurrent(imageSlide(), {
+      index: 0,
+      total: 1,
+      exhausted: true,
+      effectiveSeconds: 5,
+      playing: true,
+    });
+    const click = (/** @type {Element | null | undefined} */ el) =>
+      el?.dispatchEvent(new Event("click", { bubbles: true }));
+
+    click(overlay.root.querySelector(".rs-slide")); // the media — no close
+    click(overlay.root.querySelector(".rs-btn")); // a control — no close
+    expect(onClose).not.toHaveBeenCalled();
+
+    click(overlay.root.querySelector(".rs-stage")); // backdrop — closes
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
   it("renders a status message", () => {
     const overlay = createOverlay(noopHandlers());
     overlay.showStatus("No supported media on this page.");

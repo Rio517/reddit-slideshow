@@ -45,8 +45,8 @@ describe("createRedgifsResolver", () => {
       String(c[0]).includes("/auth/temporary"),
     );
     expect(authCalls.length).toBe(1); // token reused across resolves
-    const gifCall = fetchImpl.mock.calls.find((c) =>
-      String(c[0]).includes("/gifs/abc"),
+    const gifCall = /** @type {any} */ (
+      fetchImpl.mock.calls.find((c) => String(c[0]).includes("/gifs/abc"))
     );
     expect(gifCall?.[1]?.headers?.Authorization).toBe("Bearer T1");
   });
