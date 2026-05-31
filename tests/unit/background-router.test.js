@@ -110,6 +110,27 @@ describe("createMessageRouter — requestPage", () => {
     );
     expect(result).toMatchObject({ ok: false, error: { status: 403 } });
   });
+
+  it("rejects a listing fetch from a non-content-script sender (no tab)", async () => {
+    /** @type {string[]} */
+    const fetched = [];
+    const router = makeRouter({
+      fetchQueuePage: async (/** @type {string} */ pageUrl) => {
+        fetched.push(pageUrl);
+        return { slides: [], after: null, postsScanned: 0, exhausted: true };
+      },
+    });
+    const result = await router(
+      {
+        type: "slideshow.requestPage",
+        payload: { pageUrl: "https://old.reddit.com/r/x/" },
+      },
+      { id: RUNTIME_ID }, // an extension page: own id, but no tab
+    );
+    expect(result).toEqual({ ok: false });
+    // The session-authenticated fetch must never run for an untrusted caller.
+    expect(fetched).toEqual([]);
+  });
 });
 
 describe("createMessageRouter — fetchImage", () => {

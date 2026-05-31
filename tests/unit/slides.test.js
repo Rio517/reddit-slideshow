@@ -139,6 +139,42 @@ describe("gallery posts", () => {
       [3, 3],
     ]);
   });
+
+  it("leaves a single-surviving-image gallery unnumbered (no '1/1')", () => {
+    // A gallery whose other items are deleted/invalid collapses to one slide;
+    // it should read as a plain post, not "(1/1)".
+    const oneValid = {
+      data: {
+        children: [
+          {
+            data: {
+              name: "t3_gsolo",
+              title: "Mostly-deleted gallery",
+              permalink: "/r/x/comments/gsolo/",
+              is_gallery: true,
+              gallery_data: {
+                items: [
+                  { media_id: "img_a" },
+                  { media_id: "img_b", is_deleted: true },
+                ],
+              },
+              media_metadata: {
+                img_a: {
+                  status: "valid",
+                  s: { u: "https://i.redd.it/a.jpg", x: 100, y: 100 },
+                },
+                img_b: { status: "failed" },
+              },
+            },
+          },
+        ],
+      },
+    };
+    const slides = slidesFromListing(oneValid);
+    expect(slides).toHaveLength(1);
+    expect(slides[0].galleryIndex).toBeUndefined();
+    expect(slides[0].galleryTotal).toBeUndefined();
+  });
 });
 
 describe("Reddit-hosted video posts", () => {

@@ -83,24 +83,28 @@ async function load() {
 }
 
 async function persist() {
-  await saveSettings({
-    imageTimerSeconds: Number(timerSlider.value),
-    autoplay: autoplay.checked,
-    startMuted: startMuted.checked,
-    includeNsfw: includeNsfw.checked,
-    dedupe: dedupe.checked,
-    alwaysShowMeta: alwaysShowMeta.checked,
-    maxLoadWaitSeconds: Number(maxLoadWait.value),
-    contentDedup: contentDedup.checked,
-    panZoom: panZoom.checked,
-    panZoomMinOversize: Number(panZoomInputs.panZoomMinOversize.value),
-    panZoomScale: Number(panZoomInputs.panZoomScale.value),
-    panZoomShowSeconds: Number(panZoomInputs.panZoomShowSeconds.value),
-    panZoomZoomInSeconds: Number(panZoomInputs.panZoomZoomInSeconds.value),
-    panZoomPanSeconds: Number(panZoomInputs.panZoomPanSeconds.value),
-    panZoomZoomOutSeconds: Number(panZoomInputs.panZoomZoomOutSeconds.value),
-    panZoomShowEndSeconds: Number(panZoomInputs.panZoomShowEndSeconds.value),
-  });
+  try {
+    await saveSettings({
+      imageTimerSeconds: Number(timerSlider.value),
+      autoplay: autoplay.checked,
+      startMuted: startMuted.checked,
+      includeNsfw: includeNsfw.checked,
+      dedupe: dedupe.checked,
+      alwaysShowMeta: alwaysShowMeta.checked,
+      maxLoadWaitSeconds: Number(maxLoadWait.value),
+      contentDedup: contentDedup.checked,
+      panZoom: panZoom.checked,
+      panZoomMinOversize: Number(panZoomInputs.panZoomMinOversize.value),
+      panZoomScale: Number(panZoomInputs.panZoomScale.value),
+      panZoomShowSeconds: Number(panZoomInputs.panZoomShowSeconds.value),
+      panZoomZoomInSeconds: Number(panZoomInputs.panZoomZoomInSeconds.value),
+      panZoomPanSeconds: Number(panZoomInputs.panZoomPanSeconds.value),
+      panZoomZoomOutSeconds: Number(panZoomInputs.panZoomZoomOutSeconds.value),
+      panZoomShowEndSeconds: Number(panZoomInputs.panZoomShowEndSeconds.value),
+    });
+  } catch {
+    // Used as a change listener; a failed settings write isn't actionable here.
+  }
 }
 
 timerSlider.addEventListener("input", () => {

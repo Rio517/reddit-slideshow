@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createOverlay } from "../../lib/overlay-ui.js";
 
+/** @typedef {ReturnType<typeof createOverlay>} Overlay */
+
 /**
  * @param {Partial<import("../../lib/slides.js").Slide>} [overrides]
  * @returns {import("../../lib/slides.js").Slide}
@@ -34,9 +36,23 @@ const PANEL_SETTINGS = {
   includeNsfw: true,
   dedupe: true,
   contentDedup: false,
+  alwaysShowMeta: true,
   maxLoadWaitSeconds: 5,
   panZoom: false,
 };
+
+/** @param {Overlay} overlay */
+function renderProxiedVideo(overlay) {
+  overlay.renderCurrent(
+    imageSlide({
+      kind: "video",
+      durationMode: "media",
+      proxied: true,
+      mediaUrl: "https://media.redgifs.com/X.mp4",
+    }),
+    { index: 0, total: 1, exhausted: true, effectiveSeconds: 5, playing: true },
+  );
+}
 
 function noopHandlers() {
   return {
@@ -248,6 +264,95 @@ describe("createOverlay", () => {
     expect(overlay.root.querySelector(".rs-status")?.textContent).toBe(
       "No supported media on this page.",
     );
+  });
+
+  it("clicking play/pause toggles playback without closing the slideshow", () => {
+    const onClose = vi.fn();
+    /** @type {any} */
+    let overlay;
+    // The real wiring swaps the icon on toggle, which detaches the click
+    // target — the backdrop-close handler must not mistake that for a backdrop.
+    const onTogglePlay = vi.fn(() => overlay.setPlaying(false));
+    overlay = createOverlay({ ...noopHandlers(), onClose, onTogglePlay });
+    overlay.renderCurrent(imageSlide(), {
+      index: 0,
+      total: 1,
+      exhausted: true,
+      effectiveSeconds: 5,
+      playing: true,
+    });
+    const play = overlay.root.querySelector(".rs-btn--primary");
+    const icon = play?.querySelector(".rs-icon") ?? play;
+    icon?.dispatchEvent(new Event("click", { bubbles: true }));
+    expect(onTogglePlay).toHaveBeenCalledTimes(1);
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("shows a branded logo splash while loading", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.showLoading();
+    expect(overlay.root.querySelector(".rs-logo__mark")).toBeTruthy();
+    expect(overlay.root.querySelector(".rs-logo__name")?.textContent).toBe(
+      "Reddit Slideshow",
+    );
+    expect(overlay.root.querySelector(".rs-logo__sub")?.textContent).toBe(
+      "Loading…",
+    );
+  });
+
+  it("pins the meta with rs-pin-meta only when alwaysShowMeta is set", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.setSettings(
+      /** @type {any} */ ({ ...PANEL_SETTINGS, alwaysShowMeta: true }),
+    );
+    expect(overlay.root.classList.contains("rs-pin-meta")).toBe(true);
+    overlay.setSettings(
+      /** @type {any} */ ({ ...PANEL_SETTINGS, alwaysShowMeta: false }),
+    );
+    expect(overlay.root.classList.contains("rs-pin-meta")).toBe(false);
+  });
+
+  it("stops and detaches the current video on hide so audio can't keep playing", async () => {
+    vi.useRealTimers();
+    const overlay = createOverlay({
+      ...noopHandlers(),
+      resolveMedia: vi.fn(async () => "blob:fake-hide"),
+    });
+    renderProxiedVideo(overlay);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(overlay.root.querySelector("video")).toBeTruthy();
+    overlay.hide();
+    expect(overlay.root.querySelector("video")).toBeNull();
+  });
+
+  it("tears down the current video when a status card replaces it", async () => {
+    vi.useRealTimers();
+    const overlay = createOverlay({
+      ...noopHandlers(),
+      resolveMedia: vi.fn(async () => "blob:fake-status"),
+    });
+    renderProxiedVideo(overlay);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(overlay.root.querySelector("video")).toBeTruthy();
+    overlay.showStatus("No more media to show.");
+    expect(overlay.root.querySelector("video")).toBeNull();
+    expect(overlay.root.querySelector(".rs-status")?.textContent).toBe(
+      "No more media to show.",
+    );
+  });
+
+  it("reports the true skip total even when the retained list is capped", () => {
+    const overlay = createOverlay(noopHandlers());
+    const badge = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-skipped")
+    );
+    // 250 skips occurred but only the most recent one is retained.
+    overlay.setSkipped([imageSlide({ title: "most recent skip" })], 250);
+    expect(badge?.textContent).toBe("250 skipped");
+    badge?.dispatchEvent(new Event("click", { bubbles: true }));
+    expect(
+      overlay.root.querySelector(".rs-skipped-panel__note")?.textContent,
+    ).toBe("Showing the most recent 1.");
   });
 
   it("skips broken media via onMediaFailed instead of dwelling", () => {

@@ -31,14 +31,18 @@ Key decisions already made:
 
 ## 1. Immediate Todo
 
-v1 is feature-complete, including mute/audio, duplicate detection (both layers),
-and the self-audit fixes. Remaining work needs a human or is optional:
+1. Is there a runtime introspection tool we could use to improve iteration speed and debugging speed?
+2. please add build/publishing instructions to readme if not there already.
+3. Slide transitions: bbetween images i see a roughly 1s delay between one image going away and a new one coming in.... i dont want that. Ideally we could have a transition preference. with 6 options, including fade, slide, none, and maybe you can suggest others that users might like. i think this would be best in the full settings section.
+4. Please create a new popout button in the control slider that opens the slideshow in a dedicated minimal window. i would use this for airplay. Ideally no browser bar or url bar or title. very minmal.
+5. Please audit our test suite speed, can it be faster, especially when we go to CI
+6. go to CI.
+   CHECK IF DONE
 
-1. **Real-Firefox verification (needs a human).** Reload the built add-on and check: the side-rail controls/icons, custom-timer slider + max-load-wait, Include-NSFW filter, autoplay-off, start-from-scroll-position, the loading spinner, the toolbar icon, Redgifs playback **under the new iframe `sandbox`**, **audio on unmute** for a v.redd.it clip, and — after enabling "Also detect re-uploaded images" — that **Layer 2 dedup** actually skips a repost (the `createImageBitmap`/`OffscreenCanvas` + privileged-fetch chain).
-2. **New Reddit check (needs a human).** On a logged-in `www.reddit.com/r/<sub>/` listing, launch the slideshow and confirm images / v.redd.it / Redgifs render under the www CSP, nav/pagination work, start-from-scroll lands on the right post (shreddit cursor), and "open original" stays on www. If media is blocked, capture the CSP directive (ADR 0008's iframe fallback).
-3. **Chrome — logged-in media render (needs a human).** The Chrome build is smoke-tested (loaded unpacked via Playwright): the extension loads, the MV3 service worker registers, the content script injects, the overlay renders, and the SW's `credentials: "include"` listing fetch attaches the user's Reddit cookies (see `docs/research/chrome-support.md`). The one remaining step is a logged-in run: load `.output/chrome-mv3/` unpacked in Chrome, log into Reddit, and confirm the slideshow actually renders media on old + www (Reddit `403`s anonymous `.json`, so a logged-out automated run can't show this).
-4. **Full HLS/DASH audio** — only if the unmute check shows many clips are silent (muxed-fallback assumption wrong).
-5. **Packaging:** `npm run zip` (Firefox/AMO) and `npm run zip:chrome` (Chrome Web Store) when ready.
+7. **Full HLS/DASH audio** — only if the unmute check shows many clips are silent (muxed-fallback assumption wrong).
+8. **Packaging:** `npm run zip` (Firefox/AMO) and `npm run zip:chrome` (Chrome Web Store) when ready.
+
+MIGHT BE DONE ALREDY:
 
 ### Quality follow-ups (lower priority)
 
@@ -53,6 +57,10 @@ and the self-audit fixes. Remaining work needs a human or is optional:
 - **Narrow typedefs for Reddit listing JSON** (`lib/slides.js` et al. currently
   use `any`).
 - **`requiredElement(selector, ctor)` helper** for the options-page lookups.
+- **Split `lib/overlay-ui.js`** if it keeps growing — candidate seams are the
+  jump-list panel, the skipped-list panel, and a media-lifecycle module (object
+  URL revoke, video stop, ready fallback, listener aborts), with `createOverlay`
+  as the assembly point.
 
 The content↔overlay↔background glue now lives in `lib/session.js` (injected deps),
 covered by `tests/unit/session.test.js`.

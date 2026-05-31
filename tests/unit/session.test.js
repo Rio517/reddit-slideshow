@@ -39,6 +39,19 @@ function imageSlide(id, overrides) {
   });
 }
 
+/** @param {string} id @param {string | null} after */
+function pageOf(id, after) {
+  return {
+    ok: true,
+    page: {
+      slides: [imageSlide(id)],
+      after,
+      exhausted: false,
+      postsScanned: 50,
+    },
+  };
+}
+
 /** @param {Record<string, unknown>} [overrides] */
 function settings(overrides) {
   return {
@@ -194,6 +207,59 @@ describe("createSlideshowSession", () => {
     await flush(); // let the async pagination fetch resolve
     expect(request.calls).toContain("t3_next");
     session.handleKeydown(key("ArrowRight"));
+    expect(mediaSrc()).toBe("https://i.redd.it/b.jpg");
+  });
+
+  it("a restart while a pagination fetch is in flight does not corrupt the new run", async () => {
+    let calls = 0;
+    /** @type {(reason?: unknown) => void} */
+    let rejectStale = () => {};
+    const requestPage = async () => {
+      calls += 1;
+      // Run 1's first page (a) and run 2's (b) carry a cursor; the paginations
+      // they trigger stay pending (run 1's is the one we later reject).
+      if (calls === 1) {
+        return pageOf("a", "t3_p2");
+      }
+      if (calls === 2) {
+        return new Promise((_resolve, reject) => {
+          rejectStale = reject;
+        });
+      }
+      if (calls === 3) {
+        return pageOf("b", "t3_q2");
+      }
+      return new Promise(() => {}); // run 2's pagination: pending forever
+    };
+    const session = createSlideshowSession({
+      doc: document,
+      createOverlay,
+      getSettings: async () => settings(),
+      saveSettings: async () => {},
+      requestPage,
+      getStartCursor: () => undefined,
+      openUrl: () => {},
+      createImage: () => ({ src: "", decoding: "" }),
+    });
+    sessions.push(session);
+
+    await session.start();
+    session.handleKeydown(key("ArrowRight")); // run 1 → waiting, pagination pending
+    await flush();
+
+    // Restart with a fresh controller while run 1's fetch is still pending.
+    await session.start();
+    await flush();
+    expect(mediaSrc()).toBe("https://i.redd.it/b.jpg");
+    session.handleKeydown(key("ArrowRight")); // run 2 → waiting on its own page
+    expect(text(".rs-status")).toBeUndefined();
+
+    // Run 1's fetch now rejects onto the shared controller binding. The catch's
+    // runId guard must drop it, not append a phantom exhausted page to run 2.
+    rejectStale(new Error("aborted"));
+    await flush();
+
+    expect(text(".rs-status")).toBeUndefined(); // not "No more media to show."
     expect(mediaSrc()).toBe("https://i.redd.it/b.jpg");
   });
 
@@ -387,6 +453,7 @@ describe("createSlideshowSession", () => {
       hide() {},
       isOpen: () => true,
       showStatus() {},
+      showLoading() {},
       setSkipped() {},
       setSettings() {},
       setMuted() {},
