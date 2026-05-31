@@ -216,7 +216,7 @@ item's single purpose, and (3) we do not use or transfer user data to determine
 creditworthiness or for lending.
 
 **Privacy policy URL:** the `PRIVACY.md` in this repository
-(https://github.com/Rio517/reddit-slideshow/blob/main/PRIVACY.md), or a hosted
+(https://github.com/Rio517/slideshow-spectacular-for-reddit/blob/main/PRIVACY.md), or a hosted
 copy of it.
 
 ---
@@ -290,4 +290,4 @@ want a third tile.)
 > images" setting is what triggers the runtime request for the optional
 > preview.redd.it / external-preview.redd.it host permissions.
 >
-> Source: https://github.com/Rio517/reddit-slideshow
+> Source: https://github.com/Rio517/slideshow-spectacular-for-reddit
