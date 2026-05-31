@@ -866,18 +866,34 @@ iframe.reddit-slideshow-media {
 }
 
 .rs-skipped-panel__item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
   text-align: left;
   font: inherit;
   font-size: 13px;
-  color: var(--rs-fg);
+  color: var(--rs-muted);
   background: transparent;
   border: none;
   border-radius: 6px;
   padding: 7px 8px;
   cursor: pointer;
+}
+
+.rs-skipped-panel__text {
+  flex: 1;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.rs-skipped-panel__reason {
+  flex: none;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--rs-accent);
+  opacity: 0.85;
 }
 
 .rs-skipped-panel__item:hover {
@@ -1155,7 +1171,7 @@ iframe.reddit-slideshow-media {
 
 .rs-jump-panel__item {
   display: grid;
-  grid-template-columns: 32px 1fr;
+  grid-template-columns: 32px 1fr auto;
   align-items: center;
   gap: 10px;
   text-align: left;
@@ -1167,6 +1183,17 @@ iframe.reddit-slideshow-media {
   border-radius: 7px;
   padding: 8px;
   cursor: pointer;
+}
+
+/* Auto-skipped slides stay listed but read as muted. */
+.rs-jump-panel__item--skipped {
+  opacity: 0.55;
+}
+
+.rs-jump-panel__tag {
+  font-size: 11px;
+  color: var(--rs-muted);
+  white-space: nowrap;
 }
 
 .rs-jump-panel__item:hover {

@@ -196,6 +196,29 @@ describe("createSlideshowSession", () => {
     expect(mediaSrc()).toBe("https://i.redd.it/a.jpg");
   });
 
+  it("shows the end card and replays from the top on the next forward press", async () => {
+    const page = {
+      slides: [imageSlide("a"), imageSlide("b")],
+      after: null,
+      exhausted: true,
+      postsScanned: 2,
+    };
+    // Same page both times: a restart re-fetches from the start cursor.
+    const { session } = makeSession({ pages: [page, page] });
+    await session.start();
+    session.handleKeydown(key("ArrowRight")); // -> b (last)
+    expect(mediaSrc()).toBe("https://i.redd.it/b.jpg");
+
+    session.handleKeydown(key("ArrowRight")); // past the end -> end card
+    expect(q(".rs-logo")).not.toBeNull();
+    expect(text(".rs-logo__sub")).toContain("start over");
+
+    session.handleKeydown(key("ArrowRight")); // restart from the top
+    await flush();
+    expect(mediaSrc()).toBe("https://i.redd.it/a.jpg");
+    expect(text(".rs-meta__counter")).toBe("1 / 2");
+  });
+
   it("hands off to a popout window and closes this tab's slideshow", async () => {
     const openPopout = vi.fn();
     const { session } = makeSession({ openPopout });
@@ -507,6 +530,7 @@ describe("createSlideshowSession", () => {
       isOpen: () => true,
       showStatus() {},
       showLoading() {},
+      showEnd() {},
       setSkipped() {},
       setSettings() {},
       setMuted() {},
@@ -574,6 +598,7 @@ describe("createSlideshowSession", () => {
       isOpen: () => true,
       showStatus() {},
       showLoading() {},
+      showEnd() {},
       setSkipped() {},
       setSettings() {},
       setMuted() {},

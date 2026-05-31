@@ -546,6 +546,48 @@ describe("createOverlay", () => {
     expect(onOpenOriginal).toHaveBeenCalledTimes(1);
   });
 
+  it("shows the skip reason next to each skipped item", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.setSkipped(
+      [imageSlide({ title: "Dupe", skipReason: "Duplicate image" })],
+      1,
+    );
+    /** @type {HTMLElement} */ (
+      overlay.root.querySelector(".rs-skipped")
+    ).dispatchEvent(new Event("click", { bubbles: true }));
+    expect(
+      overlay.root.querySelector(".rs-skipped-panel__text")?.textContent,
+    ).toBe("Dupe");
+    expect(
+      overlay.root.querySelector(".rs-skipped-panel__reason")?.textContent,
+    ).toBe("Duplicate image");
+  });
+
+  it("dims and tags auto-skipped slides in the jump list", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.setJumpList(
+      [
+        imageSlide({ title: "kept" }),
+        imageSlide({ title: "gone", skipReason: "Unavailable" }),
+      ],
+      0,
+      1,
+    );
+    /** @type {HTMLElement} */ (
+      overlay.root.querySelector(".rs-meta__counter")
+    ).dispatchEvent(new Event("click", { bubbles: true }));
+    const items = overlay.root.querySelectorAll(".rs-jump-panel__item");
+    expect(items[0].classList.contains("rs-jump-panel__item--skipped")).toBe(
+      false,
+    );
+    expect(items[1].classList.contains("rs-jump-panel__item--skipped")).toBe(
+      true,
+    );
+    expect(items[1].querySelector(".rs-jump-panel__tag")?.textContent).toBe(
+      "(skipped)",
+    );
+  });
+
   it("skips a slide whose media URL is unsafe (non-HTTPS)", async () => {
     const onMediaFailed = vi.fn();
     const overlay = createOverlay({ ...noopHandlers(), onMediaFailed });
