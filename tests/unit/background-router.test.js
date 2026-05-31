@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { createMessageRouter } from "../../lib/background-router.js";
 
 const RUNTIME_ID = "self@example";
@@ -184,5 +184,24 @@ describe("createMessageRouter — fetchImage", () => {
     expect(
       await router({ type: "slideshow.fetchImage", payload: {} }, OWN),
     ).toEqual({ ok: false });
+  });
+});
+
+describe("createMessageRouter — openOptions", () => {
+  it("opens the options page for an own-sender request", async () => {
+    const openOptionsPage = vi.fn();
+    const router = makeRouter({ openOptionsPage });
+    const result = await router({ type: "slideshow.openOptions" }, OWN);
+    expect(openOptionsPage).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({ ok: true });
+  });
+
+  it("ignores an openOptions request from a foreign sender", () => {
+    const openOptionsPage = vi.fn();
+    const router = makeRouter({ openOptionsPage });
+    expect(
+      router({ type: "slideshow.openOptions" }, { id: "someone-else" }),
+    ).toBeUndefined();
+    expect(openOptionsPage).not.toHaveBeenCalled();
   });
 });

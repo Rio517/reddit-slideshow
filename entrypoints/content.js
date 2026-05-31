@@ -39,6 +39,13 @@ export default defineContentScript({
         return afterCursorForViewport(posts);
       },
       openUrl: (url) => window.open(url, "_blank", "noopener"),
+      // The options page can only be opened from a privileged context, so ask
+      // the background to open it.
+      openPreferences: () => {
+        browser.runtime
+          .sendMessage({ type: "slideshow.openOptions" })
+          .catch(() => {});
+      },
       createImage: () => new Image(),
       // Layer 2 dedup: the background fetches the bytes (privileged), then we
       // downscale to 9x8 and difference-hash. Returns null on any failure.

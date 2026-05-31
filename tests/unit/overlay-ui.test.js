@@ -37,6 +37,7 @@ function noopHandlers() {
     onMediaEnded() {},
     onMediaReady() {},
     onToggleMute() {},
+    onOpenPreferences() {},
   };
 }
 
@@ -55,12 +56,20 @@ describe("createOverlay", () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
 
-  it("builds the chrome with six controls, hidden by default", () => {
+  it("builds the chrome with seven controls, hidden by default", () => {
     const overlay = createOverlay(noopHandlers());
     expect(overlay.root.querySelector(".rs-stage")).toBeTruthy();
     expect(overlay.root.querySelector(".rs-timer")).toBeTruthy();
-    expect(overlay.root.querySelectorAll(".rs-btn").length).toBe(6);
+    expect(overlay.root.querySelectorAll(".rs-btn").length).toBe(7);
     expect(overlay.isOpen()).toBe(false);
+  });
+
+  it("opens preferences when the preferences control is clicked", () => {
+    const handlers = noopHandlers();
+    const onOpenPreferences = vi.fn();
+    const overlay = createOverlay({ ...handlers, onOpenPreferences });
+    clickByLabel(overlay.root, "Preferences");
+    expect(onOpenPreferences).toHaveBeenCalledTimes(1);
   });
 
   it("renders a slide with the position counter, title, and NSFW tag", () => {
@@ -114,6 +123,7 @@ describe("createOverlay", () => {
       onMediaEnded: () => {},
       onMediaReady: () => {},
       onToggleMute: () => calls.push("mute"),
+      onOpenPreferences: () => calls.push("prefs"),
     });
     overlay.renderCurrent(imageSlide(), {
       index: 0,
@@ -126,8 +136,9 @@ describe("createOverlay", () => {
     clickByLabel(overlay.root, "Previous");
     clickByLabel(overlay.root, "Open");
     clickByLabel(overlay.root, "Mute");
+    clickByLabel(overlay.root, "Preferences");
     clickByLabel(overlay.root, "Close");
-    expect(calls).toEqual(["next", "prev", "open", "mute", "close"]);
+    expect(calls).toEqual(["next", "prev", "open", "mute", "prefs", "close"]);
   });
 
   it("renders a status message", () => {

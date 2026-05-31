@@ -17,6 +17,7 @@ export default defineBackground(() => {
           ? response.arrayBuffer()
           : Promise.reject(new Error(`HTTP ${response.status}`)),
       ),
+    openOptionsPage: () => browser.runtime.openOptionsPage(),
   });
   browser.runtime.onMessage.addListener(router);
 
