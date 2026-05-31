@@ -63,6 +63,13 @@ describe("normalizeSettings", () => {
     ).toBe(5);
   });
 
+  it("defaults transition to fade and only accepts known transitions", () => {
+    expect(normalizeSettings({}).transition).toBe("fade");
+    expect(normalizeSettings({ transition: "flip" }).transition).toBe("flip");
+    expect(normalizeSettings({ transition: "spin" }).transition).toBe("fade");
+    expect(normalizeSettings({ transition: 7 }).transition).toBe("fade");
+  });
+
   it("defaults pan-zoom off with sensible phase durations", () => {
     const s = normalizeSettings({});
     expect(s.panZoom).toBe(false);
@@ -113,6 +120,7 @@ describe("getSettings / saveSettings", () => {
       contentDedup: true,
       alwaysShowMeta: true,
       maxLoadWaitSeconds: 10,
+      transition: "fade",
       panZoom: false,
       panZoomScale: 2,
       panZoomShowSeconds: 2,

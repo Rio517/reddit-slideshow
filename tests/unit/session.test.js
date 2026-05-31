@@ -63,6 +63,7 @@ function settings(overrides) {
     contentDedup: false,
     alwaysShowMeta: true,
     maxLoadWaitSeconds: 5,
+    transition: "fade",
     panZoom: false,
     panZoomScale: 2,
     panZoomShowSeconds: 2,
@@ -133,10 +134,13 @@ function makeSession({
 
 /** @param {string} sel */
 const text = (sel) => document.querySelector(sel)?.textContent;
-const mediaSrc = () =>
-  document
-    .querySelector(`${ROOT} img.reddit-slideshow-media`)
-    ?.getAttribute("src");
+// The current slide is the newest frame: a render layers it over the previous
+// one, which is only retired once the new media is ready (it never "loads" in
+// these DOM-less tests, so read the last frame).
+const mediaSrc = () => {
+  const imgs = document.querySelectorAll(`${ROOT} img.reddit-slideshow-media`);
+  return imgs[imgs.length - 1]?.getAttribute("src");
+};
 /** @param {string} k @returns {any} */
 const key = (k) => ({
   key: k,

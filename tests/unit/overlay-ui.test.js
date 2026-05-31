@@ -420,4 +420,91 @@ describe("createOverlay", () => {
     overlay.setBuffering(false);
     expect(hint?.hidden).toBe(true);
   });
+
+  /**
+   * @param {Overlay} overlay
+   * @param {string} id
+   * @param {number} index
+   * @param {string} [transition]
+   */
+  function renderImageAt(overlay, id, index, transition = "fade") {
+    overlay.renderCurrent(
+      imageSlide({ id, mediaUrl: `https://i.redd.it/${id}.jpg` }),
+      {
+        index,
+        total: 3,
+        exhausted: false,
+        effectiveSeconds: 5,
+        playing: true,
+        transition,
+      },
+    );
+  }
+
+  /**
+   * @param {Overlay} overlay
+   * @param {string} id
+   */
+  function imgFor(overlay, id) {
+    return /** @type {HTMLImageElement | null} */ (
+      overlay.root.querySelector(`img[src="https://i.redd.it/${id}.jpg"]`)
+    );
+  }
+
+  /**
+   * Drive an image slide to "ready": dispatch load, then flush the decode()
+   * microtask the swap waits on.
+   * @param {Overlay} overlay
+   * @param {string} id
+   */
+  async function markImageReady(overlay, id) {
+    imgFor(overlay, id)?.dispatchEvent(new Event("load"));
+    await Promise.resolve();
+    await Promise.resolve();
+  }
+
+  it("holds the previous slide on screen until the next is decoded (no gap)", async () => {
+    vi.useRealTimers();
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+
+    renderImageAt(overlay, "a", 0);
+    await markImageReady(overlay, "a");
+    expect(overlay.root.querySelectorAll(".rs-slide").length).toBe(1);
+
+    // Advance: the new slide is not ready yet, so "a" must stay on screen
+    // rather than being replaced by a black/loading gap.
+    renderImageAt(overlay, "b", 1);
+    expect(overlay.root.querySelectorAll(".rs-slide").length).toBe(2);
+    expect(imgFor(overlay, "a")).toBeTruthy();
+
+    // Once "b" is decoded, "a" transitions out and is retired.
+    await markImageReady(overlay, "b");
+    overlay.root
+      .querySelector(".rs-slide--exit")
+      ?.dispatchEvent(new Event("animationend"));
+    expect(imgFor(overlay, "a")).toBeNull();
+    expect(imgFor(overlay, "b")).toBeTruthy();
+    expect(overlay.root.querySelectorAll(".rs-slide").length).toBe(1);
+  });
+
+  it("tags the incoming frame with the chosen transition and direction", async () => {
+    vi.useRealTimers();
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+
+    renderImageAt(overlay, "a", 1, "slide");
+    await markImageReady(overlay, "a");
+    const frame = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-slide")
+    );
+    expect(frame?.classList.contains("rs-tx-slide")).toBe(true);
+    expect(frame?.classList.contains("rs-dir-fwd")).toBe(true);
+
+    // Going backward (lower index) flips the direction class on the next frame.
+    renderImageAt(overlay, "b", 0, "slide");
+    await markImageReady(overlay, "b");
+    const incoming = imgFor(overlay, "b")?.closest(".rs-slide");
+    expect(incoming?.classList.contains("rs-dir-back")).toBe(true);
+  });
 });

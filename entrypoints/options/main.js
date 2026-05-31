@@ -30,6 +30,9 @@ const alwaysShowMeta = /** @type {HTMLInputElement} */ (
 const maxLoadWait = /** @type {HTMLSelectElement} */ (
   document.querySelector("#maxLoadWaitSeconds")
 );
+const transition = /** @type {HTMLSelectElement} */ (
+  document.querySelector("#transition")
+);
 const contentDedup = /** @type {HTMLInputElement} */ (
   document.querySelector("#contentDedup")
 );
@@ -71,6 +74,7 @@ async function load() {
   dedupe.checked = settings.dedupe;
   alwaysShowMeta.checked = settings.alwaysShowMeta;
   maxLoadWait.value = String(settings.maxLoadWaitSeconds);
+  transition.value = settings.transition;
   contentDedup.checked = settings.contentDedup;
   panZoom.checked = settings.panZoom;
   for (const [id, outId] of PAN_ZOOM_RANGES) {
@@ -92,6 +96,7 @@ async function persist() {
       dedupe: dedupe.checked,
       alwaysShowMeta: alwaysShowMeta.checked,
       maxLoadWaitSeconds: Number(maxLoadWait.value),
+      transition: transition.value,
       contentDedup: contentDedup.checked,
       panZoom: panZoom.checked,
       panZoomMinOversize: Number(panZoomInputs.panZoomMinOversize.value),
@@ -117,6 +122,7 @@ includeNsfw.addEventListener("change", persist);
 dedupe.addEventListener("change", persist);
 alwaysShowMeta.addEventListener("change", persist);
 maxLoadWait.addEventListener("change", persist);
+transition.addEventListener("change", persist);
 panZoom.addEventListener("change", () => {
   syncPanZoomEnabled();
   persist();

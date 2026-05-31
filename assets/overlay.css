@@ -3,6 +3,10 @@
   --rs-muted: #9aa4b2;
   --rs-accent: #f6b352;
   --rs-danger: #ff6b6b;
+  /* Slide-change transition timing — keep --rs-tx-dur in sync with
+     TRANSITION_MS in lib/overlay-ui.js. */
+  --rs-tx-dur: 0.45s;
+  --rs-tx-ease: cubic-bezier(0.22, 1, 0.36, 1);
 
   position: fixed;
   inset: 0;
@@ -72,24 +76,253 @@
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+  /* For the `flip` transition; harmless to 2D transforms. */
+  perspective: 2200px;
 }
 
 .rs-slide {
+  /* Stack every frame in the one grid cell so the incoming slide can transition
+     over the outgoing one (gap-free swap). */
+  grid-area: 1 / 1;
   display: grid;
   place-items: center;
   /* Clip the pan & zoom (scaled media) to the image's fit box. */
   overflow: hidden;
-  animation: rs-fade-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-@keyframes rs-fade-in {
+/* Held invisible until its media is decoded, so the entrance never animates a
+   blank/undecoded frame in. */
+.rs-slide--pending {
+  opacity: 0;
+}
+
+/* The incoming frame sits above the outgoing one during a transition. */
+.rs-slide--enter {
+  z-index: 1;
+  animation: rs-enter-fade var(--rs-tx-dur) var(--rs-tx-ease) both;
+}
+.rs-slide--exit {
+  z-index: 0;
+  animation: rs-exit-fade var(--rs-tx-dur) var(--rs-tx-ease) both;
+}
+
+/* fade — pure cross-fade (default) */
+.rs-tx-fade.rs-slide--enter {
+  animation-name: rs-enter-fade;
+}
+.rs-tx-fade.rs-slide--exit {
+  animation-name: rs-exit-fade;
+}
+
+/* zoom — incoming scales up into place, outgoing scales away */
+.rs-tx-zoom.rs-slide--enter {
+  animation-name: rs-enter-zoom;
+}
+.rs-tx-zoom.rs-slide--exit {
+  animation-name: rs-exit-zoom;
+}
+
+/* slide — directional slide + fade */
+.rs-tx-slide.rs-dir-fwd.rs-slide--enter {
+  animation-name: rs-enter-slide-fwd;
+}
+.rs-tx-slide.rs-dir-back.rs-slide--enter {
+  animation-name: rs-enter-slide-back;
+}
+.rs-tx-slide.rs-dir-fwd.rs-slide--exit {
+  animation-name: rs-exit-slide-fwd;
+}
+.rs-tx-slide.rs-dir-back.rs-slide--exit {
+  animation-name: rs-exit-slide-back;
+}
+
+/* push — directional, fully opaque conveyor */
+.rs-tx-push.rs-dir-fwd.rs-slide--enter {
+  animation-name: rs-enter-push-fwd;
+}
+.rs-tx-push.rs-dir-back.rs-slide--enter {
+  animation-name: rs-enter-push-back;
+}
+.rs-tx-push.rs-dir-fwd.rs-slide--exit {
+  animation-name: rs-exit-push-fwd;
+}
+.rs-tx-push.rs-dir-back.rs-slide--exit {
+  animation-name: rs-exit-push-back;
+}
+
+/* flip — 3D card flip around the vertical axis */
+.rs-tx-flip {
+  backface-visibility: hidden;
+}
+.rs-tx-flip.rs-dir-fwd.rs-slide--enter {
+  animation-name: rs-enter-flip-fwd;
+}
+.rs-tx-flip.rs-dir-back.rs-slide--enter {
+  animation-name: rs-enter-flip-back;
+}
+.rs-tx-flip.rs-dir-fwd.rs-slide--exit {
+  animation-name: rs-exit-flip-fwd;
+}
+.rs-tx-flip.rs-dir-back.rs-slide--exit {
+  animation-name: rs-exit-flip-back;
+}
+
+@keyframes rs-enter-fade {
   from {
     opacity: 0;
-    transform: scale(0.985);
   }
   to {
     opacity: 1;
-    transform: none;
+  }
+}
+@keyframes rs-exit-fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes rs-enter-zoom {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes rs-exit-zoom {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+}
+@keyframes rs-enter-slide-fwd {
+  from {
+    opacity: 0;
+    transform: translateX(16%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes rs-enter-slide-back {
+  from {
+    opacity: 0;
+    transform: translateX(-16%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes rs-exit-slide-fwd {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-16%);
+  }
+}
+@keyframes rs-exit-slide-back {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(16%);
+  }
+}
+@keyframes rs-enter-push-fwd {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes rs-enter-push-back {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes rs-exit-push-fwd {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+@keyframes rs-exit-push-back {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes rs-enter-flip-fwd {
+  from {
+    opacity: 0;
+    transform: rotateY(90deg);
+  }
+  to {
+    opacity: 1;
+    transform: rotateY(0);
+  }
+}
+@keyframes rs-enter-flip-back {
+  from {
+    opacity: 0;
+    transform: rotateY(-90deg);
+  }
+  to {
+    opacity: 1;
+    transform: rotateY(0);
+  }
+}
+@keyframes rs-exit-flip-fwd {
+  from {
+    opacity: 1;
+    transform: rotateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: rotateY(-90deg);
+  }
+}
+@keyframes rs-exit-flip-back {
+  from {
+    opacity: 1;
+    transform: rotateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: rotateY(90deg);
+  }
+}
+
+/* Respect reduced-motion: collapse every transition to a plain cross-fade. */
+@media (prefers-reduced-motion: reduce) {
+  .rs-slide--enter {
+    animation: rs-enter-fade var(--rs-tx-dur) var(--rs-tx-ease) both !important;
+  }
+  .rs-slide--exit {
+    animation: rs-exit-fade var(--rs-tx-dur) var(--rs-tx-ease) both !important;
   }
 }
 
