@@ -267,6 +267,20 @@ describe("createMessageRouter — fetchMedia", () => {
     expect(result.ok).toBe(true);
   });
 
+  it("returns bytes for a Giphy media subdomain", async () => {
+    const router = makeRouter({
+      fetchMediaBytes: async () => new ArrayBuffer(16),
+    });
+    const result = await router(
+      {
+        type: "slideshow.fetchMedia",
+        payload: { url: "https://media2.giphy.com/media/abc/giphy.mp4" },
+      },
+      OWN,
+    );
+    expect(result.ok).toBe(true);
+  });
+
   it("rejects a look-alike host that only ends with the brand, not the domain", async () => {
     let called = false;
     const router = makeRouter({

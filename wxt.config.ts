@@ -23,6 +23,9 @@ export default defineConfig({
       // from the per-video CDN subdomain (cdn-*.). One wildcard covers both,
       // scoped to the streamable.com domain (ADR 0013).
       "https://*.streamable.com/*",
+      // Giphy: background-fetch the transformed .mp4 from the media CDN subdomain
+      // (media./media2./…), played as a blob (ADR 0014).
+      "https://*.giphy.com/*",
     ],
     // Requested at runtime only when the user enables content-based dedup
     // (ADR 0006 Layer 2), so the background can fetch images to hash. i.redd.it

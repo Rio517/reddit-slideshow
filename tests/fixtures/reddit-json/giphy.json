@@ -1,0 +1,26 @@
+{
+  "kind": "Listing",
+  "data": {
+    "after": "t3_giphy_after",
+    "before": null,
+    "children": [
+      {
+        "kind": "t3",
+        "data": {
+          "name": "t3_gp1",
+          "title": "Giphy reaction",
+          "permalink": "/r/example/comments/gp1/giphy_reaction/",
+          "domain": "giphy.com",
+          "post_hint": "rich:video",
+          "is_video": false,
+          "over_18": false,
+          "url": "https://giphy.com/gifs/funny-cat-dance-l0HlBO3eHHpvbicmc",
+          "url_overridden_by_dest": "https://giphy.com/gifs/funny-cat-dance-l0HlBO3eHHpvbicmc",
+          "preview": {
+            "images": [{ "source": { "width": 480, "height": 270 } }]
+          }
+        }
+      }
+    ]
+  }
+}

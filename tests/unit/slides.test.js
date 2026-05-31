@@ -7,6 +7,7 @@ import redgifsFixture from "../fixtures/reddit-json/redgifs.json";
 import imgurGifvFixture from "../fixtures/reddit-json/imgur-gifv.json";
 import catboxVideoFixture from "../fixtures/reddit-json/catbox-video.json";
 import streamableFixture from "../fixtures/reddit-json/streamable.json";
+import giphyFixture from "../fixtures/reddit-json/giphy.json";
 import crosspostFixture from "../fixtures/reddit-json/crosspost.json";
 
 describe("slidesFromListing", () => {
@@ -337,6 +338,70 @@ describe("Streamable posts", () => {
       title: "Streamable clip",
       durationMode: "timer",
     });
+  });
+});
+
+describe("Giphy posts", () => {
+  it("transforms a giphy.com/gifs/<slug-id> watch page to the proxied mp4", () => {
+    const slides = slidesFromListing(giphyFixture);
+    expect(slides[0]).toMatchObject({
+      id: "t3_gp1:0",
+      postId: "t3_gp1",
+      provider: "giphy",
+      kind: "video",
+      mediaUrl: "https://media.giphy.com/media/l0HlBO3eHHpvbicmc/giphy.mp4",
+      sourceUrl: "https://giphy.com/gifs/funny-cat-dance-l0HlBO3eHHpvbicmc",
+      title: "Giphy reaction",
+      durationMode: "media",
+      audioAvailable: false,
+      isGif: true,
+      proxied: true,
+      mimeType: "video/mp4",
+      sourceWidth: 480,
+      sourceHeight: 270,
+    });
+  });
+
+  it("extracts the id from a slugless giphy.com/gifs/<id> URL", () => {
+    const slides = slidesFromListing({
+      data: {
+        children: [
+          {
+            kind: "t3",
+            data: {
+              name: "t3_gp2",
+              title: "Slugless",
+              permalink: "/r/x/comments/gp2/s/",
+              url_overridden_by_dest: "https://giphy.com/gifs/abc123XYZ",
+            },
+          },
+        ],
+      },
+    });
+    expect(slides[0]).toMatchObject({
+      provider: "giphy",
+      mediaUrl: "https://media.giphy.com/media/abc123XYZ/giphy.mp4",
+    });
+  });
+
+  it("leaves a direct media.giphy.com .gif to the image path", () => {
+    const slides = slidesFromListing({
+      data: {
+        children: [
+          {
+            kind: "t3",
+            data: {
+              name: "t3_gp3",
+              title: "Direct gif",
+              permalink: "/r/x/comments/gp3/g/",
+              url_overridden_by_dest:
+                "https://media.giphy.com/media/abc123XYZ/giphy.gif",
+            },
+          },
+        ],
+      },
+    });
+    expect(slides[0]).toMatchObject({ kind: "image" });
   });
 });
 
