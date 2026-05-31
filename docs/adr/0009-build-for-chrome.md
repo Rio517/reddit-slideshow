@@ -1,7 +1,7 @@
 # ADR 0009: Build for Chrome (cross-browser via WXT)
 
 Date: 2026-05-30
-Status: Accepted (target in place; pending a real-Chrome smoke test)
+Status: Accepted
 
 ## Context
 
@@ -40,8 +40,13 @@ Firefox-only settings block), which WXT can express per browser.
 - WXT handles the per-browser `background` shape, so the background code is
   unchanged.
 - `web-ext lint` covers the Firefox output only (it is a Mozilla tool); the
-  Chrome build is validated by inspecting its generated manifest and a manual
-  smoke test.
+  Chrome build is validated by inspecting its generated manifest and a real-Chrome
+  smoke test (loaded unpacked via Playwright). Verified: the extension loads, the
+  MV3 service worker registers, the content script injects on Reddit, the overlay
+  (`#reddit-slideshow-root`) renders, and the SW's `credentials: "include"`
+  listing fetch attaches the user's Reddit cookies. A full media-render pass needs
+  a logged-in session — Reddit `403`s anonymous `.json` from a fresh automated
+  profile — so that last step is a manual check.
 
 ## Alternatives Considered
 
@@ -55,6 +60,7 @@ Firefox-only settings block), which WXT can express per browser.
 
 ## Follow-Up
 
-- Smoke-test the service-worker background in real Chrome (launch message
-  round-trip, listing fetch, Layer 2 image fetch) on old and new Reddit.
+- Confirm a logged-in media-render pass in real Chrome (load unpacked, log into
+  Reddit, run the slideshow on old + www) — the one smoke-test step that needs a
+  human session.
 - Create the Chrome Web Store listing.

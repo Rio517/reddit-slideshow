@@ -32,7 +32,7 @@ message handlers + `fetch`, which run fine in a service worker.
   required — Chrome could later fetch directly if desired.
 - **Session fetch:** a Chrome MV3 service worker
   `fetch(..., { credentials: "include" })` with `host_permissions` sends the
-  user's Reddit cookies, same as Firefox.
+  user's Reddit cookies, same as Firefox. **Verified in real Chrome** (see below).
 
 ## Verified
 
@@ -40,6 +40,16 @@ message handlers + `fetch`, which run fine in a service worker.
 `service_worker` background, PNG icons, and **no** `browser_specific_settings`.
 The Firefox build still has the event page + gecko id. Web-ext lint applies to
 the Firefox output only (it is a Mozilla tool).
+
+Real-Chrome smoke test (loaded unpacked via Playwright): the extension loads, the
+MV3 service worker registers, the content script injects on `old.reddit.com`, and
+the overlay (`#reddit-slideshow-root`) renders. The service worker's
+`credentials: "include"` listing fetch to both `old.reddit.com/.json` and
+`www.reddit.com/.json` **attaches the user's Reddit cookies** — confirming the
+session-fetch assumption on Chrome. Those fetches return `403` from a fresh,
+not-logged-in automated profile (Reddit blocks anonymous `.json`), so a full
+media-render pass still needs a manual logged-in run; the logged-in `200` path is
+already verified separately (curl with a logged-in session).
 
 ## Distribution
 
