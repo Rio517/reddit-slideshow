@@ -7,6 +7,8 @@ keyboard-driven media slideshow. It reuses your existing logged-in Reddit
 session — no API keys — and resolves direct images, galleries, Reddit-hosted
 video, Redgifs, and crossposts.
 
+![A full-screen slideshow over r/aww: a sleeping cat with the position counter, open-original, and the control rail (prev/play/next, mute, fullscreen, settings, close)](docs/slideshow-demo.png)
+
 ## Features
 
 -
