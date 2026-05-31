@@ -16,6 +16,9 @@ export default defineConfig({
       // background, so the clip plays as a native, correctly-timed video.
       "https://api.redgifs.com/*",
       "https://media.redgifs.com/*",
+      // Imgur .gifv → .mp4: background-fetched and played as a blob, because
+      // Imgur hotlink-protects against a reddit Referer (ADR 0011).
+      "https://i.imgur.com/*",
     ],
     // Requested at runtime only when the user enables content-based dedup
     // (ADR 0006 Layer 2), so the background can fetch images to hash. i.redd.it

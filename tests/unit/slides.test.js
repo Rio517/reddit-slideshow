@@ -4,6 +4,7 @@ import fixture from "../fixtures/reddit-json/subreddit-direct-images.json";
 import galleryFixture from "../fixtures/reddit-json/gallery.json";
 import videoFixture from "../fixtures/reddit-json/reddit-video.json";
 import redgifsFixture from "../fixtures/reddit-json/redgifs.json";
+import imgurGifvFixture from "../fixtures/reddit-json/imgur-gifv.json";
 import crosspostFixture from "../fixtures/reddit-json/crosspost.json";
 
 describe("slidesFromListing", () => {
@@ -223,6 +224,55 @@ describe("Redgifs posts", () => {
       over18: true,
       sourceWidth: 1080,
       sourceHeight: 1920,
+    });
+  });
+});
+
+describe("Imgur .gifv posts", () => {
+  it("plays the .mp4 (transformed from .gifv) as a proxied, looping video", () => {
+    const slides = slidesFromListing(imgurGifvFixture);
+    expect(slides[0]).toMatchObject({
+      id: "t3_img1:0",
+      postId: "t3_img1",
+      provider: "imgur",
+      kind: "video",
+      mediaUrl: "https://i.imgur.com/AbCdEf1.mp4",
+      sourceUrl: "https://i.imgur.com/AbCdEf1.gifv",
+      permalink:
+        "https://old.reddit.com/r/example/comments/img1/imgur_gifv_clip/",
+      title: "Imgur gifv clip",
+      durationMode: "media",
+      audioAvailable: false,
+      isGif: true,
+      proxied: true,
+      mimeType: "video/mp4",
+      sourceWidth: 800,
+      sourceHeight: 600,
+      filenameHint: "t3_img1-imgur-gifv-clip.mp4",
+    });
+  });
+
+  it("transforms a bare imgur.com/<id>.gifv to the i.imgur.com mp4", () => {
+    const slides = slidesFromListing({
+      data: {
+        children: [
+          {
+            kind: "t3",
+            data: {
+              name: "t3_img2",
+              title: "Bare imgur gifv",
+              permalink: "/r/x/comments/img2/bare/",
+              url_overridden_by_dest: "https://imgur.com/ZyXwV9.gifv",
+            },
+          },
+        ],
+      },
+    });
+    expect(slides[0]).toMatchObject({
+      provider: "imgur",
+      kind: "video",
+      mediaUrl: "https://i.imgur.com/ZyXwV9.mp4",
+      proxied: true,
     });
   });
 });

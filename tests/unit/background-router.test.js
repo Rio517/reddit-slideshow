@@ -236,7 +236,22 @@ describe("createMessageRouter — fetchMedia", () => {
     expect(result.bytes).toBeInstanceOf(ArrayBuffer);
   });
 
-  it("rejects a non-Redgifs media host without fetching", async () => {
+  it("returns bytes for an Imgur .mp4 media url", async () => {
+    const router = makeRouter({
+      fetchMediaBytes: async () => new ArrayBuffer(16),
+    });
+    const result = await router(
+      {
+        type: "slideshow.fetchMedia",
+        payload: { url: "https://i.imgur.com/AbCdEf1.mp4" },
+      },
+      OWN,
+    );
+    expect(result.ok).toBe(true);
+    expect(result.bytes).toBeInstanceOf(ArrayBuffer);
+  });
+
+  it("rejects a non-allowlisted media host without fetching", async () => {
     let called = false;
     const router = makeRouter({
       fetchMediaBytes: async () => {

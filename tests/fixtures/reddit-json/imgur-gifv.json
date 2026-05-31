@@ -1,0 +1,26 @@
+{
+  "kind": "Listing",
+  "data": {
+    "after": "t3_imgur_after",
+    "before": null,
+    "children": [
+      {
+        "kind": "t3",
+        "data": {
+          "name": "t3_img1",
+          "title": "Imgur gifv clip",
+          "permalink": "/r/example/comments/img1/imgur_gifv_clip/",
+          "domain": "i.imgur.com",
+          "post_hint": "rich:video",
+          "is_video": false,
+          "over_18": false,
+          "url": "https://i.imgur.com/AbCdEf1.gifv",
+          "url_overridden_by_dest": "https://i.imgur.com/AbCdEf1.gifv",
+          "preview": {
+            "images": [{ "source": { "width": 800, "height": 600 } }]
+          }
+        }
+      }
+    ]
+  }
+}

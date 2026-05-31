@@ -44,10 +44,9 @@ resolver (`lib/redgifs.js`-style) where a network resolve is needed, then play a
 a proxied `<video>` blob or render as images. Every new fetch host needs a scoped
 `host_permission` + an ADR, plus a fixture and a resolver test.
 
-- **Imgur** — `.gifv` → `.mp4` native video (sync URL transform, proxied blob).
-  Then Imgur **albums** (`imgur.com/a/…`, `/gallery/…`) → resolve to the image
-  list (a 1→N async resolve — a queue change; do after gifv). Direct
-  `i.imgur.com` images already work via the generic image path.
+- **Imgur albums** (`imgur.com/a/…`, `/gallery/…`) → resolve to the image list (a
+  1→N async resolve — a queue change). `.gifv` → `.mp4` native video (ADR 0011)
+  and direct `i.imgur.com` images already work.
 - **Streamable** — `streamable.com/<id>` → resolve the mp4 via the public API
   (`api.streamable.com/videos/<id>`, no key); play as native video.
 - **Giphy** — `giphy.com/gifs/<id>` / `media.giphy.com` → the direct mp4 (or gif).
