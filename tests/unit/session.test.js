@@ -738,7 +738,7 @@ describe("createSlideshowSession", () => {
 });
 
 describe("PageUp / PageDown ±10", () => {
-  const slidesPage = (n) => ({
+  const slidesPage = (/** @type {number} */ n) => ({
     slides: Array.from({ length: n }, (_, i) => imageSlide(String(i))),
     after: null,
     exhausted: true,

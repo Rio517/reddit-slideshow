@@ -89,11 +89,11 @@ describe("createOverlay", () => {
     document.body.inert = false;
   });
 
-  it("builds the chrome with nine controls, hidden by default", () => {
+  it("builds the chrome with ten controls, hidden by default", () => {
     const overlay = createOverlay(noopHandlers());
     expect(overlay.root.querySelector(".rs-stage")).toBeTruthy();
     expect(overlay.root.querySelector(".rs-timer")).toBeTruthy();
-    expect(overlay.root.querySelectorAll(".rs-btn").length).toBe(9);
+    expect(overlay.root.querySelectorAll(".rs-btn").length).toBe(10);
     expect(overlay.isOpen()).toBe(false);
   });
 
@@ -783,14 +783,161 @@ describe("createOverlay", () => {
   it("holds the committed frame, not an undecoded pending one, on a rapid 3rd advance", async () => {
     vi.useRealTimers();
     const overlay = createOverlay(noopHandlers());
+    overlay.show();
+
+    // A committed + visible.
+    renderImageAt(overlay, "a", 0);
+    await markImageReady(overlay, "a");
+    expect(overlay.root.querySelectorAll(".rs-slide").length).toBe(1);
+
+    // Advance to B but never ready it - A stays visible under the pending B.
+    renderImageAt(overlay, "b", 1);
+    expect(overlay.root.querySelectorAll(".rs-slide").length).toBe(2);
+
+    // Advance again to C (also unready). The flush must retire the never-committed
+    // pending B and keep the committed A, so the only visible frame is never
+    // removed while an undecoded frame is held.
+    renderImageAt(overlay, "c", 2);
+    expect(imgFor(overlay, "a")).toBeTruthy(); // committed A still on screen
+    expect(imgFor(overlay, "b")).toBeNull(); // pending B retired, not held
+    expect(imgFor(overlay, "c")).toBeTruthy(); // new pending C layered on
+    const a = imgFor(overlay, "a")?.closest(".rs-slide");
+    expect(a?.classList.contains("rs-slide--pending")).toBe(false); // A is the live frame
+
+    // Once C decodes, A transitions out and is retired.
+    await markImageReady(overlay, "c");
+    overlay.root
+      .querySelector(".rs-slide--exit")
+      ?.dispatchEvent(new Event("animationend"));
+    expect(imgFor(overlay, "a")).toBeNull();
+    expect(imgFor(overlay, "c")).toBeTruthy();
+    expect(overlay.root.querySelectorAll(".rs-slide").length).toBe(1);
+  });
+
+  it("tags the incoming frame with the chosen transition and direction", async () => {
+    vi.useRealTimers();
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+
+    renderImageAt(overlay, "a", 1, "slide");
+    await markImageReady(overlay, "a");
+    const frame = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-slide")
+    );
+    expect(frame?.classList.contains("rs-tx-slide")).toBe(true);
+    expect(frame?.classList.contains("rs-dir-fwd")).toBe(true);
+
+    // Going backward (lower index) flips the direction class on the next frame.
+    renderImageAt(overlay, "b", 0, "slide");
+    await markImageReady(overlay, "b");
+    const incoming = imgFor(overlay, "b")?.closest(".rs-slide");
+    expect(incoming?.classList.contains("rs-dir-back")).toBe(true);
+  });
+
+  it("exposes dialog roles and a polite live region", () => {
+    const overlay = createOverlay(noopHandlers());
+    expect(overlay.root.getAttribute("role")).toBe("dialog");
+    expect(overlay.root.getAttribute("aria-modal")).toBe("true");
+    expect(overlay.root.getAttribute("aria-label")).toBe("Reddit slideshow");
+    const confirm = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-confirm")
+    );
+    expect(confirm?.getAttribute("role")).toBe("alertdialog");
+    expect(confirm?.getAttribute("aria-labelledby")).toBe("rs-confirm-text");
+    const live = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-live")
+    );
+    expect(live?.getAttribute("aria-live")).toBe("polite");
+  });
+
+  it("moves focus into the dialog on show and restores it on hide", () => {
+    const prior = document.createElement("button");
+    document.body.append(prior);
+    prior.focus();
+    expect(document.activeElement).toBe(prior);
+
+    const overlay = createOverlay(noopHandlers());
+    document.documentElement.append(overlay.root);
+    overlay.show();
+    expect(document.activeElement).toBe(overlay.root);
+    overlay.hide();
+    expect(document.activeElement).toBe(prior);
+
+    overlay.root.remove();
+    prior.remove();
+  });
+
+  it("announces the slide position and title in the live region", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    overlay.renderCurrent(imageSlide({ title: "Sunset", over18: true }), {
+      index: 2,
+      total: 50,
+      exhausted: false,
+      effectiveSeconds: 5,
+      playing: true,
+    });
+    expect(overlay.root.querySelector(".rs-live")?.textContent).toBe(
+      "3 of 50, Sunset, NSFW",
+    );
+  });
+
+  it("announces a fresh auto-skip but not the start-of-run reset", () => {
+    const overlay = createOverlay(noopHandlers());
+    const live = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-live")
+    );
+    // Start-of-run reset to zero: no announcement.
+    overlay.setSkipped([], 0);
+    expect(live?.textContent).toBe("");
+    // A new skip increments the total → announce it.
+    overlay.setSkipped([imageSlide({ title: "Dead clip" })], 1);
+    expect(live?.textContent).toBe("Skipped unavailable media: Dead clip");
+  });
+
+  it("dismissTopLayer closes the confirm first, then panels, returning false when empty", () => {
+    const overlay = createOverlay(noopHandlers());
+    expect(overlay.dismissTopLayer()).toBe(false); // nothing open
+
+    // Open the settings panel; dismissTopLayer closes it and reports true.
+    clickByLabel(overlay.root, "Settings");
+    const panel = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-settings-panel")
+    );
+    expect(panel?.hidden).toBe(false);
+    expect(overlay.dismissTopLayer()).toBe(true);
+    expect(panel?.hidden).toBe(true);
+
+    // The confirm popover is dismissed before any panel.
+    const click = (/** @type {Element | null | undefined} */ el) =>
+      el?.dispatchEvent(new Event("click", { bubbles: true }));
+    overlay.show();
+    click(overlay.root.querySelector(".rs-stage")); // backdrop → confirm
+    const confirm = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-confirm")
+    );
+    expect(confirm?.hidden).toBe(false);
+    expect(overlay.dismissTopLayer()).toBe(true);
+    expect(confirm?.hidden).toBe(true);
+  });
+});
 
 describe("help panel", () => {
   const helpLabel = "Keyboard shortcuts (?)";
+  /** @param {Overlay} overlay @returns {HTMLElement | undefined} */
   function helpBtn(overlay) {
-    return [...overlay.root.querySelectorAll(".rs-controls .rs-btn")].find(
-      (b) => b.getAttribute("aria-label") === helpLabel,
+    return /** @type {HTMLElement | undefined} */ (
+      [...overlay.root.querySelectorAll(".rs-controls .rs-btn")].find(
+        (b) => b.getAttribute("aria-label") === helpLabel,
+      )
     );
   }
+  /** @param {Overlay} overlay @returns {HTMLElement | null} */
+  const helpPanel = (overlay) =>
+    overlay.root.querySelector(".rs-help-panel");
+  /** @param {Overlay} overlay @returns {HTMLElement | null} */
+  const settingsPanel = (overlay) =>
+    overlay.root.querySelector(".rs-settings-panel");
 
   it("has a (?) help button in the control rail", () => {
     const overlay = createOverlay(noopHandlers());
@@ -800,60 +947,168 @@ describe("help panel", () => {
   it("toggles the shortcuts panel from the help button", () => {
     const overlay = createOverlay(noopHandlers());
     overlay.show();
-    const panel = overlay.root.querySelector(".rs-help-panel");
-    expect(panel.hidden).toBe(true);
-    helpBtn(overlay).click();
-    expect(panel.hidden).toBe(false);
-    helpBtn(overlay).click();
-    expect(panel.hidden).toBe(true);
+    const panel = helpPanel(overlay);
+    expect(panel?.hidden).toBe(true);
+    helpBtn(overlay)?.click();
+    expect(panel?.hidden).toBe(false);
+    helpBtn(overlay)?.click();
+    expect(panel?.hidden).toBe(true);
   });
 
   it("opening help closes the settings panel (centered cards don't stack)", () => {
     const overlay = createOverlay(noopHandlers());
     overlay.show();
-    const gear = [
-      ...overlay.root.querySelectorAll(".rs-controls .rs-btn"),
-    ].find((b) => b.getAttribute("aria-label") === "Settings");
-    gear.click();
-    expect(overlay.root.querySelector(".rs-settings-panel").hidden).toBe(false);
-    helpBtn(overlay).click();
-    expect(overlay.root.querySelector(".rs-help-panel").hidden).toBe(false);
-    expect(overlay.root.querySelector(".rs-settings-panel").hidden).toBe(true);
+    const gear = /** @type {HTMLElement | undefined} */ (
+      [...overlay.root.querySelectorAll(".rs-controls .rs-btn")].find(
+        (b) => b.getAttribute("aria-label") === "Settings",
+      )
+    );
+    gear?.click();
+    expect(settingsPanel(overlay)?.hidden).toBe(false);
+    helpBtn(overlay)?.click();
+    expect(helpPanel(overlay)?.hidden).toBe(false);
+    expect(settingsPanel(overlay)?.hidden).toBe(true);
   });
 
   it("a backdrop click dismisses the help panel, not the show", () => {
     const onClose = vi.fn();
     const overlay = createOverlay({ ...noopHandlers(), onClose });
     overlay.show();
-    helpBtn(overlay).click();
-    expect(overlay.root.querySelector(".rs-help-panel").hidden).toBe(false);
+    helpBtn(overlay)?.click();
+    expect(helpPanel(overlay)?.hidden).toBe(false);
     overlay.root.dispatchEvent(new Event("click", { bubbles: true }));
-    expect(overlay.root.querySelector(".rs-help-panel").hidden).toBe(true);
+    expect(helpPanel(overlay)?.hidden).toBe(true);
     expect(onClose).not.toHaveBeenCalled();
   });
 
   it("dismissTopLayer closes the help panel and returns true", () => {
     const overlay = createOverlay(noopHandlers());
     overlay.show();
-    helpBtn(overlay).click();
+    helpBtn(overlay)?.click();
     expect(overlay.dismissTopLayer()).toBe(true);
-    expect(overlay.root.querySelector(".rs-help-panel").hidden).toBe(true);
+    expect(helpPanel(overlay)?.hidden).toBe(true);
     expect(overlay.dismissTopLayer()).toBe(false);
   });
 
   it("hide() closes the help panel", () => {
     const overlay = createOverlay(noopHandlers());
     overlay.show();
-    helpBtn(overlay).click();
+    helpBtn(overlay)?.click();
     overlay.hide();
-    expect(overlay.root.querySelector(".rs-help-panel").hidden).toBe(true);
+    expect(helpPanel(overlay)?.hidden).toBe(true);
   });
 
   it("going idle hides the help panel", () => {
     const overlay = createOverlay(noopHandlers());
     overlay.show();
-    helpBtn(overlay).click();
+    helpBtn(overlay)?.click();
     overlay.root.dispatchEvent(new Event("mouseleave"));
-    expect(overlay.root.querySelector(".rs-help-panel").hidden).toBe(true);
+    expect(helpPanel(overlay)?.hidden).toBe(true);
+  });
+});
+
+describe("auto-hide video controls", () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => {
+    vi.useRealTimers();
+    document.body.inert = false;
+  });
+
+  /** @param {Overlay} overlay @returns {HTMLVideoElement} */
+  function renderVideoSlide(overlay) {
+    overlay.renderCurrent(
+      imageSlide({
+        kind: "video",
+        durationMode: "media",
+        mediaUrl: "https://v.redd.it/abc123/DASH_720.mp4",
+        sourceUrl: "https://v.redd.it/abc123/DASH_720.mp4",
+      }),
+      {
+        index: 0,
+        total: 1,
+        exhausted: true,
+        effectiveSeconds: 5,
+        playing: true,
+      },
+    );
+    return /** @type {HTMLVideoElement} */ (overlay.root.querySelector("video"));
+  }
+
+  it("starts with native controls hidden", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    expect(renderVideoSlide(overlay).controls).toBe(false);
+  });
+
+  it("reveals controls on pointer activity over the video", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    const video = renderVideoSlide(overlay);
+    video.dispatchEvent(new Event("pointermove"));
+    expect(video.controls).toBe(true);
+  });
+
+  it("hides controls when the pointer leaves the video", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    const video = renderVideoSlide(overlay);
+    video.dispatchEvent(new Event("pointerenter"));
+    expect(video.controls).toBe(true);
+    video.dispatchEvent(new Event("pointerleave"));
+    expect(video.controls).toBe(false);
+  });
+
+  it("re-hides controls after the pointer goes idle", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    const video = renderVideoSlide(overlay);
+    video.dispatchEvent(new Event("pointermove"));
+    expect(video.controls).toBe(true);
+    vi.advanceTimersByTime(2000);
+    expect(video.controls).toBe(false);
+  });
+
+  it("re-shows controls on a later pointer move after idle", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    const video = renderVideoSlide(overlay);
+    video.dispatchEvent(new Event("pointermove"));
+    vi.advanceTimersByTime(2000);
+    expect(video.controls).toBe(false);
+    video.dispatchEvent(new Event("pointermove"));
+    expect(video.controls).toBe(true);
+  });
+
+  it("does not reveal controls at the start or end of the clip", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    const video = renderVideoSlide(overlay);
+    video.dispatchEvent(new Event("loadeddata")); // playback starts
+    expect(video.controls).toBe(false);
+    video.dispatchEvent(new Event("ended")); // playback ends
+    expect(video.controls).toBe(false);
+  });
+
+  it("tears down the pointer listeners when the frame is retired", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    const video = renderVideoSlide(overlay);
+    video.dispatchEvent(new Event("pointermove"));
+    expect(video.controls).toBe(true);
+    // A new render aborts the old frame's media listeners, which hides its
+    // controls; further pointer events on the detached video do nothing.
+    overlay.renderCurrent(
+      imageSlide({ id: "later", mediaUrl: "https://i.redd.it/later.jpg" }),
+      {
+        index: 1,
+        total: 2,
+        exhausted: true,
+        effectiveSeconds: 5,
+        playing: true,
+      },
+    );
+    expect(video.controls).toBe(false);
+    video.dispatchEvent(new Event("pointermove"));
+    expect(video.controls).toBe(false);
   });
 });

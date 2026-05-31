@@ -391,9 +391,9 @@ describe("SlideshowController", () => {
 });
 
 describe("skip(n)", () => {
-  const makeSlides = (n) =>
+  const makeSlides = (/** @type {number} */ n) =>
     Array.from({ length: n }, (_, i) => slideWithId(`s${i}`));
-  const page = (slides) => ({
+  const page = (/** @type {import("../../lib/slides.js").Slide[]} */ slides) => ({
     slides,
     after: null,
     exhausted: true,
