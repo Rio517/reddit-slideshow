@@ -78,7 +78,6 @@ describe("slidesFromListing", () => {
               title: "URL only image",
               permalink: "/r/example/comments/urlonly/url_only_image/",
               url: "https://i.redd.it/urlonly.webp",
-              domain: "i.redd.it",
               post_hint: "image",
             },
           },
