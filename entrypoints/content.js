@@ -81,6 +81,15 @@ export default defineContentScript({
       true,
     );
 
+    // Apply preference changes (e.g. the per-image timer) to a running
+    // slideshow immediately, without requiring a page reload.
+    browser.storage.onChanged.addListener((_changes, area) => {
+      if (area !== "local") return;
+      getSettings()
+        .then((next) => session.applyLiveSettings(next))
+        .catch(() => {});
+    });
+
     browser.runtime.onMessage.addListener((/** @type {any} */ message) => {
       if (message?.type !== "slideshow.startRequested") return undefined;
       session.start();

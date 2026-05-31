@@ -79,6 +79,43 @@ describe("SlideshowController", () => {
     expect(rendered).toEqual(["a", "b"]);
   });
 
+  it("reschedules the current image slide when the dwell changes live", () => {
+    const { controller, rendered } = makeController({ imageTimerSeconds: 10 });
+    controller.start({
+      slides: [slideWithId("a"), slideWithId("b")],
+      exhausted: true,
+      postsScanned: 2,
+    });
+    controller.markReady();
+    vi.advanceTimersByTime(5000); // 10s dwell — not yet
+    expect(rendered).toEqual(["a"]);
+    controller.setImageTimerSeconds(2); // shorten live → restart from now
+    vi.advanceTimersByTime(2000);
+    expect(rendered).toEqual(["a", "b"]);
+  });
+
+  it("leaves a playing video undisturbed when the dwell changes live", () => {
+    const { controller, rendered } = makeController();
+    controller.start({
+      slides: [
+        slideWithId("v", {
+          kind: "video",
+          durationMode: "media",
+          durationSeconds: 10,
+        }),
+        slideWithId("b"),
+      ],
+      exhausted: true,
+      postsScanned: 2,
+    });
+    controller.markReady(); // 10s + 2s safety timer
+    controller.setImageTimerSeconds(1); // must NOT shorten the video
+    vi.advanceTimersByTime(2000);
+    expect(rendered).toEqual(["v"]);
+    vi.advanceTimersByTime(10000); // 12s total → safety fires
+    expect(rendered).toEqual(["v", "b"]);
+  });
+
   it("keeps the timer running after manual navigation", () => {
     const { controller, rendered } = makeController();
     controller.start({

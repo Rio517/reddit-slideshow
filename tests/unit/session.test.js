@@ -311,6 +311,18 @@ describe("createSlideshowSession", () => {
     expect(stopped).toBe(1);
   });
 
+  it("applies a changed image timer to the running slideshow without reload", async () => {
+    const { session } = makeSession();
+    await session.start();
+    session.applyLiveSettings(
+      /** @type {any} */ (settings({ imageTimerSeconds: 20 })),
+    );
+    const fill = /** @type {HTMLElement | null} */ (
+      document.querySelector(".rs-timer__fill")
+    );
+    expect(fill?.style.animation).toContain("20s");
+  });
+
   it("persists the mute preference when toggled", async () => {
     /** @type {object[]} */
     const saved = [];
