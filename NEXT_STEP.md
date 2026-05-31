@@ -29,7 +29,31 @@ Key decisions already made:
 
 ---
 
-## 1. Next up — media providers
+## 1. Do first
+
+- **Overlay shadow-root migration** — isolate overlay CSS from host/RES styles and
+  get a real focus trap (inert host). High value; a deliberate architecture change.
+- **Redgifs streaming** (avoid buffering the whole mp4 to a blob first).
+- **Tip jar** — a small "support / tip" link (Ko-fi / GitHub Sponsors / Buy Me a
+  Coffee) in the options-page footer (and maybe by the overlay's "Full
+  preferences" link). Keep it a plain external link; mind each store's donation
+  policy.
+- **Automate the slideshow screenshot (offline).** The options-page shots already
+  regenerate via `npm run screenshots`; the slideshow shot only failed because it
+  drove _live_ Reddit, whose `.json` 403s from some IPs. Drive it from a LOCAL
+  FIXTURE instead so it's deterministic and network-free: either intercept the
+  `slideshow.requestPage` message via a Playwright route and return a sample
+  r/aww-style listing (reuse `tests/fixtures/reddit-json/`) with a few bundled
+  images, or mount `createOverlay` + `renderCurrent` over sample images in a tiny
+  harness page. Output `docs/screenshots/slideshow.png`.
+- **Permission tightening — make `i.redd.it` optional.** It's fetched only by the
+  opt-in content-dedup hashing, so move it from `host_permissions` to
+  `optional_host_permissions` and add it to `CONTENT_DEDUP_ORIGINS` in
+  `entrypoints/options/main.js` (granted/removed with the toggle). Drops the
+  default install to `storage` + `old`/`www`.reddit + the two redgifs hosts.
+  Verify the permission prompt + hashing still work in real Firefox.
+
+## 2. Next up — media providers
 
 Add more providers so the slideshow isn't Redgifs-centric. Each mirrors the
 Redgifs pattern: detection in the `lib/slides.js` provider dispatch, a background
@@ -52,24 +76,19 @@ slideshow fit).
 
 ### Also deferred (lower priority)
 
-- **Overlay shadow-root migration** — isolate overlay CSS from host/RES styles and
-  get a real focus trap (inert host). High value; a deliberate architecture change.
 - **Real-Firefox re-check:** the dropped iframe `allow-same-origin` (security M1)
   — confirm Redgifs `/ifr/` playback still works while logged in; revert that one
   line if it regresses.
 - **Mute control + real audio** (needs a bundled HLS/DASH player).
 - **Redgifs lazy resolution** (push a page before its embeds resolve) and
-  **Redgifs streaming** (avoid buffering the whole mp4 to a blob first).
 - **Content-dedup hashing** from a Reddit preview URL (or HEAD-gate on size)
   instead of the full display image.
 - **Split `lib/overlay-ui.js`** if it keeps growing — jump-list, skipped-list, and
   media-lifecycle seams, with `createOverlay` as the assembly point.
-- **Tip jar** — a small "support / tip" link (Ko-fi / GitHub Sponsors / Buy Me a
-  Coffee) in the options-page footer (and maybe by the overlay's "Full
-  preferences" link). Keep it a plain external link; mind each store's donation
-  policy.
 - **AMO + Chrome Web Store submission** — copy is ready in `docs/store-listing.md`;
   package with `npm run zip` / `npm run zip:chrome`.
+- **README:** note `npx playwright install chromium` in the Screenshots section —
+  the browser binary isn't fetched by `npm install`.
 
 Keep small commits. Do not batch multiple slices into one giant commit.
 
