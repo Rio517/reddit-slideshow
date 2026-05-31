@@ -101,6 +101,12 @@ The core logic in `lib/` is DOM/extension-agnostic and unit-tested; the
 v1 is feature-complete and unit-tested. Distribution (AMO signing/listing) is not
 done yet.
 
+## Privacy
+
+No analytics, no tracking, no developer servers — the extension only fetches the
+Reddit listing/media you are viewing and stores your settings locally. See
+[PRIVACY.md](PRIVACY.md).
+
 ## License
 
 [MIT](LICENSE) © Mario Olivio Flores
