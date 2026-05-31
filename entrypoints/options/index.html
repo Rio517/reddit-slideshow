@@ -197,12 +197,12 @@
         margin: 0;
         cursor: pointer;
       }
+      /* The enable control is the same toggle switch as the other settings
+         (styled with .check input above); only nudge it to align with the
+         heading. Don't re-set width/height/appearance here — that fought the
+         switch styling and mangled the knob. */
       .panzoom__head input {
-        width: 18px;
-        height: 18px;
-        margin-top: 1px;
-        flex: none;
-        accent-color: var(--accent);
+        margin-top: 2px;
       }
       .panzoom__heading {
         display: flex;
@@ -320,7 +320,7 @@
 
       <label class="field">
         <span class="field__label">
-          <span>Image timer</span>
+          <span>Time per image</span>
           <span><output id="timerValue">5</output> seconds</span>
         </span>
         <input
@@ -427,7 +427,7 @@
         <label class="panzoom__head">
           <input id="panZoom" type="checkbox" />
           <span class="panzoom__heading">
-            <span class="panzoom__title">Pan &amp; zoom UHD images</span>
+            <span class="panzoom__title">Pan &amp; zoom large images</span>
             <span class="hint">
               A slow pan and zoom, only on images too big to see at once — push
               in, drift top→bottom, pull back out.
