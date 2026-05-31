@@ -686,6 +686,40 @@ describe("createOverlay", () => {
     expect(overlay.root.querySelectorAll(".rs-slide").length).toBe(1);
   });
 
+  it("holds the committed frame, not an undecoded pending one, on a rapid 3rd advance", async () => {
+    vi.useRealTimers();
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+
+    // A committed + visible.
+    renderImageAt(overlay, "a", 0);
+    await markImageReady(overlay, "a");
+    expect(overlay.root.querySelectorAll(".rs-slide").length).toBe(1);
+
+    // Advance to B but never ready it — A stays visible under the pending B.
+    renderImageAt(overlay, "b", 1);
+    expect(overlay.root.querySelectorAll(".rs-slide").length).toBe(2);
+
+    // Advance again to C (also unready). The flush must retire the never-committed
+    // pending B and keep the committed A, so the only visible frame is never
+    // removed while an undecoded frame is held.
+    renderImageAt(overlay, "c", 2);
+    expect(imgFor(overlay, "a")).toBeTruthy(); // committed A still on screen
+    expect(imgFor(overlay, "b")).toBeNull(); // pending B retired, not held
+    expect(imgFor(overlay, "c")).toBeTruthy(); // new pending C layered on
+    const a = imgFor(overlay, "a")?.closest(".rs-slide");
+    expect(a?.classList.contains("rs-slide--pending")).toBe(false); // A is the live frame
+
+    // Once C decodes, A transitions out and is retired.
+    await markImageReady(overlay, "c");
+    overlay.root
+      .querySelector(".rs-slide--exit")
+      ?.dispatchEvent(new Event("animationend"));
+    expect(imgFor(overlay, "a")).toBeNull();
+    expect(imgFor(overlay, "c")).toBeTruthy();
+    expect(overlay.root.querySelectorAll(".rs-slide").length).toBe(1);
+  });
+
   it("tags the incoming frame with the chosen transition and direction", async () => {
     vi.useRealTimers();
     const overlay = createOverlay(noopHandlers());

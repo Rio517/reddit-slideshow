@@ -383,6 +383,35 @@ describe("createSlideshowSession", () => {
     expect(created.every((img) => img.src === "")).toBe(true);
   });
 
+  it("does not preload an upcoming image whose URL is unsafe", async () => {
+    /** @type {Array<{ src: string }>} */
+    const created = [];
+    const { session } = makeSession({
+      pages: [
+        {
+          slides: [
+            imageSlide("a"),
+            imageSlide("bad", { mediaUrl: "http://i.redd.it/bad.jpg" }),
+          ],
+          after: null,
+          exhausted: true,
+          postsScanned: 2,
+        },
+      ],
+      createImage: () => {
+        const img = { src: "", decoding: "" };
+        created.push(img);
+        return img;
+      },
+    });
+    await session.start();
+    // "a" is showing; the only upcoming image ("bad") is non-HTTPS, so the
+    // preloader must skip it rather than set img.src past the safety gate.
+    expect(created.every((img) => img.src !== "http://i.redd.it/bad.jpg")).toBe(
+      true,
+    );
+  });
+
   it("suppresses handled keys but not others", async () => {
     const { session } = makeSession();
     await session.start();
