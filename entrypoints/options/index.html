@@ -441,23 +441,21 @@
         <div class="panzoom__body">
           <div class="pz-row">
             <span class="pz-row__label">
-              <span
-                >Zoom &amp; pan when the image's longest side beats the window
-                by</span
-              >
-              <span><output id="panZoomMinOversizeValue">1.5</output>×</span>
+              <span>Pan &amp; zoom applies to</span>
+              <!-- The "×" lives in the output; main.js shows "All images" at 1×. -->
+              <span><output id="panZoomMinOversizeValue">1.5×</output></span>
             </span>
             <input
               id="panZoomMinOversize"
               type="range"
-              min="1.25"
+              min="1"
               max="3"
               step="0.05"
               value="1.5"
             />
             <span class="pz-row__note">
-              Higher = only the very largest images move; everything else just
-              shows for the normal image timer.
+              “All images” moves every image. Higher only moves images that much
+              larger than the window — the rest just show for the normal timer.
             </span>
           </div>
 

@@ -561,6 +561,56 @@ describe("createSlideshowSession", () => {
     expect(renders[1].info.effectiveSeconds).toBe(5); // normal image timer
   });
 
+  it("pan-zooms every image when the threshold is 'All images' (1×)", async () => {
+    /** @type {Array<{ slide: any, info: any }>} */
+    const renders = [];
+    const fakeOverlay = () => ({
+      root: document.createElement("div"),
+      host: Object.assign(document.createElement("div"), {
+        id: "reddit-slideshow-host",
+      }),
+      show() {},
+      hide() {},
+      isOpen: () => true,
+      showStatus() {},
+      showLoading() {},
+      setSkipped() {},
+      setSettings() {},
+      setMuted() {},
+      setBuffering() {},
+      setPlaying() {},
+      restartTimer() {},
+      setJumpList() {},
+      renderCurrent: (/** @type {any} */ slide, /** @type {any} */ info) =>
+        renders.push({ slide, info }),
+    });
+    // A sub-window image that wouldn't normally pan-zoom.
+    const small = imageSlide("small", { sourceWidth: 800, sourceHeight: 600 });
+    const session = createSlideshowSession({
+      doc: document,
+      createOverlay: /** @type {any} */ (fakeOverlay),
+      getSettings: async () =>
+        /** @type {any} */ (settings({ panZoom: true, panZoomMinOversize: 1 })),
+      saveSettings: async () => {},
+      requestPage: async () => ({
+        ok: true,
+        page: {
+          slides: [small],
+          after: null,
+          exhausted: true,
+          postsScanned: 1,
+        },
+      }),
+      getStartCursor: () => undefined,
+      openUrl: () => {},
+      createImage: () => ({ src: "", decoding: "" }),
+    });
+    sessions.push(session);
+    await session.start();
+    expect(renders[0].slide.id).toBe("small");
+    expect(renders[0].info.panZoom).not.toBeNull(); // moves anyway at "All images"
+  });
+
   it("jumps to a loaded post from the counter list", async () => {
     const { session } = makeSession({
       pages: [

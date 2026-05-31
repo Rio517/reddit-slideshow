@@ -60,6 +60,20 @@ const panZoomInputs = Object.fromEntries(
   ]),
 );
 
+/**
+ * Display text for a pan-zoom range value. Only the oversize threshold is
+ * special: at its 1× minimum it reads "All images" — pan & zoom every image,
+ * not just oversized ones. (The "×" lives in the output, not static markup.)
+ * @param {string} id
+ * @param {string} value
+ */
+function panZoomOutText(id, value) {
+  if (id === "panZoomMinOversize") {
+    return Number(value) <= 1 ? "All images" : `${value}×`;
+  }
+  return value;
+}
+
 async function load() {
   const settings = await getSettings();
   timerSlider.value = String(imageTimerStopIndex(settings.imageTimerSeconds));
@@ -81,7 +95,7 @@ async function load() {
     const value = String(/** @type {any} */ (settings)[id]);
     panZoomInputs[id].value = value;
     const out = document.querySelector(`#${outId}`);
-    if (out) out.textContent = value;
+    if (out) out.textContent = panZoomOutText(id, value);
   }
   syncPanZoomEnabled();
 }
@@ -139,7 +153,7 @@ for (const [id, outId] of PAN_ZOOM_RANGES) {
   const input = panZoomInputs[id];
   const out = document.querySelector(`#${outId}`);
   input.addEventListener("input", () => {
-    if (out) out.textContent = input.value;
+    if (out) out.textContent = panZoomOutText(id, input.value);
   });
   input.addEventListener("change", persist);
 }
