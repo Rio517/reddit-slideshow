@@ -74,7 +74,10 @@ describe("fetchQueuePage", () => {
   it("resolves slide permalinks against the page origin (no old.reddit dependency)", async () => {
     /** @type {typeof fetch} */
     const fetchImpl = async () =>
-      new Response(JSON.stringify(fixture), { status: 200 });
+      new Response(JSON.stringify(fixture), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
     const page = await fetchQueuePage(
       "https://www.reddit.com/r/example/",
       {},
@@ -91,7 +94,10 @@ describe("fetchQueuePage", () => {
     /** @type {typeof fetch} */
     const fetchImpl = async (url) => {
       urls.push(String(url));
-      return new Response(JSON.stringify(fixture), { status: 200 });
+      return new Response(JSON.stringify(fixture), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
     };
 
     await fetchQueuePage(
