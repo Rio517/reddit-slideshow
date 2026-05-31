@@ -62,6 +62,27 @@ describe("normalizeSettings", () => {
       normalizeSettings({ maxLoadWaitSeconds: 7 }).maxLoadWaitSeconds,
     ).toBe(5);
   });
+
+  it("defaults pan-zoom off with sensible phase durations", () => {
+    const s = normalizeSettings({});
+    expect(s.panZoom).toBe(false);
+    expect(s.panZoomScale).toBe(2);
+    expect(s.panZoomPanSeconds).toBe(6);
+  });
+
+  it("clamps the pan-zoom scale and phase durations", () => {
+    expect(normalizeSettings({ panZoomScale: 99 }).panZoomScale).toBe(5);
+    expect(normalizeSettings({ panZoomScale: 1 }).panZoomScale).toBe(1.1);
+    expect(
+      normalizeSettings({ panZoomPanSeconds: 999 }).panZoomPanSeconds,
+    ).toBe(30);
+    expect(
+      normalizeSettings({ panZoomShowSeconds: -4 }).panZoomShowSeconds,
+    ).toBe(0);
+    expect(
+      normalizeSettings({ panZoomZoomInSeconds: "x" }).panZoomZoomInSeconds,
+    ).toBe(2);
+  });
 });
 
 describe("getSettings / saveSettings", () => {
@@ -91,6 +112,13 @@ describe("getSettings / saveSettings", () => {
       dedupe: false,
       contentDedup: true,
       maxLoadWaitSeconds: 10,
+      panZoom: false,
+      panZoomScale: 2,
+      panZoomShowSeconds: 2,
+      panZoomZoomInSeconds: 2,
+      panZoomPanSeconds: 6,
+      panZoomZoomOutSeconds: 2,
+      panZoomShowEndSeconds: 2,
     });
   });
 

@@ -77,6 +77,8 @@
 .rs-slide {
   display: grid;
   place-items: center;
+  /* Clip the pan & zoom (scaled media) to the image's fit box. */
+  overflow: hidden;
   animation: rs-fade-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 

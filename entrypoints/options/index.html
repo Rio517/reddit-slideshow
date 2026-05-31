@@ -166,6 +166,107 @@
           </span>
         </span>
       </label>
+
+      <label class="check">
+        <input id="panZoom" type="checkbox" />
+        <span>
+          Pan &amp; zoom images (Ken Burns)
+          <span class="hint">
+            On images: show whole, zoom in, pan top→bottom, zoom out, show
+            again. The phases below set the per-image timing.
+          </span>
+        </span>
+      </label>
+
+      <label class="field">
+        <span class="field__label">
+          <span>Zoom level</span>
+          <span><output id="panZoomScaleValue">2</output>×</span>
+        </span>
+        <input
+          id="panZoomScale"
+          type="range"
+          min="1.1"
+          max="5"
+          step="0.1"
+          value="2"
+        />
+      </label>
+
+      <label class="field">
+        <span class="field__label">
+          <span>1. Show whole image</span>
+          <span><output id="panZoomShowValue">2</output> s</span>
+        </span>
+        <input
+          id="panZoomShowSeconds"
+          type="range"
+          min="0"
+          max="30"
+          step="0.5"
+          value="2"
+        />
+      </label>
+
+      <label class="field">
+        <span class="field__label">
+          <span>2. Zoom in</span>
+          <span><output id="panZoomZoomInValue">2</output> s</span>
+        </span>
+        <input
+          id="panZoomZoomInSeconds"
+          type="range"
+          min="0"
+          max="30"
+          step="0.5"
+          value="2"
+        />
+      </label>
+
+      <label class="field">
+        <span class="field__label">
+          <span>3. Pan top → bottom</span>
+          <span><output id="panZoomPanValue">6</output> s</span>
+        </span>
+        <input
+          id="panZoomPanSeconds"
+          type="range"
+          min="0"
+          max="30"
+          step="0.5"
+          value="6"
+        />
+      </label>
+
+      <label class="field">
+        <span class="field__label">
+          <span>4. Zoom out</span>
+          <span><output id="panZoomZoomOutValue">2</output> s</span>
+        </span>
+        <input
+          id="panZoomZoomOutSeconds"
+          type="range"
+          min="0"
+          max="30"
+          step="0.5"
+          value="2"
+        />
+      </label>
+
+      <label class="field">
+        <span class="field__label">
+          <span>5. Show whole image again</span>
+          <span><output id="panZoomShowEndValue">2</output> s</span>
+        </span>
+        <input
+          id="panZoomShowEndSeconds"
+          type="range"
+          min="0"
+          max="30"
+          step="0.5"
+          value="2"
+        />
+      </label>
     </main>
     <script type="module" src="./main.js"></script>
   </body>

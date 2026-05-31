@@ -13,6 +13,7 @@ const SETTINGS = {
   dedupe: false,
   contentDedup: false,
   maxLoadWaitSeconds: 10,
+  panZoom: false,
 };
 
 function make() {
@@ -41,8 +42,9 @@ describe("createSettingsPanel", () => {
     );
     expect(range.value).toBe("8");
     expect(select.value).toBe("10");
-    // autoplay, start-muted, NSFW, dedupe — all false here
+    // autoplay, start-muted, NSFW, dedupe, pan-zoom — all false here
     expect([...checks].map((c) => c.checked)).toEqual([
+      false,
       false,
       false,
       false,

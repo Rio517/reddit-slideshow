@@ -35,6 +35,7 @@ const PANEL_SETTINGS = {
   dedupe: true,
   contentDedup: false,
   maxLoadWaitSeconds: 5,
+  panZoom: false,
 };
 
 function noopHandlers() {

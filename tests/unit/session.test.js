@@ -49,6 +49,13 @@ function settings(overrides) {
     dedupe: true,
     contentDedup: false,
     maxLoadWaitSeconds: 5,
+    panZoom: false,
+    panZoomScale: 2,
+    panZoomShowSeconds: 2,
+    panZoomZoomInSeconds: 2,
+    panZoomPanSeconds: 6,
+    panZoomZoomOutSeconds: 2,
+    panZoomShowEndSeconds: 2,
     ...overrides,
   };
 }
@@ -367,6 +374,38 @@ describe("createSlideshowSession", () => {
       document.querySelector(`${ROOT} .rs-timer__fill`)
     );
     expect(fill?.style.animation).toContain("20s");
+  });
+
+  it("sets the image dwell to the pan-zoom total when enabled", async () => {
+    const { session } = makeSession({
+      settingsOverrides: {
+        panZoom: true,
+        panZoomShowSeconds: 3,
+        panZoomZoomInSeconds: 3,
+        panZoomPanSeconds: 4,
+        panZoomZoomOutSeconds: 0,
+        panZoomShowEndSeconds: 0,
+      }, // total = 10s
+    });
+    await session.start();
+    // Re-applying settings restarts the current image's countdown bar, which
+    // should run for the pan-zoom total, not the 5s image timer.
+    session.applyLiveSettings(
+      /** @type {any} */ (
+        settings({
+          panZoom: true,
+          panZoomShowSeconds: 3,
+          panZoomZoomInSeconds: 3,
+          panZoomPanSeconds: 4,
+          panZoomZoomOutSeconds: 0,
+          panZoomShowEndSeconds: 0,
+        })
+      ),
+    );
+    const fill = /** @type {HTMLElement | null} */ (
+      document.querySelector(`${ROOT} .rs-timer__fill`)
+    );
+    expect(fill?.style.animation).toContain("10s");
   });
 
   it("persists the mute preference when toggled", async () => {

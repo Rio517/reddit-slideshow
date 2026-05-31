@@ -19,6 +19,7 @@ This directory holds planning material for a Firefox-first browser extension tha
 - [ADR 0007](adr/0007-bound-the-in-memory-slide-queue.md): bound the in-memory slide queue with back-history eviction.
 - [ADR 0008](adr/0008-support-new-reddit.md): support new Reddit (www.reddit.com) with a self-contained data path.
 - [ADR 0009](adr/0009-build-for-chrome.md): build a Chrome MV3 target from the same source.
+- [ADR 0010](adr/0010-pan-and-zoom-images.md): Ken Burns pan & zoom for image slides (resolution-independent; dwell = sum of phases).
 - [Foundation plan](superpowers/plans/2026-05-29-foundation-wxt-mv3.md): task-by-task plan for the WXT/MV3 scaffold, shared core, and offline fixtures.
 
 ## Status
