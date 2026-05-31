@@ -1,4 +1,4 @@
-# Reddit Slideshow Browser Extention
+# Reddit Slideshow Spectacular!
 
 Slideshow for videos and images in your reddit feed. Uses your current page/feed view.
 
@@ -31,25 +31,23 @@ video, Redgifs, and crossposts.
 
 ## Screenshots
 
-The options page in light and dark mode (click to enlarge):
+The shot at the top is the slideshow in action. The options page (click to
+enlarge):
 
 <p>
   <a href="docs/screenshots/options-light.png">
-    <img src="docs/screenshots/options-light.png" width="320"
-      alt="Reddit Slideshow options page, light theme">
-  </a>
-  <a href="docs/screenshots/options-dark.png">
-    <img src="docs/screenshots/options-dark.png" width="320"
-      alt="Reddit Slideshow options page, dark theme">
+    <img src="docs/screenshots/options-light.png" width="360"
+      alt="Reddit Slideshow Spectacular options page">
   </a>
 </p>
 
-Regenerate the shots anytime with `npm run screenshots` — it builds the Firefox
-extension, serves the output, and uses Playwright/Chromium to capture the options
-page (`docs/screenshots/options-{light,dark}.png`) and an offline, deterministic
-slideshow shot (`docs/screenshots/slideshow.png`, the real overlay over fixture
-slides). The Chromium binary isn't fetched by `npm install` — run
-`npx playwright install chromium` once first.
+Regenerate the shots and the add-on-store assets anytime with `npm run
+screenshots` — it builds the Firefox extension, serves the output, and uses
+Playwright/Chromium to capture a slideshow shot (`docs/screenshots/slideshow.png`)
+plus the options page in light and dark
+(`docs/screenshots/options-{light,dark}.png`) for the store listings. The Chromium
+binary isn't fetched by `npm install` — run `npx playwright install chromium` once
+first.
 
 ## Install
 
@@ -83,7 +81,7 @@ a permanent install, use Firefox Developer Edition / Nightly / ESR, set
 2. Turn on **Developer mode** (toggle, top-right).
 3. Click **Load unpacked** and select the **folder** `.output/chrome-mv3/`
    (the folder itself, not a file inside it).
-4. Click the toolbar's puzzle-piece icon and pin **Reddit Slideshow**.
+4. Click the toolbar's puzzle-piece icon and pin **Reddit Slideshow Spectacular**.
 5. After code changes, re-run `npm run build:chrome` and click the **↻ reload**
    icon on the extension's card in `chrome://extensions`.
 

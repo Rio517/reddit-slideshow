@@ -13,10 +13,15 @@ as-is.
 
 ## 1. Name
 
-**Name (both stores):** Reddit Slideshow
+**Name (both stores):** Reddit Slideshow Spectacular!
 
 There is no separate store/display name; the manifest `name` is
-"Reddit Slideshow" and the same name works on both stores.
+"Reddit Slideshow Spectacular!" and the same name works on both stores.
+
+Note for review: a name that leads with "Reddit" can draw scrutiny about implying
+official affiliation. Reddit Enhancement Suite ships under a Reddit-leading name,
+so it's allowable, but if a reviewer pushes back, a "… for Reddit" phrasing
+(e.g. "Slideshow Spectacular for Reddit") is the safer convention.
 
 ---
 
@@ -40,8 +45,8 @@ There is no separate store/display name; the manifest `name` is
 
 ## 3. Detailed description (plain text — paste as-is)
 
-Reddit Slideshow turns the Reddit listing you're already viewing into a
-full-screen, keyboard-driven media slideshow. Open a feed, subreddit,
+Reddit Slideshow Spectacular turns the Reddit listing you're already viewing into
+a full-screen, keyboard-driven media slideshow. Open a feed, subreddit,
 multireddit, or search results on old.reddit.com or www.reddit.com, click the
 toolbar icon (or press Alt+Shift+S), and lean back.
 
@@ -191,7 +196,7 @@ Use these answers:
 
 Plain-language summary to paste where a free-text box is offered:
 
-> Reddit Slideshow collects nothing and sends nothing to the developer — there
+> Reddit Slideshow Spectacular collects nothing and sends nothing to the developer — there
 > is no developer server, no analytics, no telemetry, no tracking, no ads, and
 > no accounts. It makes network requests only to Reddit, Reddit's media hosts,
 > and (for Redgifs posts) Redgifs, to fetch the media you're viewing. Redgifs
@@ -245,7 +250,7 @@ want a third tile.)
 
 **Single purpose (paste into the Chrome "single purpose" field):**
 
-> Reddit Slideshow has one purpose: to turn the Reddit listing the user is
+> Reddit Slideshow Spectacular has one purpose: to turn the Reddit listing the user is
 > currently viewing into a full-screen, keyboard-driven media slideshow of that
 > listing's images and videos.
 
@@ -277,7 +282,7 @@ want a third tile.)
 >
 > How to test: sign in to Reddit, open any media-heavy listing on
 > old.reddit.com or www.reddit.com (e.g. https://old.reddit.com/r/aww/), and
-> click the "Reddit Slideshow" toolbar icon (or press Alt+Shift+S). A
+> click the "Reddit Slideshow Spectacular" toolbar icon (or press Alt+Shift+S). A
 > full-screen slideshow opens over the page. Use Left/Right to navigate, Space
 > to play/pause, M to mute, F for fullscreen, and Esc to close. The gear icon
 > opens settings, which apply live. The optional "Also detect re-uploaded
