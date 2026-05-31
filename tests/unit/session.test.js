@@ -64,6 +64,7 @@ function settings(overrides) {
     alwaysShowMeta: true,
     maxLoadWaitSeconds: 5,
     transition: "fade",
+    timerBar: "all",
     panZoom: false,
     panZoomScale: 2,
     panZoomShowSeconds: 2,

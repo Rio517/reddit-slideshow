@@ -927,6 +927,24 @@ iframe.reddit-slideshow-media {
   padding: 6px 8px;
 }
 
+.rs-set__radio {
+  display: flex;
+  gap: 14px;
+}
+
+.rs-set__radio-opt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--rs-fg);
+  cursor: pointer;
+}
+
+.rs-set__radio-opt input {
+  accent-color: var(--rs-accent);
+}
+
 .rs-set__check {
   display: flex;
   align-items: center;

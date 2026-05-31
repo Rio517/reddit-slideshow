@@ -33,6 +33,11 @@ const maxLoadWait = /** @type {HTMLSelectElement} */ (
 const transition = /** @type {HTMLSelectElement} */ (
   document.querySelector("#transition")
 );
+const timerBarRadios = /** @type {NodeListOf<HTMLInputElement>} */ (
+  document.querySelectorAll('input[name="timerBar"]')
+);
+const timerBarValue = () =>
+  [...timerBarRadios].find((r) => r.checked)?.value ?? "video";
 const contentDedup = /** @type {HTMLInputElement} */ (
   document.querySelector("#contentDedup")
 );
@@ -75,6 +80,9 @@ async function load() {
   alwaysShowMeta.checked = settings.alwaysShowMeta;
   maxLoadWait.value = String(settings.maxLoadWaitSeconds);
   transition.value = settings.transition;
+  for (const radio of timerBarRadios) {
+    radio.checked = radio.value === settings.timerBar;
+  }
   contentDedup.checked = settings.contentDedup;
   panZoom.checked = settings.panZoom;
   for (const [id, outId] of PAN_ZOOM_RANGES) {
@@ -97,6 +105,7 @@ async function persist() {
       alwaysShowMeta: alwaysShowMeta.checked,
       maxLoadWaitSeconds: Number(maxLoadWait.value),
       transition: transition.value,
+      timerBar: timerBarValue(),
       contentDedup: contentDedup.checked,
       panZoom: panZoom.checked,
       panZoomMinOversize: Number(panZoomInputs.panZoomMinOversize.value),
@@ -123,6 +132,7 @@ dedupe.addEventListener("change", persist);
 alwaysShowMeta.addEventListener("change", persist);
 maxLoadWait.addEventListener("change", persist);
 transition.addEventListener("change", persist);
+for (const radio of timerBarRadios) radio.addEventListener("change", persist);
 panZoom.addEventListener("change", () => {
   syncPanZoomEnabled();
   persist();

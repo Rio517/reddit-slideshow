@@ -72,6 +72,20 @@
         border-radius: 8px;
         font: inherit;
       }
+      .radio {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+      }
+      .radio__opt {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+      }
+      .radio__opt input {
+        accent-color: var(--accent);
+      }
       .check {
         display: flex;
         align-items: center;
@@ -260,6 +274,21 @@
           <option value="flip">Flip</option>
         </select>
       </label>
+
+      <div class="field">
+        <span class="field__label"><span>Timer bar</span></span>
+        <div class="radio">
+          <label class="radio__opt">
+            <input type="radio" name="timerBar" value="none" /> None
+          </label>
+          <label class="radio__opt">
+            <input type="radio" name="timerBar" value="video" /> Video only
+          </label>
+          <label class="radio__opt">
+            <input type="radio" name="timerBar" value="all" /> All slides
+          </label>
+        </div>
+      </div>
 
       <label class="field">
         <span class="field__label">

@@ -38,6 +38,7 @@ const PANEL_SETTINGS = {
   contentDedup: false,
   alwaysShowMeta: true,
   maxLoadWaitSeconds: 5,
+  timerBar: "all",
   panZoom: false,
 };
 
@@ -523,6 +524,80 @@ describe("createOverlay", () => {
     expect(
       overlay.root.querySelector(".rs-placeholder__title")?.textContent,
     ).toBe("Removed post");
+  });
+
+  it("shows the timer bar only for video slides under the default mode", async () => {
+    vi.useRealTimers();
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    const timer = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-timer")
+    );
+
+    // Default mode is "video": an image slide gets no bar.
+    overlay.renderCurrent(
+      imageSlide({ id: "img", mediaUrl: "https://i.redd.it/img.jpg" }),
+      {
+        index: 0,
+        total: 2,
+        exhausted: false,
+        effectiveSeconds: 5,
+        playing: true,
+      },
+    );
+    overlay.root
+      .querySelector('img[src="https://i.redd.it/img.jpg"]')
+      ?.dispatchEvent(new Event("load"));
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(timer?.hidden).toBe(true);
+
+    // A video slide does get the bar.
+    overlay.renderCurrent(
+      imageSlide({
+        id: "vid",
+        kind: "video",
+        durationMode: "media",
+        mediaUrl: "https://v.redd.it/vid.mp4",
+      }),
+      {
+        index: 1,
+        total: 2,
+        exhausted: false,
+        effectiveSeconds: 5,
+        playing: true,
+      },
+    );
+    overlay.root.querySelector("video")?.dispatchEvent(new Event("loadeddata"));
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(timer?.hidden).toBe(false);
+  });
+
+  it("shows the timer bar for images when the mode is 'all'", async () => {
+    vi.useRealTimers();
+    const overlay = createOverlay(noopHandlers());
+    overlay.setSettings(
+      /** @type {any} */ ({ ...PANEL_SETTINGS, timerBar: "all" }),
+    );
+    overlay.show();
+    overlay.renderCurrent(imageSlide({ mediaUrl: "https://i.redd.it/a.jpg" }), {
+      index: 0,
+      total: 1,
+      exhausted: true,
+      effectiveSeconds: 5,
+      playing: true,
+    });
+    overlay.root
+      .querySelector('img[src="https://i.redd.it/a.jpg"]')
+      ?.dispatchEvent(new Event("load"));
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(
+      /** @type {HTMLElement | null} */ (
+        overlay.root.querySelector(".rs-timer")
+      )?.hidden,
+    ).toBe(false);
   });
 
   it("toggles the buffering hint", () => {

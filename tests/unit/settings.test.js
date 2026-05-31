@@ -70,6 +70,13 @@ describe("normalizeSettings", () => {
     expect(normalizeSettings({ transition: 7 }).transition).toBe("fade");
   });
 
+  it("defaults timerBar to video and only accepts known modes", () => {
+    expect(normalizeSettings({}).timerBar).toBe("video");
+    expect(normalizeSettings({ timerBar: "all" }).timerBar).toBe("all");
+    expect(normalizeSettings({ timerBar: "none" }).timerBar).toBe("none");
+    expect(normalizeSettings({ timerBar: "bogus" }).timerBar).toBe("video");
+  });
+
   it("defaults pan-zoom off with sensible phase durations", () => {
     const s = normalizeSettings({});
     expect(s.panZoom).toBe(false);
@@ -121,6 +128,7 @@ describe("getSettings / saveSettings", () => {
       alwaysShowMeta: true,
       maxLoadWaitSeconds: 10,
       transition: "fade",
+      timerBar: "video",
       panZoom: false,
       panZoomScale: 2,
       panZoomShowSeconds: 2,

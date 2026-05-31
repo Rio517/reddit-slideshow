@@ -14,6 +14,7 @@ const SETTINGS = {
   contentDedup: false,
   alwaysShowMeta: false,
   maxLoadWaitSeconds: 10,
+  timerBar: "video",
   panZoom: false,
 };
 
@@ -60,6 +61,21 @@ describe("createSettingsPanel", () => {
     range.value = "15";
     range.dispatchEvent(new Event("change", { bubbles: true }));
     expect(onChange).toHaveBeenCalledWith({ imageTimerSeconds: 15 });
+  });
+
+  it("reflects and emits the timer-bar radio", () => {
+    const { panel, onChange } = make();
+    panel.setValues(/** @type {any} */ (SETTINGS));
+    const video = /** @type {HTMLInputElement} */ (
+      document.querySelector('.rs-set__radio input[value="video"]')
+    );
+    expect(video.checked).toBe(true);
+    const all = /** @type {HTMLInputElement} */ (
+      document.querySelector('.rs-set__radio input[value="all"]')
+    );
+    all.checked = true;
+    all.dispatchEvent(new Event("change", { bubbles: true }));
+    expect(onChange).toHaveBeenCalledWith({ timerBar: "all" });
   });
 
   it("emits a boolean patch when a checkbox toggles", () => {
