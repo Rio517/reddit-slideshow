@@ -1,0 +1,23 @@
+{
+  "kind": "Listing",
+  "data": {
+    "after": "t3_imgur_album_after",
+    "before": null,
+    "children": [
+      {
+        "kind": "t3",
+        "data": {
+          "name": "t3_alb1",
+          "title": "Imgur album",
+          "permalink": "/r/example/comments/alb1/imgur_album/",
+          "domain": "imgur.com",
+          "post_hint": "link",
+          "is_video": false,
+          "over_18": false,
+          "url": "https://imgur.com/a/AbCd12",
+          "url_overridden_by_dest": "https://imgur.com/a/AbCd12"
+        }
+      }
+    ]
+  }
+}
