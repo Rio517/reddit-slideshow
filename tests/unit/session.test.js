@@ -383,6 +383,35 @@ describe("createSlideshowSession", () => {
     expect(created.every((img) => img.src === "")).toBe(true);
   });
 
+  it("does not preload an upcoming image whose URL is unsafe", async () => {
+    /** @type {Array<{ src: string }>} */
+    const created = [];
+    const { session } = makeSession({
+      pages: [
+        {
+          slides: [
+            imageSlide("a"),
+            imageSlide("bad", { mediaUrl: "http://i.redd.it/bad.jpg" }),
+          ],
+          after: null,
+          exhausted: true,
+          postsScanned: 2,
+        },
+      ],
+      createImage: () => {
+        const img = { src: "", decoding: "" };
+        created.push(img);
+        return img;
+      },
+    });
+    await session.start();
+    // "a" is showing; the only upcoming image ("bad") is non-HTTPS, so the
+    // preloader must skip it rather than set img.src past the safety gate.
+    expect(created.every((img) => img.src !== "http://i.redd.it/bad.jpg")).toBe(
+      true,
+    );
+  });
+
   it("suppresses handled keys but not others", async () => {
     const { session } = makeSession();
     await session.start();
@@ -552,6 +581,51 @@ describe("createSlideshowSession", () => {
     /** @type {HTMLElement} */ (items[0]).click();
     expect(mediaSrc()).toBe("https://i.redd.it/a.jpg");
     expect(text(".rs-meta__counter")).toBe("1 / 3");
+  });
+
+  it("Escape dismisses an open panel before closing the show", async () => {
+    const { session } = makeSession();
+    await session.start();
+    expect(session.isOpen()).toBe(true);
+
+    // Open the inline settings panel via the gear.
+    /** @type {HTMLElement} */ (
+      document.querySelector(`${ROOT} [aria-label^="Settings"]`)
+    ).click();
+    const panel = /** @type {HTMLElement | null} */ (
+      document.querySelector(`${ROOT} .rs-settings-panel`)
+    );
+    expect(panel?.hidden).toBe(false);
+
+    // First Escape closes the panel, not the show.
+    session.handleKeydown(key("Escape"));
+    expect(panel?.hidden).toBe(true);
+    expect(session.isOpen()).toBe(true);
+
+    // Second Escape (nothing open) closes the show.
+    session.handleKeydown(key("Escape"));
+    expect(session.isOpen()).toBe(false);
+  });
+
+  it("lets Space act natively on a focused control instead of toggling play", async () => {
+    const { session } = makeSession();
+    await session.start();
+    const range = /** @type {HTMLInputElement} */ (
+      document.querySelector(`${ROOT} .rs-set__range`)
+    );
+    let prevented = false;
+    session.handleKeydown(
+      /** @type {any} */ ({
+        key: " ",
+        target: range,
+        preventDefault: () => {
+          prevented = true;
+        },
+        stopImmediatePropagation: () => {},
+      }),
+    );
+    // The handler returned early, so it neither prevented the key nor paused.
+    expect(prevented).toBe(false);
   });
 
   it("persists the mute preference when toggled", async () => {

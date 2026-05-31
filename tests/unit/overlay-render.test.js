@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { renderSlide, MEDIA_CLASS } from "../../lib/overlay-render.js";
+import {
+  renderSlide,
+  MEDIA_CLASS,
+  mediaUrlIsSafe,
+} from "../../lib/overlay-render.js";
 
 /**
  * @param {Partial<import("../../lib/slides.js").Slide>} [overrides]
@@ -89,6 +93,23 @@ describe("renderSlide", () => {
     );
     expect(video("https://v.redd.it/x/CMAF_720.mp4").getAttribute("src")).toBe(
       "https://v.redd.it/x/CMAF_720.mp4",
+    );
+  });
+
+  it("treats an embed as unsafe when its embedUrl is rejected (off-host/empty)", () => {
+    const embed = (
+      /** @type {Partial<import("../../lib/slides.js").Slide>} */ o,
+    ) => slide({ provider: "redgifs", kind: "embed", ...o });
+    // A good Redgifs embed passes.
+    expect(
+      mediaUrlIsSafe(embed({ embedUrl: "https://www.redgifs.com/ifr/abc" })),
+    ).toBe(true);
+    // An off-host or non-HTTPS embed URL is unsafe, so the overlay can skip it.
+    expect(
+      mediaUrlIsSafe(embed({ embedUrl: "https://evil.example/ifr/abc" })),
+    ).toBe(false);
+    expect(mediaUrlIsSafe(embed({ embedUrl: undefined, mediaUrl: "" }))).toBe(
+      false,
     );
   });
 

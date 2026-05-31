@@ -89,6 +89,15 @@ describe("createSettingsPanel", () => {
     expect(onChange).toHaveBeenCalledWith({ autoplay: true });
   });
 
+  it("labels the timer-bar radios as a radiogroup", () => {
+    make();
+    const group = /** @type {HTMLElement | null} */ (
+      document.querySelector(".rs-set__radio")
+    );
+    expect(group?.getAttribute("role")).toBe("radiogroup");
+    expect(group?.getAttribute("aria-label")).toBe("Top timer bar");
+  });
+
   it("opens the full preferences page", () => {
     const { onOpenFullPreferences } = make();
     /** @type {HTMLElement} */ (

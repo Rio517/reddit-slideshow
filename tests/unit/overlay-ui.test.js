@@ -686,6 +686,40 @@ describe("createOverlay", () => {
     expect(overlay.root.querySelectorAll(".rs-slide").length).toBe(1);
   });
 
+  it("holds the committed frame, not an undecoded pending one, on a rapid 3rd advance", async () => {
+    vi.useRealTimers();
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+
+    // A committed + visible.
+    renderImageAt(overlay, "a", 0);
+    await markImageReady(overlay, "a");
+    expect(overlay.root.querySelectorAll(".rs-slide").length).toBe(1);
+
+    // Advance to B but never ready it — A stays visible under the pending B.
+    renderImageAt(overlay, "b", 1);
+    expect(overlay.root.querySelectorAll(".rs-slide").length).toBe(2);
+
+    // Advance again to C (also unready). The flush must retire the never-committed
+    // pending B and keep the committed A, so the only visible frame is never
+    // removed while an undecoded frame is held.
+    renderImageAt(overlay, "c", 2);
+    expect(imgFor(overlay, "a")).toBeTruthy(); // committed A still on screen
+    expect(imgFor(overlay, "b")).toBeNull(); // pending B retired, not held
+    expect(imgFor(overlay, "c")).toBeTruthy(); // new pending C layered on
+    const a = imgFor(overlay, "a")?.closest(".rs-slide");
+    expect(a?.classList.contains("rs-slide--pending")).toBe(false); // A is the live frame
+
+    // Once C decodes, A transitions out and is retired.
+    await markImageReady(overlay, "c");
+    overlay.root
+      .querySelector(".rs-slide--exit")
+      ?.dispatchEvent(new Event("animationend"));
+    expect(imgFor(overlay, "a")).toBeNull();
+    expect(imgFor(overlay, "c")).toBeTruthy();
+    expect(overlay.root.querySelectorAll(".rs-slide").length).toBe(1);
+  });
+
   it("tags the incoming frame with the chosen transition and direction", async () => {
     vi.useRealTimers();
     const overlay = createOverlay(noopHandlers());
@@ -704,5 +738,92 @@ describe("createOverlay", () => {
     await markImageReady(overlay, "b");
     const incoming = imgFor(overlay, "b")?.closest(".rs-slide");
     expect(incoming?.classList.contains("rs-dir-back")).toBe(true);
+  });
+
+  it("exposes dialog roles and a polite live region", () => {
+    const overlay = createOverlay(noopHandlers());
+    expect(overlay.root.getAttribute("role")).toBe("dialog");
+    expect(overlay.root.getAttribute("aria-modal")).toBe("true");
+    expect(overlay.root.getAttribute("aria-label")).toBe("Reddit slideshow");
+    const confirm = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-confirm")
+    );
+    expect(confirm?.getAttribute("role")).toBe("alertdialog");
+    expect(confirm?.getAttribute("aria-labelledby")).toBe("rs-confirm-text");
+    const live = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-live")
+    );
+    expect(live?.getAttribute("aria-live")).toBe("polite");
+  });
+
+  it("moves focus into the dialog on show and restores it on hide", () => {
+    const prior = document.createElement("button");
+    document.body.append(prior);
+    prior.focus();
+    expect(document.activeElement).toBe(prior);
+
+    const overlay = createOverlay(noopHandlers());
+    document.documentElement.append(overlay.root);
+    overlay.show();
+    expect(document.activeElement).toBe(overlay.root);
+    overlay.hide();
+    expect(document.activeElement).toBe(prior);
+
+    overlay.root.remove();
+    prior.remove();
+  });
+
+  it("announces the slide position and title in the live region", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    overlay.renderCurrent(imageSlide({ title: "Sunset", over18: true }), {
+      index: 2,
+      total: 50,
+      exhausted: false,
+      effectiveSeconds: 5,
+      playing: true,
+    });
+    expect(overlay.root.querySelector(".rs-live")?.textContent).toBe(
+      "3 of 50, Sunset, NSFW",
+    );
+  });
+
+  it("announces a fresh auto-skip but not the start-of-run reset", () => {
+    const overlay = createOverlay(noopHandlers());
+    const live = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-live")
+    );
+    // Start-of-run reset to zero: no announcement.
+    overlay.setSkipped([], 0);
+    expect(live?.textContent).toBe("");
+    // A new skip increments the total → announce it.
+    overlay.setSkipped([imageSlide({ title: "Dead clip" })], 1);
+    expect(live?.textContent).toBe("Skipped unavailable media: Dead clip");
+  });
+
+  it("dismissTopLayer closes the confirm first, then panels, returning false when empty", () => {
+    const overlay = createOverlay(noopHandlers());
+    expect(overlay.dismissTopLayer()).toBe(false); // nothing open
+
+    // Open the settings panel; dismissTopLayer closes it and reports true.
+    clickByLabel(overlay.root, "Settings");
+    const panel = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-settings-panel")
+    );
+    expect(panel?.hidden).toBe(false);
+    expect(overlay.dismissTopLayer()).toBe(true);
+    expect(panel?.hidden).toBe(true);
+
+    // The confirm popover is dismissed before any panel.
+    const click = (/** @type {Element | null | undefined} */ el) =>
+      el?.dispatchEvent(new Event("click", { bubbles: true }));
+    overlay.show();
+    click(overlay.root.querySelector(".rs-stage")); // backdrop → confirm
+    const confirm = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-confirm")
+    );
+    expect(confirm?.hidden).toBe(false);
+    expect(overlay.dismissTopLayer()).toBe(true);
+    expect(confirm?.hidden).toBe(true);
   });
 });
