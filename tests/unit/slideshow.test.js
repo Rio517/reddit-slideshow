@@ -142,6 +142,40 @@ describe("SlideshowController", () => {
     expect(controller.current?.id).toBe("a");
   });
 
+  it("steps over auto-skipped slides when navigating both ways", () => {
+    const { controller } = makeController();
+    controller.start({
+      slides: [
+        slideWithId("a"),
+        slideWithId("b", { skipReason: "Unavailable" }),
+        slideWithId("c"),
+      ],
+      after: null,
+      exhausted: true,
+      postsScanned: 3,
+    });
+    controller.next(); // a -> skip b -> c
+    expect(controller.current?.id).toBe("c");
+    controller.prev(); // c -> skip b -> a
+    expect(controller.current?.id).toBe("a");
+  });
+
+  it("ends when only skipped slides remain ahead in an exhausted queue", () => {
+    const { controller, ended } = makeController();
+    controller.start({
+      slides: [
+        slideWithId("a"),
+        slideWithId("b", { skipReason: "Unavailable" }),
+      ],
+      after: null,
+      exhausted: true,
+      postsScanned: 2,
+    });
+    controller.next(); // nothing playable ahead -> end
+    expect(ended()).toBe(1);
+    expect(controller.current?.id).toBe("a");
+  });
+
   it("advances video on mediaEnded, before the safety timer", () => {
     const { controller, rendered } = makeController();
     controller.start({

@@ -497,6 +497,29 @@ describe("createSlideshowSession", () => {
     expect(text(".rs-skipped")).toBe("1 skipped");
   });
 
+  it("steps back over a skipped slide without re-skipping it", async () => {
+    const { session } = makeSession({
+      pages: [
+        {
+          slides: [imageSlide("a"), imageSlide("b"), imageSlide("c")],
+          after: null,
+          exhausted: true,
+          postsScanned: 3,
+        },
+      ],
+    });
+    await session.start();
+    // Break "a": it is recorded once and the show moves to "b".
+    q(".reddit-slideshow-media")?.dispatchEvent(new Event("error"));
+    expect(mediaSrc()).toBe("https://i.redd.it/b.jpg");
+    expect(text(".rs-skipped")).toBe("1 skipped");
+
+    // Back from "b": "a" is skipped, so it does not land on it or re-skip it.
+    session.handleKeydown(key("ArrowLeft"));
+    expect(mediaSrc()).toBe("https://i.redd.it/b.jpg");
+    expect(text(".rs-skipped")).toBe("1 skipped");
+  });
+
   it("changes a setting from the in-overlay panel (persist + live)", async () => {
     /** @type {object[]} */
     const saved = [];
