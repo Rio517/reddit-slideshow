@@ -365,6 +365,21 @@ describe("createOverlay", () => {
     );
   });
 
+  it("clears the loading splash once the first slide renders", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.showLoading();
+    expect(overlay.root.querySelector(".rs-logo")).toBeTruthy();
+    overlay.renderCurrent(imageSlide(), {
+      index: 0,
+      total: 1,
+      exhausted: true,
+      effectiveSeconds: 5,
+      playing: true,
+    });
+    // The splash must not linger as a second grid item beneath the slide.
+    expect(overlay.root.querySelector(".rs-logo")).toBeNull();
+  });
+
   it("pins the meta with rs-pin-meta only when alwaysShowMeta is set", () => {
     const overlay = createOverlay(noopHandlers());
     overlay.setSettings(
