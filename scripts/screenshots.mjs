@@ -1,22 +1,24 @@
 // Regenerates the README screenshots: the options page (light + dark) and a
-// live slideshow shot over r/aww. Options shots build firefox-mv3, serve it
-// statically, and drive Chromium to render entrypoints/options/index.html. The
-// slideshow shot builds chrome-mv3, loads it as an unpacked extension, and lets
-// the content script auto-start over real r/aww media. The live capture is
-// best-effort: any network/Reddit failure is logged and skipped, never fatal.
+// slideshow shot. Options shots build firefox-mv3, serve it statically, and
+// drive Chromium to render entrypoints/options/index.html. The slideshow shot
+// is fully offline and deterministic: it bundles a tiny harness that mounts the
+// REAL overlay + session over fixture image slides (scripts/slideshow-harness/)
+// and fulfils the i.redd.it media URLs with inline SVG, so no extension, network
+// or live Reddit is involved. The capture is still best-effort: any failure is
+// logged and skipped, never fatal.
 
 import { spawn } from "node:child_process";
 import { createServer } from "node:http";
-import { mkdir, mkdtemp, rm } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, rm } from "node:fs/promises";
 import { createReadStream } from "node:fs";
 import { tmpdir } from "node:os";
 import { extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { build } from "esbuild";
 import { chromium } from "playwright";
 
 const root = resolve(fileURLToPath(new URL("../", import.meta.url)));
 const outDir = join(root, ".output", "firefox-mv3");
-const chromeOutDir = join(root, ".output", "chrome-mv3");
 const shotsDir = join(root, "docs", "screenshots");
 
 const MIME = {
@@ -97,70 +99,101 @@ function applyState() {
   if (maxLoadOut) maxLoadOut.textContent = "8";
 }
 
-// A real desktop Chrome UA; headless Chrome's default UA gets extra scrutiny.
-const DESKTOP_UA =
-  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) " +
-  "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36";
+// An r/aww-style fixture image: a hued gradient with a soft paw, sized like a
+// 3:2 photo. Vector, so it's crisp and identical every run. The slide's title
+// shows in the overlay meta; the image only needs to look like a photo.
+function fixtureSvg(url) {
+  const n = Number(/rs-fixture-(\d+)/.exec(url)?.[1] ?? 1);
+  const hue = (n * 53) % 360;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1067" viewBox="0 0 1600 1067">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="hsl(${hue} 62% 56%)"/>
+      <stop offset="1" stop-color="hsl(${(hue + 38) % 360} 58% 36%)"/>
+    </linearGradient>
+    <radialGradient id="h" cx="0.32" cy="0.28" r="0.85">
+      <stop offset="0" stop-color="rgba(255,255,255,0.35)"/>
+      <stop offset="1" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="1067" fill="url(#g)"/>
+  <rect width="1600" height="1067" fill="url(#h)"/>
+  <g fill="rgba(255,255,255,0.22)" transform="translate(800 560)">
+    <ellipse cx="0" cy="60" rx="120" ry="95"/>
+    <ellipse cx="-150" cy="-40" rx="46" ry="62"/>
+    <ellipse cx="-55" cy="-110" rx="44" ry="60"/>
+    <ellipse cx="55" cy="-110" rx="44" ry="60"/>
+    <ellipse cx="150" cy="-40" rx="46" ry="62"/>
+  </g>
+</svg>`;
+}
 
-// Capture the live overlay over a SFW subreddit (r/aww, public listing JSON).
-// Loads the built chrome-mv3 as an unpacked extension; the content script
-// auto-starts the slideshow because the URL carries the #rs-slideshow marker.
-// old.reddit.com is used (not www): www serves a JS bot-challenge to headless
-// that navigates away and drops the hash, while old serves the listing directly.
-// Best-effort: any failure (Reddit blocked, no media in time) is logged and
-// swallowed so the options shots and overall script still succeed.
+// Capture the overlay offline: bundle scripts/slideshow-harness/ (the real
+// overlay + session over fixture image slides), serve it, and let Playwright
+// fulfil the i.redd.it media URLs with inline SVG. Best-effort: any failure is
+// logged and swallowed so the options shots and overall script still succeed.
 async function captureSlideshow() {
-  await run("npm", ["run", "build:chrome"]);
-
-  // Persistent context is the only way to load an unpacked MV3 extension.
-  // --headless=new keeps it headless while still running the extension.
-  const userDataDir = await mkdtemp(join(tmpdir(), "rs-shots-"));
-  let context;
+  const harnessSrc = join(root, "scripts", "slideshow-harness");
+  const dir = await mkdtemp(join(tmpdir(), "rs-shots-"));
+  let browser;
   try {
-    context = await chromium.launchPersistentContext(userDataDir, {
-      channel: "chromium",
-      headless: true,
-      viewport: { width: 1280, height: 800 },
-      args: [
-        "--headless=new",
-        `--user-agent=${DESKTOP_UA}`,
-        `--disable-extensions-except=${chromeOutDir}`,
-        `--load-extension=${chromeOutDir}`,
-      ],
+    // Bundle the harness: resolves the lib/* imports and stubs wxt/browser so
+    // settings.js bundles for a plain page.
+    await build({
+      entryPoints: [join(harnessSrc, "harness.js")],
+      bundle: true,
+      format: "esm",
+      outfile: join(dir, "harness.js"),
+      alias: { "wxt/browser": join(harnessSrc, "stub-browser.js") },
+      logLevel: "silent",
     });
+    await cp(join(harnessSrc, "index.html"), join(dir, "index.html"));
+    await cp(join(root, "assets", "overlay.css"), join(dir, "overlay.css"));
 
-    const page = context.pages()[0] ?? (await context.newPage());
-    await page.goto("https://old.reddit.com/r/aww/#rs-slideshow", {
-      waitUntil: "domcontentloaded",
-      timeout: 20000,
-    });
-
-    // Wait for the overlay to mount and a real image/video to render.
-    await page.waitForSelector("#reddit-slideshow-root", {
-      state: "visible",
-      timeout: 20000,
-    });
-    await page.waitForSelector(
-      "img.reddit-slideshow-media, video.reddit-slideshow-media",
-      { state: "visible", timeout: 20000 },
-    );
-
-    // Let the first slide decode and the control rail settle.
-    await page.waitForTimeout(2500);
-
-    await page.screenshot({
-      path: join(shotsDir, "slideshow.png"),
-      fullPage: false,
-    });
-    console.log("captured docs/screenshots/slideshow.png");
+    const { server, port } = await serve(dir);
+    try {
+      browser = await chromium.launch();
+      const page = await browser.newPage({
+        viewport: { width: 1280, height: 800 },
+      });
+      await page.route("https://i.redd.it/**", (route) =>
+        route.fulfill({
+          contentType: "image/svg+xml",
+          body: fixtureSvg(route.request().url()),
+        }),
+      );
+      await page.goto(`http://127.0.0.1:${port}/index.html`, {
+        waitUntil: "domcontentloaded",
+      });
+      await page.waitForSelector("#reddit-slideshow-root", {
+        state: "visible",
+        timeout: 20000,
+      });
+      await page.waitForSelector("img.reddit-slideshow-media", {
+        state: "visible",
+        timeout: 20000,
+      });
+      // Let the first slide decode and the entrance transition settle.
+      await page.waitForTimeout(800);
+      // Nudge activity so the idle auto-hide doesn't fade the control rail.
+      await page.mouse.move(640, 740);
+      await page.waitForTimeout(200);
+      await page.screenshot({
+        path: join(shotsDir, "slideshow.png"),
+        fullPage: false,
+      });
+      console.log("captured docs/screenshots/slideshow.png");
+    } finally {
+      server.close();
+    }
   } catch (err) {
     console.warn(
-      `WARNING: live r/aww slideshow capture skipped (${err?.message ?? err}). ` +
+      `WARNING: offline slideshow capture skipped (${err?.message ?? err}). ` +
         "Options shots are unaffected.",
     );
   } finally {
-    await context?.close();
-    await rm(userDataDir, { recursive: true, force: true });
+    await browser?.close();
+    await rm(dir, { recursive: true, force: true });
   }
 }
 
