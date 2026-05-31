@@ -59,6 +59,18 @@ describe("fetchListingJson", () => {
       jsonUrl: "https://old.reddit.com/r/example/.json?raw_json=1",
     });
   });
+
+  it("fails closed when a 200 response is not JSON", async () => {
+    const fetchImpl = async () =>
+      new Response("<!doctype html>", {
+        status: 200,
+        headers: { "content-type": "text/html" },
+      });
+
+    await expect(
+      fetchListingJson("https://old.reddit.com/r/example/", {}, fetchImpl),
+    ).rejects.toMatchObject({ name: "RedditListingFetchError", status: 200 });
+  });
 });
 
 describe("summarizeListing", () => {
