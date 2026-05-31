@@ -100,3 +100,7 @@ The core logic in `lib/` is DOM/extension-agnostic and unit-tested; the
 
 v1 is feature-complete and unit-tested. Distribution (AMO signing/listing) is not
 done yet.
+
+## License
+
+[MIT](LICENSE) © Mario Olivio Flores

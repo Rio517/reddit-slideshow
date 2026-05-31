@@ -132,7 +132,10 @@ describe("createMessageRouter — fetchImage", () => {
       },
     });
     const result = await router(
-      { type: "slideshow.fetchImage", payload: { url: "https://i.redd.it/a.jpg" } },
+      {
+        type: "slideshow.fetchImage",
+        payload: { url: "https://i.redd.it/a.jpg" },
+      },
       OWN,
     );
     expect(result).toEqual({ ok: false });
@@ -147,7 +150,10 @@ describe("createMessageRouter — fetchImage", () => {
       },
     });
     const result = await router(
-      { type: "slideshow.fetchImage", payload: { url: "https://evil.example/x.jpg" } },
+      {
+        type: "slideshow.fetchImage",
+        payload: { url: "https://evil.example/x.jpg" },
+      },
       OWN,
     );
     expect(result).toEqual({ ok: false });
@@ -163,7 +169,10 @@ describe("createMessageRouter — fetchImage", () => {
       },
     });
     const result = await router(
-      { type: "slideshow.fetchImage", payload: { url: "http://i.redd.it/a.jpg" } },
+      {
+        type: "slideshow.fetchImage",
+        payload: { url: "http://i.redd.it/a.jpg" },
+      },
       OWN,
     );
     expect(result).toEqual({ ok: false });
