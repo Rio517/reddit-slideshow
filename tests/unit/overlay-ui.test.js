@@ -27,6 +27,16 @@ function imageSlide(overrides) {
   };
 }
 
+const PANEL_SETTINGS = {
+  imageTimerSeconds: 5,
+  startMuted: true,
+  autoplay: true,
+  includeNsfw: true,
+  dedupe: true,
+  contentDedup: false,
+  maxLoadWaitSeconds: 5,
+};
+
 function noopHandlers() {
   return {
     onPrev() {},
@@ -64,12 +74,40 @@ describe("createOverlay", () => {
     expect(overlay.isOpen()).toBe(false);
   });
 
-  it("opens preferences when the preferences control is clicked", () => {
-    const handlers = noopHandlers();
+  it("toggles the inline settings panel from the gear", () => {
+    const overlay = createOverlay(noopHandlers());
+    const panel = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-settings-panel")
+    );
+    expect(panel?.hidden).toBe(true);
+    clickByLabel(overlay.root, "Settings");
+    expect(panel?.hidden).toBe(false);
+    clickByLabel(overlay.root, "Settings");
+    expect(panel?.hidden).toBe(true);
+  });
+
+  it("opens full preferences from the settings panel", () => {
     const onOpenPreferences = vi.fn();
-    const overlay = createOverlay({ ...handlers, onOpenPreferences });
-    clickByLabel(overlay.root, "Preferences");
+    const overlay = createOverlay({ ...noopHandlers(), onOpenPreferences });
+    clickByLabel(overlay.root, "Settings");
+    overlay.root
+      .querySelector(".rs-settings-panel__more")
+      ?.dispatchEvent(new Event("click", { bubbles: true }));
     expect(onOpenPreferences).toHaveBeenCalledTimes(1);
+  });
+
+  it("applies a settings panel change via onChangeSetting", () => {
+    const onChangeSetting = vi.fn();
+    const overlay = createOverlay({ ...noopHandlers(), onChangeSetting });
+    overlay.setSettings(/** @type {any} */ ({ ...PANEL_SETTINGS }));
+    const range = /** @type {HTMLInputElement | null} */ (
+      overlay.root.querySelector(".rs-set__range")
+    );
+    if (range) {
+      range.value = "12";
+      range.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    expect(onChangeSetting).toHaveBeenCalledWith({ imageTimerSeconds: 12 });
   });
 
   it("renders a slide with the position counter, title, and NSFW tag", () => {
@@ -136,9 +174,8 @@ describe("createOverlay", () => {
     clickByLabel(overlay.root, "Previous");
     clickByLabel(overlay.root, "Open");
     clickByLabel(overlay.root, "Mute");
-    clickByLabel(overlay.root, "Preferences");
     clickByLabel(overlay.root, "Close");
-    expect(calls).toEqual(["next", "prev", "open", "mute", "prefs", "close"]);
+    expect(calls).toEqual(["next", "prev", "open", "mute", "close"]);
   });
 
   it("loads a proxied video through resolveMedia as a blob src", async () => {

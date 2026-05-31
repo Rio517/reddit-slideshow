@@ -345,6 +345,30 @@ describe("createSlideshowSession", () => {
     expect(text(".rs-skipped")).toBe("1 skipped");
   });
 
+  it("changes a setting from the in-overlay panel (persist + live)", async () => {
+    /** @type {object[]} */
+    const saved = [];
+    const { session } = makeSession({
+      saveSettings: async (patch) => saved.push(patch),
+    });
+    await session.start();
+    // Open the inline settings panel and bump the per-image timer.
+    /** @type {HTMLElement} */ (
+      document.querySelector(`${ROOT} [aria-label^="Settings"]`)
+    ).click();
+    const range = /** @type {HTMLInputElement} */ (
+      document.querySelector(`${ROOT} .rs-set__range`)
+    );
+    range.value = "20";
+    range.dispatchEvent(new Event("change", { bubbles: true }));
+
+    expect(saved.at(-1)).toEqual({ imageTimerSeconds: 20 });
+    const fill = /** @type {HTMLElement | null} */ (
+      document.querySelector(`${ROOT} .rs-timer__fill`)
+    );
+    expect(fill?.style.animation).toContain("20s");
+  });
+
   it("persists the mute preference when toggled", async () => {
     /** @type {object[]} */
     const saved = [];
