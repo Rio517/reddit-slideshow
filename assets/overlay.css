@@ -1023,6 +1023,12 @@ iframe.reddit-slideshow-media {
   cursor: pointer;
 }
 
+/* A little extra breathing room between the Top Timer Bar field (the last
+   field) and the first toggle below it. */
+.rs-set__field + .rs-set__check {
+  margin-top: 4px;
+}
+
 /* Compact toggle switch (the native checkbox, restyled). */
 .rs-set__check input {
   appearance: none;
