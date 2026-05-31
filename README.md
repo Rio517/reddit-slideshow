@@ -104,8 +104,8 @@ done yet.
 ## Privacy
 
 No analytics, no tracking, no developer servers — the extension only fetches the
-Reddit listing/media you are viewing and stores your settings locally. See
-[PRIVACY.md](PRIVACY.md).
+media you are viewing (Reddit, and Redgifs for Redgifs links) and stores your
+settings locally. See [PRIVACY.md](PRIVACY.md).
 
 ## License
 

@@ -187,6 +187,54 @@ describe("createMessageRouter — fetchImage", () => {
   });
 });
 
+describe("createMessageRouter — fetchMedia", () => {
+  it("returns bytes for a Redgifs media url", async () => {
+    const router = makeRouter({
+      fetchMediaBytes: async () => new ArrayBuffer(16),
+    });
+    const result = await router(
+      {
+        type: "slideshow.fetchMedia",
+        payload: { url: "https://media.redgifs.com/X.mp4" },
+      },
+      OWN,
+    );
+    expect(result.ok).toBe(true);
+    expect(result.bytes).toBeInstanceOf(ArrayBuffer);
+  });
+
+  it("rejects a non-Redgifs media host without fetching", async () => {
+    let called = false;
+    const router = makeRouter({
+      fetchMediaBytes: async () => {
+        called = true;
+        return new ArrayBuffer(8);
+      },
+    });
+    const result = await router(
+      {
+        type: "slideshow.fetchMedia",
+        payload: { url: "https://i.redd.it/a.jpg" },
+      },
+      OWN,
+    );
+    expect(result).toEqual({ ok: false });
+    expect(called).toBe(false);
+  });
+
+  it("fails closed when no media fetcher is wired", async () => {
+    const router = makeRouter();
+    const result = await router(
+      {
+        type: "slideshow.fetchMedia",
+        payload: { url: "https://media.redgifs.com/X.mp4" },
+      },
+      OWN,
+    );
+    expect(result).toEqual({ ok: false });
+  });
+});
+
 describe("createMessageRouter — openOptions", () => {
   it("opens the options page for an own-sender request", async () => {
     const openOptionsPage = vi.fn();

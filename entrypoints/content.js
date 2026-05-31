@@ -46,6 +46,24 @@ export default defineContentScript({
           .sendMessage({ type: "slideshow.openOptions" })
           .catch(() => {});
       },
+      // Proxied media (Redgifs): the background fetches the mp4 bytes (no reddit
+      // Referer, so the CDN serves them); we wrap them in a blob: URL the page
+      // CSP allows. Returns null on any failure so the overlay shows a fallback.
+      resolveMedia: async (url) => {
+        let res;
+        try {
+          res = await browser.runtime.sendMessage({
+            type: "slideshow.fetchMedia",
+            payload: { url },
+          });
+        } catch {
+          return null;
+        }
+        if (!res?.ok || !res.bytes) return null;
+        return URL.createObjectURL(
+          new Blob([res.bytes], { type: "video/mp4" }),
+        );
+      },
       createImage: () => new Image(),
       // Layer 2 dedup: the background fetches the bytes (privileged), then we
       // downscale to 9x8 and difference-hash. Returns null on any failure.

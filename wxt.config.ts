@@ -11,6 +11,10 @@ export default defineConfig({
       "https://www.reddit.com/*",
       "https://i.redd.it/*",
       "https://v.redd.it/*",
+      // Redgifs: resolve the direct mp4 (api) and fetch its bytes (media) in the
+      // background, so the clip plays as a native, correctly-timed video.
+      "https://api.redgifs.com/*",
+      "https://media.redgifs.com/*",
     ],
     // Requested at runtime only when the user enables content-based dedup
     // (ADR 0006 Layer 2), so the background can fetch preview images to hash.

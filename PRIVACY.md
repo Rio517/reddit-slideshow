@@ -17,8 +17,8 @@ information. Removing the extension removes them.
 
 ## Network requests the extension makes
 
-All requests go to Reddit and Reddit's own media servers — never to any server
-operated by the developer (there is none):
+Requests go only to Reddit, Reddit's own media servers, and — for Redgifs posts
+— Redgifs. Never to any server operated by the developer (there is none):
 
 - **Listing data.** To build the slideshow, the extension fetches the JSON for
   the listing you are on (`old.reddit.com` / `www.reddit.com`). This request
@@ -30,6 +30,16 @@ operated by the developer (there is none):
 - **Media.** Images and videos are loaded directly from Reddit's media hosts
   (`i.redd.it`, `v.redd.it`) by your browser to display each slide, the same way
   they would load on Reddit itself.
+- **Redgifs clips.** When a post links to Redgifs, the extension's background
+  contacts Redgifs to play the clip as a normal video: it requests the clip's
+  metadata and direct video URL from `api.redgifs.com`, then downloads the video
+  from `media.redgifs.com`. Both requests are made **without cookies**
+  (`credentials: "omit"`) and with no referrer; Redgifs receives only what any
+  request to load that clip would (e.g. your IP address and standard request
+  data), subject to [Redgifs' own privacy policy](https://www.redgifs.com/privacy).
+  The extension sends Redgifs no account information or tracking of its own. (If
+  Redgifs can't be reached, the clip falls back to Redgifs' standard `<iframe>`
+  embed, loaded by your browser the same way Reddit embeds it.)
 - **Optional re-upload detection (off by default).** If you turn on "Also detect
   re-uploaded images," the extension fetches preview images from
   `preview.redd.it` / `external-preview.redd.it` to compute a local perceptual
@@ -38,20 +48,13 @@ operated by the developer (there is none):
   image or hash leaves your device. This feature requests its host permission
   only when you enable it.
 
-## Embedded third-party media
-
-Some Reddit posts (for example Redgifs clips) are shown using the provider's own
-embedded player in an `<iframe>`, just as Reddit embeds them. When such a slide
-is shown, your browser loads that player directly from the third party, and that
-third party's own privacy policy applies to what it receives (e.g. your IP
-address and standard request data). The extension adds no tracking of its own and
-sends no data to these providers beyond what loading their embed requires.
-
 ## Permissions and why they are needed
 
 - **`storage`** — to save your settings locally (above).
 - **Host access to `old.reddit.com`, `www.reddit.com`, `i.redd.it`,
   `v.redd.it`** — to read the listing JSON and load slide media.
+- **Host access to `api.redgifs.com`, `media.redgifs.com`** — to resolve and
+  play Redgifs clips as native video.
 - **Optional host access to `preview.redd.it`, `external-preview.redd.it`** —
   requested only if you enable re-upload detection.
 

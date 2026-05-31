@@ -141,6 +141,33 @@ describe("createOverlay", () => {
     expect(calls).toEqual(["next", "prev", "open", "mute", "prefs", "close"]);
   });
 
+  it("loads a proxied video through resolveMedia as a blob src", async () => {
+    vi.useRealTimers();
+    const resolveMedia = vi.fn(async () => "blob:fake-123");
+    const overlay = createOverlay({ ...noopHandlers(), resolveMedia });
+    overlay.renderCurrent(
+      imageSlide({
+        kind: "video",
+        durationMode: "media",
+        proxied: true,
+        mediaUrl: "https://media.redgifs.com/X.mp4",
+      }),
+      {
+        index: 0,
+        total: 1,
+        exhausted: true,
+        effectiveSeconds: 5,
+        playing: true,
+      },
+    );
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const video = overlay.root.querySelector("video.reddit-slideshow-media");
+    expect(resolveMedia).toHaveBeenCalledWith(
+      "https://media.redgifs.com/X.mp4",
+    );
+    expect(video?.getAttribute("src")).toBe("blob:fake-123");
+  });
+
   it("renders a status message", () => {
     const overlay = createOverlay(noopHandlers());
     overlay.showStatus("No supported media on this page.");
