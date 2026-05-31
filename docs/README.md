@@ -10,6 +10,7 @@ This directory holds planning material for a Firefox-first browser extension tha
 - [Prior art and tool options](research/prior-art-and-tool-options.md): existing slideshow/gallery tools, reuse candidates, and gaps.
 - [New Reddit support](research/new-reddit-support.md): supporting `www.reddit.com` (shreddit) — data, CSP, and the start cursor.
 - [Chrome support](research/chrome-support.md): building a Chrome MV3 target from the same source.
+- [JavaScript type management](research/javascript-type-management.md): how we type this plain-JS/JSDoc codebase — Reddit listing typedefs, `tsconfig` strictness progression, the `requiredElement` helper, and conventions for keeping `any` out.
 - [ADR 0001](adr/0001-standalone-firefox-webextension.md): build as a standalone Firefox WebExtension first.
 - [ADR 0002](adr/0002-provider-based-media-resolution.md): resolve media through provider adapters.
 - [ADR 0003](adr/0003-paginate-current-reddit-listing.md): keep the slideshow queue going through Reddit listing pagination.
