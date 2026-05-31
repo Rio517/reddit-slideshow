@@ -1,52 +1,29 @@
 import { browser } from "wxt/browser";
 import { getSettings, saveSettings } from "@/lib/settings.js";
+import { requiredElement } from "@/lib/dom.js";
 
 const CONTENT_DEDUP_ORIGINS = [
   "https://preview.redd.it/*",
   "https://external-preview.redd.it/*",
 ];
 
-const timerSlider = /** @type {HTMLInputElement} */ (
-  document.querySelector("#imageTimerSeconds")
-);
-const timerValue = /** @type {HTMLOutputElement} */ (
-  document.querySelector("#timerValue")
-);
-const autoplay = /** @type {HTMLInputElement} */ (
-  document.querySelector("#autoplay")
-);
-const startMuted = /** @type {HTMLInputElement} */ (
-  document.querySelector("#startMuted")
-);
-const includeNsfw = /** @type {HTMLInputElement} */ (
-  document.querySelector("#includeNsfw")
-);
-const dedupe = /** @type {HTMLInputElement} */ (
-  document.querySelector("#dedupe")
-);
-const alwaysShowMeta = /** @type {HTMLInputElement} */ (
-  document.querySelector("#alwaysShowMeta")
-);
-const maxLoadWait = /** @type {HTMLSelectElement} */ (
-  document.querySelector("#maxLoadWaitSeconds")
-);
-const transition = /** @type {HTMLSelectElement} */ (
-  document.querySelector("#transition")
-);
+const timerSlider = requiredElement("#imageTimerSeconds", HTMLInputElement);
+const timerValue = requiredElement("#timerValue", HTMLOutputElement);
+const autoplay = requiredElement("#autoplay", HTMLInputElement);
+const startMuted = requiredElement("#startMuted", HTMLInputElement);
+const includeNsfw = requiredElement("#includeNsfw", HTMLInputElement);
+const dedupe = requiredElement("#dedupe", HTMLInputElement);
+const alwaysShowMeta = requiredElement("#alwaysShowMeta", HTMLInputElement);
+const maxLoadWait = requiredElement("#maxLoadWaitSeconds", HTMLSelectElement);
+const transition = requiredElement("#transition", HTMLSelectElement);
 const timerBarRadios = /** @type {NodeListOf<HTMLInputElement>} */ (
   document.querySelectorAll('input[name="timerBar"]')
 );
 const timerBarValue = () =>
   [...timerBarRadios].find((r) => r.checked)?.value ?? "video";
-const contentDedup = /** @type {HTMLInputElement} */ (
-  document.querySelector("#contentDedup")
-);
-const panZoom = /** @type {HTMLInputElement} */ (
-  document.querySelector("#panZoom")
-);
-const panZoomCard = /** @type {HTMLElement} */ (
-  document.querySelector("#panZoomCard")
-);
+const contentDedup = requiredElement("#contentDedup", HTMLInputElement);
+const panZoom = requiredElement("#panZoom", HTMLInputElement);
+const panZoomCard = requiredElement("#panZoomCard", HTMLElement);
 
 /** Pan-zoom range inputs paired with their <output> id. */
 const PAN_ZOOM_RANGES = [
@@ -65,7 +42,7 @@ function syncPanZoomEnabled() {
 const panZoomInputs = Object.fromEntries(
   PAN_ZOOM_RANGES.map(([id]) => [
     id,
-    /** @type {HTMLInputElement} */ (document.querySelector(`#${id}`)),
+    requiredElement(`#${id}`, HTMLInputElement),
   ]),
 );
 
