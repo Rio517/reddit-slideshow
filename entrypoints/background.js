@@ -6,10 +6,13 @@ import {
   MAX_IMAGE_BYTES,
   MAX_MEDIA_BYTES,
 } from "@/lib/proxy-fetch.js";
+import { createLogger } from "@/lib/log.js";
+
+const log = createLogger("background");
 
 export default defineBackground(() => {
   browser.runtime.onInstalled.addListener(() => {
-    console.info("Reddit Slideshow installed");
+    log.info("installed");
   });
 
   const redgifs = createRedgifsResolver();
@@ -49,8 +52,8 @@ export default defineBackground(() => {
           type: "slideshow.startRequested",
           payload: { source: "action" },
         });
-      } catch {
-        console.info("Reddit Slideshow: open a Reddit listing first");
+      } catch (err) {
+        log.info("toolbar clicked off a Reddit listing", err);
       }
     },
   );

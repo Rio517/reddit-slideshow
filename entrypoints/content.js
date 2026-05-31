@@ -5,6 +5,9 @@ import { afterCursorForViewport } from "@/lib/page-cursor.js";
 import { listingPostElements, postFullname } from "@/lib/reddit-dom.js";
 import { createSlideshowSession } from "@/lib/session.js";
 import { differenceHash, luminanceFromImageData } from "@/lib/dedup.js";
+import { createLogger } from "@/lib/log.js";
+
+const log = createLogger("content");
 
 // URL fragment a popout window carries so its content script auto-starts.
 const POPOUT_MARKER = "rs-slideshow";
@@ -24,7 +27,8 @@ export default defineContentScript({
             type: "slideshow.requestPage",
             payload: { pageUrl: window.location.href, after },
           });
-        } catch {
+        } catch (err) {
+          log.warn("requestPage message failed", err);
           return {
             ok: false,
             error: { message: "Could not reach the extension background." },
@@ -71,7 +75,8 @@ export default defineContentScript({
             type: "slideshow.fetchMedia",
             payload: { url },
           });
-        } catch {
+        } catch (err) {
+          log.warn("fetchMedia message failed", url, err);
           return null;
         }
         if (!res?.ok || !res.bytes) return null;
@@ -89,7 +94,8 @@ export default defineContentScript({
             type: "slideshow.fetchImage",
             payload: { url },
           });
-        } catch {
+        } catch (err) {
+          log.warn("fetchImage message failed", url, err);
           return null;
         }
         if (!res?.ok || !res.bytes) return null;
@@ -102,7 +108,8 @@ export default defineContentScript({
           bitmap.close();
           const imageData = ctx.getImageData(0, 0, 9, 8);
           return differenceHash(luminanceFromImageData(imageData, 9, 8), 9, 8);
-        } catch {
+        } catch (err) {
+          log.warn("image hash failed", url, err);
           return null;
         }
       },
@@ -120,7 +127,7 @@ export default defineContentScript({
       if (area !== "local") return;
       getSettings()
         .then((next) => session.applyLiveSettings(next))
-        .catch(() => {});
+        .catch((err) => log.warn("applyLiveSettings failed", err));
     });
 
     browser.runtime.onMessage.addListener((/** @type {any} */ message) => {

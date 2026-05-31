@@ -2,7 +2,15 @@ import js from "@eslint/js";
 import noUnsanitized from "eslint-plugin-no-unsanitized";
 
 export default [
-  { ignores: [".wxt/**", ".output/**", "node_modules/**", "dist/**"] },
+  {
+    ignores: [
+      ".wxt/**",
+      ".output/**",
+      "node_modules/**",
+      "dist/**",
+      ".claude/**",
+    ],
+  },
   js.configs.recommended,
   {
     files: ["**/*.{js,ts}"],
