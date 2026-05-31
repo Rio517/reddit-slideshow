@@ -7,7 +7,10 @@ keyboard-driven media slideshow. It reuses your existing logged-in Reddit
 session — no API keys — and resolves direct images, galleries, Reddit-hosted
 video, Redgifs, and crossposts.
 
-![A full-screen slideshow over r/aww: a sleeping cat with the position counter, open-original, and the control rail (prev/play/next, mute, fullscreen, settings, close)](docs/slideshow-demo.png)
+<a href="docs/slideshow-demo.png">
+  <img src="docs/slideshow-demo.png" width="820"
+    alt="A full-screen slideshow over r/aww: a sleeping cat with the position counter, open-original, and the control rail (prev/play/next, mute, fullscreen, settings, close)">
+</a>
 
 ## Features
 
@@ -28,13 +31,25 @@ video, Redgifs, and crossposts.
 
 ## Screenshots
 
-The options page in light and dark mode:
+The options page in light and dark mode (click to enlarge):
 
-![Reddit Slideshow options page](docs/screenshots/options-light.png)
+<p>
+  <a href="docs/screenshots/options-light.png">
+    <img src="docs/screenshots/options-light.png" width="320"
+      alt="Reddit Slideshow options page, light theme">
+  </a>
+  <a href="docs/screenshots/options-dark.png">
+    <img src="docs/screenshots/options-dark.png" width="320"
+      alt="Reddit Slideshow options page, dark theme">
+  </a>
+</p>
 
 Regenerate the shots anytime with `npm run screenshots` — it builds the Firefox
-extension, serves the output, and uses Playwright/Chromium to capture
-`docs/screenshots/options-{light,dark}.png`.
+extension, serves the output, and uses Playwright/Chromium to capture the options
+page (`docs/screenshots/options-{light,dark}.png`) and an offline, deterministic
+slideshow shot (`docs/screenshots/slideshow.png`, the real overlay over fixture
+slides). The Chromium binary isn't fetched by `npm install` — run
+`npx playwright install chromium` once first.
 
 ## Install
 
