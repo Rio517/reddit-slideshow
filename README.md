@@ -1,32 +1,28 @@
-# Reddit Slideshow
+# Reddit Slideshow Browser Extention
 
-A Firefox-first WebExtension (Manifest V3) that turns the current Reddit
-listing — on `old.reddit.com` or `www.reddit.com` — into a full-screen,
+Slideshow for videos and images in your reddit feed. Uses your current page/feed view.
+
+From either `old.reddit.com` or `www.reddit.com`, click to create a full-screen,
 keyboard-driven media slideshow. It reuses your existing logged-in Reddit
 session — no API keys — and resolves direct images, galleries, Reddit-hosted
-video, Redgifs, and crossposts. Each frontend is self-contained (it fetches its
-own listing JSON), so the new-Reddit path never depends on old Reddit.
+video, Redgifs, and crossposts.
 
 ## Features
 
-- Launch a slideshow from any `old.reddit.com` or `www.reddit.com` listing
-  (toolbar icon or **Alt+Shift+S**). On old Reddit it starts from the post
-  nearest your scroll position; on new Reddit it starts from the top of the
-  listing.
-- Auto-advance with a configurable timer; videos advance when they finish.
-- Automatic pagination — the queue keeps loading the next listing page.
+-
+
+- Launch slideshow from any `old.reddit.com` or `www.reddit.com` feed via
+  toolbar icon or **Alt+Shift+S**.
+- Auto-advance or use arrows, videos advance when they finish.
+- Infinite pages
+- Skip duplicates: reposts, crossposts, repeated
+  galleries
 - Per-kind rendering: `<img>` for images/galleries and native `<video>` for
-  `v.redd.it` and Redgifs (Redgifs is resolved to its direct mp4 so it times and
-  unmutes like any other video).
-- A refined dark overlay: side-rail controls, a per-slide timer bar, a position
-  counter, and a loading spinner. Click the dark backdrop to close.
-- Broken media (a dead clip, a 404 image) is skipped automatically and collected
-  in a clickable "N skipped" list so you can revisit what was dropped.
-- Settings: image timer, max load wait, autoplay, start-muted, Include-NSFW
+  `v.redd.it` and some external providers, including redgifs.
+- Broken media is skipped.
+- Configure: image timer, max load wait, autoplay, start-muted, Include-NSFW
   filter, and duplicate skipping — open them from the overlay's gear, and
   changes apply live without a reload.
-- Skips duplicate media within a session (reposts, crossposts, repeated
-  galleries).
 
 ## Install
 
