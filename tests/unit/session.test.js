@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createOverlay } from "../../lib/overlay-ui.js";
 import { createSlideshowSession } from "../../lib/session.js";
 
@@ -98,12 +98,13 @@ function fakeRequest(pages) {
 }
 
 /**
- * @param {{ pages?: any[], settingsOverrides?: Record<string, unknown>, openUrl?: (url: string) => void, saveSettings?: (patch: object) => Promise<unknown>, computeImageHash?: (url: string) => Promise<string | null>, createImage?: () => { src: string, decoding?: string } }} [opts]
+ * @param {{ pages?: any[], settingsOverrides?: Record<string, unknown>, openUrl?: (url: string) => void, openPopout?: () => void, saveSettings?: (patch: object) => Promise<unknown>, computeImageHash?: (url: string) => Promise<string | null>, createImage?: () => { src: string, decoding?: string } }} [opts]
  */
 function makeSession({
   pages,
   settingsOverrides,
   openUrl,
+  openPopout,
   saveSettings,
   computeImageHash,
   createImage,
@@ -126,6 +127,7 @@ function makeSession({
     requestPage: request,
     getStartCursor: () => undefined,
     openUrl: openUrl ?? (() => {}),
+    openPopout,
     createImage: createImage ?? (() => ({ src: "", decoding: "" })),
     computeImageHash,
   });
@@ -180,6 +182,18 @@ describe("createSlideshowSession", () => {
     expect(text(".rs-meta__counter")).toBe("2 / 2");
     session.handleKeydown(key("ArrowLeft"));
     expect(mediaSrc()).toBe("https://i.redd.it/a.jpg");
+  });
+
+  it("hands off to a popout window and closes this tab's slideshow", async () => {
+    const openPopout = vi.fn();
+    const { session } = makeSession({ openPopout });
+    await session.start();
+    expect(session.isOpen()).toBe(true);
+    /** @type {HTMLElement} */ (
+      document.querySelector(`${ROOT} [aria-label^="Open in a window"]`)
+    ).click();
+    expect(openPopout).toHaveBeenCalledTimes(1);
+    expect(session.isOpen()).toBe(false);
   });
 
   it("ignores keys when the overlay is closed", async () => {
