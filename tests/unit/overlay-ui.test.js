@@ -67,12 +67,27 @@ describe("createOverlay", () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
 
-  it("builds the chrome with seven controls, hidden by default", () => {
+  it("builds the chrome with eight controls, hidden by default", () => {
     const overlay = createOverlay(noopHandlers());
     expect(overlay.root.querySelector(".rs-stage")).toBeTruthy();
     expect(overlay.root.querySelector(".rs-timer")).toBeTruthy();
-    expect(overlay.root.querySelectorAll(".rs-btn").length).toBe(7);
+    expect(overlay.root.querySelectorAll(".rs-btn").length).toBe(8);
     expect(overlay.isOpen()).toBe(false);
+  });
+
+  it("a backdrop click with the settings panel open closes the panel, not the show", () => {
+    const onClose = vi.fn();
+    const overlay = createOverlay({ ...noopHandlers(), onClose });
+    // Open the settings panel via the gear.
+    clickByLabel(overlay.root, "Settings");
+    const panel = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-settings-panel")
+    );
+    expect(panel?.hidden).toBe(false);
+    // Click the backdrop (the root itself).
+    overlay.root.dispatchEvent(new Event("click", { bubbles: true }));
+    expect(panel?.hidden).toBe(true); // panel dismissed
+    expect(onClose).not.toHaveBeenCalled(); // slideshow stays open
   });
 
   it("toggles the inline settings panel from the gear", () => {

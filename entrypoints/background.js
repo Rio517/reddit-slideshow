@@ -1,6 +1,11 @@
 import { fetchQueuePage } from "@/lib/queue.js";
 import { createMessageRouter } from "@/lib/background-router.js";
 import { createRedgifsResolver, resolveRedgifsSlides } from "@/lib/redgifs.js";
+import {
+  fetchCappedBytes,
+  MAX_IMAGE_BYTES,
+  MAX_MEDIA_BYTES,
+} from "@/lib/proxy-fetch.js";
 
 export default defineBackground(() => {
   browser.runtime.onInstalled.addListener(() => {
@@ -21,25 +26,14 @@ export default defineBackground(() => {
     return page;
   };
 
-  // Privileged background fetch; credentials omitted, and no Referer so the
-  // Redgifs CDN (which 403s a reddit referer) serves the bytes.
-  /** @param {string} url */
-  const fetchBytes = (url) =>
-    fetch(url, { credentials: "omit", referrerPolicy: "no-referrer" }).then(
-      (response) =>
-        response.ok
-          ? response.arrayBuffer()
-          : Promise.reject(new Error(`HTTP ${response.status}`)),
-    );
-
   const router = createMessageRouter({
     runtimeId: browser.runtime.id,
     fetchQueuePage: fetchQueuePageWithRedgifs,
     // Layer 2 dedup image bytes (hosts the content script's page-CORS fetch
-    // can't reach).
-    fetchImageBytes: fetchBytes,
+    // can't reach), capped + timed out.
+    fetchImageBytes: (url) => fetchCappedBytes(url, MAX_IMAGE_BYTES),
     // Redgifs mp4 bytes, played back as a blob to dodge CDN hotlink protection.
-    fetchMediaBytes: fetchBytes,
+    fetchMediaBytes: (url) => fetchCappedBytes(url, MAX_MEDIA_BYTES),
     openOptionsPage: () => browser.runtime.openOptionsPage(),
   });
   browser.runtime.onMessage.addListener(router);

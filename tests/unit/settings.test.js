@@ -119,6 +119,7 @@ describe("getSettings / saveSettings", () => {
       panZoomPanSeconds: 6,
       panZoomZoomOutSeconds: 2,
       panZoomShowEndSeconds: 2,
+      panZoomMinOversize: 1.5,
     });
   });
 

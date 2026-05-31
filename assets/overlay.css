@@ -478,12 +478,35 @@ iframe.reddit-slideshow-media {
   display: none;
 }
 
+.rs-settings-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .rs-settings-panel__title {
   margin: 0;
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--rs-muted);
+}
+
+.rs-settings-panel__close {
+  font: inherit;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--rs-muted);
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 2px 7px;
+}
+
+.rs-settings-panel__close:hover {
+  color: var(--rs-fg);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .rs-set__field {

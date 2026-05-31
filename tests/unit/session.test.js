@@ -56,6 +56,7 @@ function settings(overrides) {
     panZoomPanSeconds: 6,
     panZoomZoomOutSeconds: 2,
     panZoomShowEndSeconds: 2,
+    panZoomMinOversize: 1.5,
     ...overrides,
   };
 }
@@ -376,36 +377,66 @@ describe("createSlideshowSession", () => {
     expect(fill?.style.animation).toContain("20s");
   });
 
-  it("sets the image dwell to the pan-zoom total when enabled", async () => {
-    const { session } = makeSession({
-      settingsOverrides: {
-        panZoom: true,
-        panZoomShowSeconds: 3,
-        panZoomZoomInSeconds: 3,
-        panZoomPanSeconds: 4,
-        panZoomZoomOutSeconds: 0,
-        panZoomShowEndSeconds: 0,
-      }, // total = 10s
+  it("pan-zooms only oversized (UHD) images", async () => {
+    /** @type {Array<{ slide: any, info: any }>} */
+    const renders = [];
+    const fakeOverlay = () => ({
+      root: document.createElement("div"),
+      show() {},
+      hide() {},
+      isOpen: () => true,
+      showStatus() {},
+      setSkipped() {},
+      setSettings() {},
+      setMuted() {},
+      setBuffering() {},
+      setPlaying() {},
+      restartTimer() {},
+      renderCurrent: (/** @type {any} */ slide, /** @type {any} */ info) =>
+        renders.push({ slide, info }),
     });
+    const big = imageSlide("big", { sourceWidth: 12000, sourceHeight: 8000 });
+    const small = imageSlide("small", { sourceWidth: 800, sourceHeight: 600 });
+    const session = createSlideshowSession({
+      doc: document,
+      createOverlay: /** @type {any} */ (fakeOverlay),
+      // total = 3 + 3 + 4 + 0 + 0 = 10s
+      getSettings: async () =>
+        /** @type {any} */ (
+          settings({
+            panZoom: true,
+            panZoomShowSeconds: 3,
+            panZoomZoomInSeconds: 3,
+            panZoomPanSeconds: 4,
+            panZoomZoomOutSeconds: 0,
+            panZoomShowEndSeconds: 0,
+          })
+        ),
+      saveSettings: async () => {},
+      requestPage: async () => ({
+        ok: true,
+        page: {
+          slides: [big, small],
+          after: null,
+          exhausted: true,
+          postsScanned: 2,
+        },
+      }),
+      getStartCursor: () => undefined,
+      openUrl: () => {},
+      createImage: () => ({ src: "", decoding: "" }),
+    });
+    sessions.push(session);
     await session.start();
-    // Re-applying settings restarts the current image's countdown bar, which
-    // should run for the pan-zoom total, not the 5s image timer.
-    session.applyLiveSettings(
-      /** @type {any} */ (
-        settings({
-          panZoom: true,
-          panZoomShowSeconds: 3,
-          panZoomZoomInSeconds: 3,
-          panZoomPanSeconds: 4,
-          panZoomZoomOutSeconds: 0,
-          panZoomShowEndSeconds: 0,
-        })
-      ),
-    );
-    const fill = /** @type {HTMLElement | null} */ (
-      document.querySelector(`${ROOT} .rs-timer__fill`)
-    );
-    expect(fill?.style.animation).toContain("10s");
+    session.handleKeydown(key("ArrowRight")); // advance to the small image
+
+    expect(renders[0].slide.id).toBe("big");
+    expect(renders[0].info.panZoom).not.toBeNull(); // oversized → pan-zoom
+    expect(renders[0].info.effectiveSeconds).toBe(10); // runs the full sequence
+
+    expect(renders[1].slide.id).toBe("small");
+    expect(renders[1].info.panZoom).toBeNull(); // too small → no pan-zoom
+    expect(renders[1].info.effectiveSeconds).toBe(5); // normal image timer
   });
 
   it("persists the mute preference when toggled", async () => {

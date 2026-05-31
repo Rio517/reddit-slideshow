@@ -94,6 +94,137 @@
         font-size: 12px;
         margin-top: 2px;
       }
+
+      /* Pan & zoom: one box, with the five phases as a connected sequence. */
+      .panzoom {
+        margin-bottom: 14px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .panzoom__head {
+        display: flex;
+        gap: 13px;
+        align-items: flex-start;
+        padding: 18px;
+        margin: 0;
+        cursor: pointer;
+      }
+      .panzoom__head input {
+        width: 18px;
+        height: 18px;
+        margin-top: 1px;
+        flex: none;
+        accent-color: var(--accent);
+      }
+      .panzoom__heading {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .panzoom__title {
+        font-weight: 600;
+        font-size: 15px;
+        letter-spacing: -0.01em;
+      }
+      .panzoom__head .hint {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+      .panzoom__body {
+        border-top: 1px solid var(--line);
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+        transition: opacity 0.2s ease;
+      }
+      .panzoom[data-off="true"] .panzoom__body {
+        opacity: 0.4;
+        filter: saturate(0.4);
+        pointer-events: none;
+      }
+      .pz-row {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .pz-row__label {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 12px;
+        font-size: 13px;
+        line-height: 1.35;
+      }
+      .pz-row__label output {
+        flex: none;
+        color: var(--accent);
+        font-family: ui-monospace, "SF Mono", Menlo, monospace;
+        font-variant-numeric: tabular-nums;
+      }
+      .pz-row__note {
+        font-size: 11.5px;
+        line-height: 1.4;
+        color: var(--muted);
+      }
+      .pz-seq {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .pz-seq__title {
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .pz-steps {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        position: relative;
+      }
+      /* The line threading the numbered badges into one sequence. */
+      .pz-steps::before {
+        content: "";
+        position: absolute;
+        left: 13px;
+        top: 10px;
+        bottom: 10px;
+        width: 2px;
+        background: var(--line);
+      }
+      .pz-step {
+        display: grid;
+        grid-template-columns: 28px 1fr;
+        gap: 14px;
+        align-items: start;
+      }
+      .pz-step__num {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: 12px;
+        font-variant-numeric: tabular-nums;
+        color: var(--accent);
+        background: #0c0f15;
+        border: 1px solid rgba(246, 179, 82, 0.4);
+        position: relative;
+        z-index: 1;
+      }
+      .pz-step__ctl {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
     </style>
   </head>
   <body>
@@ -167,106 +298,148 @@
         </span>
       </label>
 
-      <label class="check">
-        <input id="panZoom" type="checkbox" />
-        <span>
-          Pan &amp; zoom images (Ken Burns)
-          <span class="hint">
-            On images: show whole, zoom in, pan top→bottom, zoom out, show
-            again. The phases below set the per-image timing.
+      <section class="panzoom" id="panZoomCard" data-off="true">
+        <label class="panzoom__head">
+          <input id="panZoom" type="checkbox" />
+          <span class="panzoom__heading">
+            <span class="panzoom__title">Pan &amp; zoom UHD images</span>
+            <span class="hint">
+              A slow Ken Burns move, only on images too big to see at once —
+              push in, drift top→bottom, pull back out.
+            </span>
           </span>
-        </span>
-      </label>
+        </label>
 
-      <label class="field">
-        <span class="field__label">
-          <span>Zoom level</span>
-          <span><output id="panZoomScaleValue">2</output>×</span>
-        </span>
-        <input
-          id="panZoomScale"
-          type="range"
-          min="1.1"
-          max="5"
-          step="0.1"
-          value="2"
-        />
-      </label>
+        <div class="panzoom__body">
+          <div class="pz-row">
+            <span class="pz-row__label">
+              <span
+                >Zoom &amp; pan when the image's longest side beats the window
+                by</span
+              >
+              <span><output id="panZoomMinOversizeValue">1.5</output>×</span>
+            </span>
+            <input
+              id="panZoomMinOversize"
+              type="range"
+              min="1.25"
+              max="3"
+              step="0.05"
+              value="1.5"
+            />
+            <span class="pz-row__note">
+              Higher = only the very largest images move; everything else just
+              shows for the normal image timer.
+            </span>
+          </div>
 
-      <label class="field">
-        <span class="field__label">
-          <span>1. Show whole image</span>
-          <span><output id="panZoomShowValue">2</output> s</span>
-        </span>
-        <input
-          id="panZoomShowSeconds"
-          type="range"
-          min="0"
-          max="30"
-          step="0.5"
-          value="2"
-        />
-      </label>
+          <div class="pz-row">
+            <span class="pz-row__label">
+              <span>Zoom level</span>
+              <span><output id="panZoomScaleValue">2</output>×</span>
+            </span>
+            <input
+              id="panZoomScale"
+              type="range"
+              min="1.1"
+              max="5"
+              step="0.1"
+              value="2"
+            />
+          </div>
 
-      <label class="field">
-        <span class="field__label">
-          <span>2. Zoom in</span>
-          <span><output id="panZoomZoomInValue">2</output> s</span>
-        </span>
-        <input
-          id="panZoomZoomInSeconds"
-          type="range"
-          min="0"
-          max="30"
-          step="0.5"
-          value="2"
-        />
-      </label>
-
-      <label class="field">
-        <span class="field__label">
-          <span>3. Pan top → bottom</span>
-          <span><output id="panZoomPanValue">6</output> s</span>
-        </span>
-        <input
-          id="panZoomPanSeconds"
-          type="range"
-          min="0"
-          max="30"
-          step="0.5"
-          value="6"
-        />
-      </label>
-
-      <label class="field">
-        <span class="field__label">
-          <span>4. Zoom out</span>
-          <span><output id="panZoomZoomOutValue">2</output> s</span>
-        </span>
-        <input
-          id="panZoomZoomOutSeconds"
-          type="range"
-          min="0"
-          max="30"
-          step="0.5"
-          value="2"
-        />
-      </label>
-
-      <label class="field">
-        <span class="field__label">
-          <span>5. Show whole image again</span>
-          <span><output id="panZoomShowEndValue">2</output> s</span>
-        </span>
-        <input
-          id="panZoomShowEndSeconds"
-          type="range"
-          min="0"
-          max="30"
-          step="0.5"
-          value="2"
-        />
-      </label>
+          <div class="pz-seq">
+            <span class="pz-seq__title">Per-image sequence</span>
+            <ol class="pz-steps">
+              <li class="pz-step">
+                <span class="pz-step__num">1</span>
+                <label class="pz-step__ctl">
+                  <span class="pz-row__label">
+                    <span>Show whole image</span>
+                    <span><output id="panZoomShowValue">2</output> s</span>
+                  </span>
+                  <input
+                    id="panZoomShowSeconds"
+                    type="range"
+                    min="0"
+                    max="30"
+                    step="0.5"
+                    value="2"
+                  />
+                </label>
+              </li>
+              <li class="pz-step">
+                <span class="pz-step__num">2</span>
+                <label class="pz-step__ctl">
+                  <span class="pz-row__label">
+                    <span>Zoom in</span>
+                    <span><output id="panZoomZoomInValue">2</output> s</span>
+                  </span>
+                  <input
+                    id="panZoomZoomInSeconds"
+                    type="range"
+                    min="0"
+                    max="30"
+                    step="0.5"
+                    value="2"
+                  />
+                </label>
+              </li>
+              <li class="pz-step">
+                <span class="pz-step__num">3</span>
+                <label class="pz-step__ctl">
+                  <span class="pz-row__label">
+                    <span>Pan top → bottom</span>
+                    <span><output id="panZoomPanValue">6</output> s</span>
+                  </span>
+                  <input
+                    id="panZoomPanSeconds"
+                    type="range"
+                    min="0"
+                    max="30"
+                    step="0.5"
+                    value="6"
+                  />
+                </label>
+              </li>
+              <li class="pz-step">
+                <span class="pz-step__num">4</span>
+                <label class="pz-step__ctl">
+                  <span class="pz-row__label">
+                    <span>Zoom out</span>
+                    <span><output id="panZoomZoomOutValue">2</output> s</span>
+                  </span>
+                  <input
+                    id="panZoomZoomOutSeconds"
+                    type="range"
+                    min="0"
+                    max="30"
+                    step="0.5"
+                    value="2"
+                  />
+                </label>
+              </li>
+              <li class="pz-step">
+                <span class="pz-step__num">5</span>
+                <label class="pz-step__ctl">
+                  <span class="pz-row__label">
+                    <span>Show whole image again</span>
+                    <span><output id="panZoomShowEndValue">2</output> s</span>
+                  </span>
+                  <input
+                    id="panZoomShowEndSeconds"
+                    type="range"
+                    min="0"
+                    max="30"
+                    step="0.5"
+                    value="2"
+                  />
+                </label>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </section>
     </main>
     <script type="module" src="./main.js"></script>
   </body>

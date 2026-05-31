@@ -2,7 +2,8 @@ import { describe, expect, it, vi } from "vitest";
 import { createMessageRouter } from "../../lib/background-router.js";
 
 const RUNTIME_ID = "self@example";
-const OWN = { id: RUNTIME_ID };
+// A content-script sender: own extension id + a tab (extension pages have none).
+const OWN = { id: RUNTIME_ID, tab: { id: 1 } };
 
 function makeRouter(overrides = {}) {
   return createMessageRouter({
@@ -184,6 +185,18 @@ describe("createMessageRouter — fetchImage", () => {
     expect(
       await router({ type: "slideshow.fetchImage", payload: {} }, OWN),
     ).toEqual({ ok: false });
+  });
+
+  it("rejects a privileged fetch from a non-content-script sender (no tab)", async () => {
+    const router = makeRouter();
+    const result = await router(
+      {
+        type: "slideshow.fetchImage",
+        payload: { url: "https://i.redd.it/a.jpg" },
+      },
+      { id: RUNTIME_ID }, // an extension page: own id, but no tab
+    );
+    expect(result).toEqual({ ok: false });
   });
 });
 

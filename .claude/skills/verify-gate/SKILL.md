@@ -20,9 +20,8 @@ so the build steps must run before it.
 2. `npm run lint` — ESLint (includes `no-unsanitized` DOM checks). Expect no output.
 3. `npm run format` — Prettier `--check`. If it fails, fix with `npx prettier --write .`, then re-run.
 4. `npm test` — Vitest unit suite. Expect all tests passing.
-5. `npm run build` — Firefox MV3 build → `.output/firefox-mv3/`.
-6. `npm run build:chrome` — Chrome MV3 build → `.output/chrome-mv3/`.
-7. `npm run webext:lint` — Mozilla addons-linter on the built Firefox output. Expect `0 errors, 0 notices, 0 warnings`.
+5. `npm run build` — builds BOTH targets (Firefox MV3 → `.output/firefox-mv3/`, then Chrome MV3 → `.output/chrome-mv3/`). `npm run build:firefox` / `build:chrome` build one.
+6. `npm run webext:lint` — Mozilla addons-linter on the built Firefox output. Expect `0 errors, 0 notices, 0 warnings`.
 
 ## What "green" means
 

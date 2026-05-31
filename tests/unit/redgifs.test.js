@@ -74,6 +74,23 @@ describe("createRedgifsResolver", () => {
     expect(gifCalls).toBe(2);
   });
 
+  it("rejects an mp4 url from an unexpected host", async () => {
+    const fetchImpl = vi.fn(async (/** @type {any} */ url) =>
+      String(url).includes("/auth/temporary")
+        ? jsonResponse({ token: "T" })
+        : jsonResponse({
+            gif: {
+              urls: { hd: "https://evil.example/x.mp4" },
+              hasAudio: false,
+            },
+          }),
+    );
+    const { resolve } = createRedgifsResolver({
+      fetchImpl: /** @type {any} */ (fetchImpl),
+    });
+    await expect(resolve("zzz")).rejects.toThrow(/media host/);
+  });
+
   it("rejects when no mp4 url is present", async () => {
     const fetchImpl = vi.fn(async (/** @type {any} */ url) =>
       String(url).includes("/auth/temporary")

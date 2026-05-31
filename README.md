@@ -77,8 +77,9 @@ startup that you can dismiss).
 
 ```sh
 npm run dev          # WXT dev runner (fresh Firefox profile — not logged in)
-npm run build        # Firefox MV3 build → .output/firefox-mv3/
-npm run build:chrome # Chrome MV3 build → .output/chrome-mv3/
+npm run build        # build BOTH → .output/firefox-mv3/ and .output/chrome-mv3/
+npm run build:firefox # Firefox MV3 only
+npm run build:chrome # Chrome MV3 only
 npm run zip          # packaged zip (Firefox / AMO)
 npm run zip:chrome   # packaged zip (Chrome Web Store)
 npm run icons        # regenerate PNG icons from public/icon.svg (Bash + librsvg/rsvg-convert; macOS/Linux)

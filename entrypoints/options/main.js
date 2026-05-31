@@ -33,9 +33,13 @@ const contentDedup = /** @type {HTMLInputElement} */ (
 const panZoom = /** @type {HTMLInputElement} */ (
   document.querySelector("#panZoom")
 );
+const panZoomCard = /** @type {HTMLElement} */ (
+  document.querySelector("#panZoomCard")
+);
 
 /** Pan-zoom range inputs paired with their <output> id. */
 const PAN_ZOOM_RANGES = [
+  ["panZoomMinOversize", "panZoomMinOversizeValue"],
   ["panZoomScale", "panZoomScaleValue"],
   ["panZoomShowSeconds", "panZoomShowValue"],
   ["panZoomZoomInSeconds", "panZoomZoomInValue"],
@@ -43,6 +47,10 @@ const PAN_ZOOM_RANGES = [
   ["panZoomZoomOutSeconds", "panZoomZoomOutValue"],
   ["panZoomShowEndSeconds", "panZoomShowEndValue"],
 ];
+
+function syncPanZoomEnabled() {
+  panZoomCard.dataset.off = String(!panZoom.checked);
+}
 const panZoomInputs = Object.fromEntries(
   PAN_ZOOM_RANGES.map(([id]) => [
     id,
@@ -67,6 +75,7 @@ async function load() {
     const out = document.querySelector(`#${outId}`);
     if (out) out.textContent = value;
   }
+  syncPanZoomEnabled();
 }
 
 async function persist() {
@@ -79,6 +88,7 @@ async function persist() {
     maxLoadWaitSeconds: Number(maxLoadWait.value),
     contentDedup: contentDedup.checked,
     panZoom: panZoom.checked,
+    panZoomMinOversize: Number(panZoomInputs.panZoomMinOversize.value),
     panZoomScale: Number(panZoomInputs.panZoomScale.value),
     panZoomShowSeconds: Number(panZoomInputs.panZoomShowSeconds.value),
     panZoomZoomInSeconds: Number(panZoomInputs.panZoomZoomInSeconds.value),
@@ -97,7 +107,10 @@ startMuted.addEventListener("change", persist);
 includeNsfw.addEventListener("change", persist);
 dedupe.addEventListener("change", persist);
 maxLoadWait.addEventListener("change", persist);
-panZoom.addEventListener("change", persist);
+panZoom.addEventListener("change", () => {
+  syncPanZoomEnabled();
+  persist();
+});
 
 for (const [id, outId] of PAN_ZOOM_RANGES) {
   const input = panZoomInputs[id];
@@ -108,13 +121,18 @@ for (const [id, outId] of PAN_ZOOM_RANGES) {
   input.addEventListener("change", persist);
 }
 
-// Enabling content dedup requires an optional host permission (read pixels).
+// Enabling content dedup requires an optional host permission (read pixels);
+// disabling it drops that permission again.
 contentDedup.addEventListener("change", async () => {
   if (contentDedup.checked) {
     const granted = await browser.permissions.request({
       origins: CONTENT_DEDUP_ORIGINS,
     });
     if (!granted) contentDedup.checked = false;
+  } else {
+    await browser.permissions
+      .remove({ origins: CONTENT_DEDUP_ORIGINS })
+      .catch(() => {});
   }
   await persist();
 });
