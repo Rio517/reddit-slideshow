@@ -103,6 +103,29 @@ librsvg (`rsvg-convert`), so it runs on macOS/Linux (or WSL), not bare Windows.
 `npm run dev` launches a clean Firefox profile that is **not** logged into
 Reddit, so prefer the temporary-add-on flow above for real testing.
 
+## Publishing
+
+Both stores take the `wxt zip` output; submission is manual (no automated
+release yet). Bump `version` in `package.json` before each release — both
+stores reject a re-used version.
+
+**Firefox (AMO):**
+
+1. `npm run zip` → a `.zip` in `.output/` (built extension + a sources zip).
+2. Submit it as a new version at
+   [addons.mozilla.org/developers](https://addons.mozilla.org/developers/).
+   This extension requests only `storage` plus scoped Reddit/Redgifs hosts and
+   ships no remote code, which keeps review straightforward.
+3. To self-distribute instead of listing, choose **On your own** to get a
+   signed `.xpi`.
+
+**Chrome Web Store:**
+
+1. `npm run zip:chrome` → a `-chrome.zip` in `.output/`.
+2. Upload it at the
+   [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole),
+   complete the listing, and submit for review.
+
 ## Project layout
 
 ```
