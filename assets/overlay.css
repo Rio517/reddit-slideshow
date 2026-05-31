@@ -576,3 +576,108 @@ iframe.reddit-slideshow-media {
 .rs-settings-panel__more:hover {
   text-decoration: underline;
 }
+
+/* The position counter doubles as the jump-to-post toggle. */
+.rs-meta__counter {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.rs-meta__counter:hover {
+  background: rgba(246, 179, 82, 0.16);
+  color: #ffe0b0;
+}
+
+/* Open-original lives in the meta bar now; size it down from the rail buttons. */
+.rs-meta__open {
+  width: 30px;
+  height: 30px;
+}
+
+.rs-meta__open:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.rs-meta__open .rs-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Jump-to-post list */
+.rs-jump-panel {
+  position: absolute;
+  left: 26px;
+  bottom: 72px;
+  z-index: 8;
+  width: min(340px, 72vw);
+  max-height: 60vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 8px;
+  border-radius: 12px;
+  background: rgba(10, 12, 18, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+}
+
+.rs-jump-panel[hidden] {
+  display: none;
+}
+
+.rs-jump-panel__title {
+  margin: 2px 8px 8px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--rs-muted);
+}
+
+.rs-jump-panel__item {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  font: inherit;
+  font-size: 13px;
+  color: var(--rs-fg);
+  background: transparent;
+  border: none;
+  border-radius: 7px;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.rs-jump-panel__item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.rs-jump-panel__item--current {
+  background: rgba(246, 179, 82, 0.14);
+}
+
+.rs-jump-panel__num {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  color: var(--rs-accent);
+  text-align: right;
+}
+
+.rs-jump-panel__text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rs-jump-panel__item--current .rs-jump-panel__text {
+  color: var(--rs-accent);
+}

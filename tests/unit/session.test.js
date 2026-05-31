@@ -392,6 +392,7 @@ describe("createSlideshowSession", () => {
       setBuffering() {},
       setPlaying() {},
       restartTimer() {},
+      setJumpList() {},
       renderCurrent: (/** @type {any} */ slide, /** @type {any} */ info) =>
         renders.push({ slide, info }),
     });
@@ -437,6 +438,33 @@ describe("createSlideshowSession", () => {
     expect(renders[1].slide.id).toBe("small");
     expect(renders[1].info.panZoom).toBeNull(); // too small → no pan-zoom
     expect(renders[1].info.effectiveSeconds).toBe(5); // normal image timer
+  });
+
+  it("jumps to a loaded post from the counter list", async () => {
+    const { session } = makeSession({
+      pages: [
+        {
+          slides: [imageSlide("a"), imageSlide("b"), imageSlide("c")],
+          after: null,
+          exhausted: true,
+          postsScanned: 3,
+        },
+      ],
+    });
+    await session.start();
+    session.handleKeydown(key("ArrowRight")); // -> b
+    session.handleKeydown(key("ArrowRight")); // -> c
+    expect(mediaSrc()).toBe("https://i.redd.it/c.jpg");
+
+    // Open the jump list from the counter, then click the first post.
+    /** @type {HTMLElement} */ (
+      document.querySelector(`${ROOT} .rs-meta__counter`)
+    ).click();
+    const items = document.querySelectorAll(`${ROOT} .rs-jump-panel__item`);
+    expect(items.length).toBe(3);
+    /** @type {HTMLElement} */ (items[0]).click();
+    expect(mediaSrc()).toBe("https://i.redd.it/a.jpg");
+    expect(text(".rs-meta__counter")).toBe("1 / 3");
   });
 
   it("persists the mute preference when toggled", async () => {
