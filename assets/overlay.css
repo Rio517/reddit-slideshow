@@ -1136,3 +1136,38 @@ iframe.reddit-slideshow-media {
 .rs-jump-panel__item--current .rs-jump-panel__text {
   color: var(--rs-accent);
 }
+
+/* Thin, theme-matched scrollbars for the scrollable panels. */
+.rs-jump-panel,
+.rs-skipped-panel,
+.rs-settings-panel {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.24) transparent;
+}
+
+.rs-jump-panel::-webkit-scrollbar,
+.rs-skipped-panel::-webkit-scrollbar,
+.rs-settings-panel::-webkit-scrollbar {
+  width: 9px;
+}
+
+.rs-jump-panel::-webkit-scrollbar-track,
+.rs-skipped-panel::-webkit-scrollbar-track,
+.rs-settings-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.rs-jump-panel::-webkit-scrollbar-thumb,
+.rs-skipped-panel::-webkit-scrollbar-thumb,
+.rs-settings-panel::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.rs-jump-panel::-webkit-scrollbar-thumb:hover,
+.rs-skipped-panel::-webkit-scrollbar-thumb:hover,
+.rs-settings-panel::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(246, 179, 82, 0.55);
+}
