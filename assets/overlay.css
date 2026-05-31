@@ -424,6 +424,7 @@ iframe.reddit-slideshow-media {
 .rs-meta__title {
   color: var(--rs-muted);
   font-size: 14px;
+  font-weight: 300;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1373,10 +1374,13 @@ iframe.reddit-slideshow-media {
 
 .rs-help-panel__keys {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  /* Right-align in a fixed-width column so every description starts at the same
+     x and a wide chord (Page Up / Page Down) wraps instead of leaking across. */
+  justify-content: flex-end;
   gap: 5px;
-  flex: 0 0 auto;
-  min-width: 118px;
+  flex: 0 0 132px;
 }
 
 .rs-help-panel__key {
