@@ -425,6 +425,7 @@ iframe.reddit-slideshow-media {
 }
 
 #reddit-slideshow-root.rs-idle .rs-controls,
+#reddit-slideshow-root.rs-idle .rs-close-top,
 #reddit-slideshow-root.rs-idle .rs-meta {
   opacity: 0;
   pointer-events: none;
@@ -471,6 +472,84 @@ iframe.reddit-slideshow-media {
 .rs-btn:focus-visible {
   outline: 2px solid var(--rs-accent);
   outline-offset: 2px;
+}
+
+/* Close button — standalone in the top-right corner, off the rail. */
+.rs-close-top {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  z-index: 7;
+  background: rgba(10, 12, 18, 0.62);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.5);
+  transition:
+    opacity 0.35s ease,
+    background 0.2s ease,
+    transform 0.12s ease;
+}
+
+/* Confirm popover for an accidental backdrop click. */
+.rs-confirm {
+  position: fixed;
+  z-index: 9;
+  /* Anchored at the click point, dropped just below it. */
+  transform: translate(-50%, 14px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(10, 12, 18, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6);
+}
+
+.rs-confirm[hidden] {
+  display: none;
+}
+
+.rs-confirm__text {
+  margin: 0;
+  font-size: 13px;
+  color: var(--rs-fg);
+}
+
+.rs-confirm__actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.rs-confirm__btn {
+  font: inherit;
+  font-size: 13px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: transparent;
+  color: var(--rs-fg);
+  cursor: pointer;
+}
+
+.rs-confirm__btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.rs-confirm__btn--danger {
+  background: var(--rs-accent);
+  color: #0b0d12;
+  border-color: transparent;
+  font-weight: 600;
+}
+
+.rs-confirm__btn--danger:hover {
+  background: var(--rs-accent);
+  filter: brightness(1.08);
 }
 
 .rs-icon {

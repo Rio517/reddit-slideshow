@@ -237,7 +237,7 @@ describe("createOverlay", () => {
     expect(video?.getAttribute("src")).toBe("blob:fake-123");
   });
 
-  it("closes on a backdrop click, but not on the media or a control", () => {
+  it("a backdrop click asks before closing; media/control clicks do not", () => {
     const onClose = vi.fn();
     const overlay = createOverlay({ ...noopHandlers(), onClose });
     overlay.renderCurrent(imageSlide(), {
@@ -254,8 +254,73 @@ describe("createOverlay", () => {
     click(overlay.root.querySelector(".rs-btn")); // a control — no close
     expect(onClose).not.toHaveBeenCalled();
 
-    click(overlay.root.querySelector(".rs-stage")); // backdrop — closes
+    // A backdrop click guards against an accidental click — it confirms first.
+    click(overlay.root.querySelector(".rs-stage"));
+    expect(onClose).not.toHaveBeenCalled();
+    const confirm = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-confirm")
+    );
+    expect(confirm?.hidden).toBe(false);
+    click(overlay.root.querySelector(".rs-confirm__btn--danger")); // "Close"
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("the X button and Keep-watching skip / dismiss the confirm", () => {
+    const onClose = vi.fn();
+    const overlay = createOverlay({ ...noopHandlers(), onClose });
+    const click = (/** @type {Element | null | undefined} */ el) =>
+      el?.dispatchEvent(new Event("click", { bubbles: true }));
+    const confirm = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-confirm")
+    );
+
+    // The X (top-right) closes immediately, no confirm.
+    clickByLabel(overlay.root, "Close");
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(confirm?.hidden).toBe(true);
+
+    // A backdrop click then "Keep watching" dismisses without closing.
+    click(overlay.root.querySelector(".rs-stage"));
+    expect(confirm?.hidden).toBe(false);
+    const keep = [...overlay.root.querySelectorAll(".rs-confirm__btn")].find(
+      (b) => !b.classList.contains("rs-confirm__btn--danger"),
+    );
+    click(keep);
+    expect(confirm?.hidden).toBe(true);
+    expect(onClose).toHaveBeenCalledTimes(1); // still just the X
+  });
+
+  it("puts the close button in the top-right corner, off the control rail", () => {
+    const overlay = createOverlay(noopHandlers());
+    const close = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector('[aria-label^="Close"]')
+    );
+    expect(close?.classList.contains("rs-close-top")).toBe(true);
+    expect(overlay.root.querySelector(".rs-controls .rs-close-top")).toBeNull();
+  });
+
+  it("keeps the controls up while the pointer rests on them", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    overlay.root.dispatchEvent(new Event("mouseleave")); // force idle
+    expect(overlay.root.classList.contains("rs-idle")).toBe(true);
+    overlay.root
+      .querySelector(".rs-controls")
+      ?.dispatchEvent(new Event("mouseenter"));
+    expect(overlay.root.classList.contains("rs-idle")).toBe(false);
+  });
+
+  it("dismisses an open settings panel when the overlay goes idle", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    clickByLabel(overlay.root, "Settings");
+    const panel = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-settings-panel")
+    );
+    expect(panel?.hidden).toBe(false);
+    overlay.root.dispatchEvent(new Event("mouseleave")); // leave → idle
+    expect(panel?.hidden).toBe(true);
+    expect(overlay.root.classList.contains("rs-idle")).toBe(true);
   });
 
   it("renders a status message", () => {
