@@ -85,7 +85,7 @@ NICE TOUCHES
 
 - Slide transitions: fade, slide, push, zoom, flip, or none
 - Optional top countdown timer bar (on video slides, every slide, or never)
-- Optional Ken Burns pan & zoom for images too big to see at once
+- Optional slow pan & zoom for images too big to see at once
 - A pinned position counter and post title so you always know where you are
 - "Open in a window" reopens the slideshow in a minimal popup window — handy for
   AirPlay / casting to a second screen

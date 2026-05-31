@@ -1,11 +1,16 @@
 # Reddit Slideshow Spectacular!
 
-Slideshow for videos and images in your reddit feed. Uses your current page/feed view.
+A full-screen, keyboard-driven slideshow of the images and videos in **your own
+Reddit** — the feed you're already looking at. Open your Home feed, a community
+you've joined, one of your Custom Feeds (multireddits), any subreddit, your saved
+posts, or a search on `old.reddit.com` or `www.reddit.com`, hit the toolbar icon
+(or **Alt+Shift+S**), and that exact view becomes the slideshow.
 
-From either `old.reddit.com` or `www.reddit.com`, click to create a full-screen,
-keyboard-driven media slideshow. It reuses your existing logged-in Reddit
-session — no API keys — and resolves direct images, galleries, Reddit-hosted
-video, Redgifs, and crossposts.
+**Private, and built on your existing setup.** It reuses your logged-in Reddit
+session — no API keys, no separate account, nothing to re-subscribe to — and runs
+entirely in your browser. No analytics, no tracking, no developer servers (there
+are none); your settings stay on your device. It plays direct images, galleries,
+Reddit-hosted video, Redgifs, Imgur, Streamable, Giphy, Catbox, and crossposts.
 
 <a href="docs/slideshow-demo.png">
   <img src="docs/slideshow-demo.png" width="820"
@@ -14,40 +19,36 @@ video, Redgifs, and crossposts.
 
 ## Features
 
--
-
-- Launch slideshow from any `old.reddit.com` or `www.reddit.com` feed via
-  toolbar icon or **Alt+Shift+S**.
-- Auto-advance or use arrows, videos advance when they finish.
-- Infinite pages
-- Skip duplicates: reposts, crossposts, repeated
-  galleries
+- Launch from any `old.reddit.com` or `www.reddit.com` feed via the toolbar icon
+  or **Alt+Shift+S** — it starts at the post nearest your scroll position.
+- Auto-advance on a timer or arrow through manually; videos advance when they end.
+- Pages forever — follows Reddit's pagination so the show keeps going.
 - Per-kind rendering: `<img>` for images/galleries and native `<video>` for
-  `v.redd.it` and some external providers, including redgifs.
-- Broken media is skipped.
-- Configure: image timer, max load wait, autoplay, start-muted, Include-NSFW
-  filter, and duplicate skipping — open them from the overlay's gear, and
-  changes apply live without a reload.
+  `v.redd.it`, Redgifs, Imgur, Streamable, Giphy, and Catbox.
+- Skips duplicates (reposts, crossposts, repeated galleries) and broken media.
+- Lots to tune from the overlay's gear, applied live with no reload — see
+  [Settings](#settings).
 
-## Screenshots
+## Settings
 
-The shot at the top is the slideshow in action. The options page (click to
-enlarge):
+Tune it from the gear in the overlay or the full options page — changes apply
+live, no reload:
 
-<p>
-  <a href="docs/screenshots/options-light.png">
-    <img src="docs/screenshots/options-light.png" width="360"
-      alt="Reddit Slideshow Spectacular! options page">
-  </a>
-</p>
+- **Seconds per image** — and how long to wait for slow media before skipping it
+- **Slide transition** — fade, slide, push, zoom, flip, or none
+- **Top countdown bar** — on video slides, every slide, or never
+- **Autoplay videos** and **start muted**
+- **Include NSFW** — follows your logged-in Reddit session by default
+- **Skip duplicates** — reposts, crossposts, repeated galleries; optionally also
+  re-uploaded images via a local perceptual hash (opt-in)
+- **Pan & zoom** for images too big to see at once — a slow push-in and drift
+  across, with full control of the sequence
+- **Always show the position counter & title**
 
-Regenerate the shots and the add-on-store assets anytime with `npm run
-screenshots` — it builds the Firefox extension, serves the output, and uses
-Playwright/Chromium to capture a slideshow shot (`docs/screenshots/slideshow.png`)
-plus the options page in light and dark
-(`docs/screenshots/options-{light,dark}.png`) for the store listings. The Chromium
-binary isn't fetched by `npm install` — run `npx playwright install chromium` once
-first.
+> Maintainer note: `npm run screenshots` regenerates the add-on-store assets — a
+> slideshow shot plus the options page in light and dark. The Chromium binary
+> isn't fetched by `npm install`, so run `npx playwright install chromium` once
+> first.
 
 ## Install
 
