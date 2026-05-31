@@ -84,12 +84,19 @@ describe("createOverlay", () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
 
-  it("builds the chrome with eight controls, hidden by default", () => {
+  it("builds the chrome with nine controls, hidden by default", () => {
     const overlay = createOverlay(noopHandlers());
     expect(overlay.root.querySelector(".rs-stage")).toBeTruthy();
     expect(overlay.root.querySelector(".rs-timer")).toBeTruthy();
-    expect(overlay.root.querySelectorAll(".rs-btn").length).toBe(8);
+    expect(overlay.root.querySelectorAll(".rs-btn").length).toBe(9);
     expect(overlay.isOpen()).toBe(false);
+  });
+
+  it("wires the popout control to onPopout", () => {
+    const onPopout = vi.fn();
+    const overlay = createOverlay({ ...noopHandlers(), onPopout });
+    clickByLabel(overlay.root, "Open in a window");
+    expect(onPopout).toHaveBeenCalledTimes(1);
   });
 
   it("a backdrop click with the settings panel open closes the panel, not the show", () => {

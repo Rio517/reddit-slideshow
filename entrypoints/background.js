@@ -35,6 +35,9 @@ export default defineBackground(() => {
     // Redgifs mp4 bytes, played back as a blob to dodge CDN hotlink protection.
     fetchMediaBytes: (url) => fetchCappedBytes(url, MAX_MEDIA_BYTES),
     openOptionsPage: () => browser.runtime.openOptionsPage(),
+    // Minimal popup window (no tab strip / toolbar / URL bar) for AirPlay.
+    openPopout: (url) =>
+      browser.windows.create({ url, type: "popup", width: 1280, height: 800 }),
   });
   browser.runtime.onMessage.addListener(router);
 

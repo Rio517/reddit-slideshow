@@ -6,6 +6,9 @@ import { listingPostElements, postFullname } from "@/lib/reddit-dom.js";
 import { createSlideshowSession } from "@/lib/session.js";
 import { differenceHash, luminanceFromImageData } from "@/lib/dedup.js";
 
+// URL fragment a popout window carries so its content script auto-starts.
+const POPOUT_MARKER = "rs-slideshow";
+
 export default defineContentScript({
   matches: ["https://old.reddit.com/*", "https://www.reddit.com/*"],
   cssInjectionMode: "manifest",
@@ -44,6 +47,18 @@ export default defineContentScript({
       openPreferences: () => {
         browser.runtime
           .sendMessage({ type: "slideshow.openOptions" })
+          .catch(() => {});
+      },
+      // Re-open the current feed in a minimal popup window (for AirPlay); the
+      // marker tells that window's content script to auto-start.
+      openPopout: () => {
+        const url = new URL(window.location.href);
+        url.hash = POPOUT_MARKER;
+        browser.runtime
+          .sendMessage({
+            type: "slideshow.openPopout",
+            payload: { url: url.toString() },
+          })
           .catch(() => {});
       },
       // Proxied media (Redgifs): the background fetches the mp4 bytes (no reddit
@@ -113,5 +128,10 @@ export default defineContentScript({
       session.start();
       return Promise.resolve({ ok: true });
     });
+
+    // A popout window opens the feed with the marker fragment; auto-start there.
+    if (window.location.hash === `#${POPOUT_MARKER}`) {
+      session.start();
+    }
   },
 });

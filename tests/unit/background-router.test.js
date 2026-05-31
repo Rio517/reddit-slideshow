@@ -286,3 +286,45 @@ describe("createMessageRouter — openOptions", () => {
     expect(openOptionsPage).not.toHaveBeenCalled();
   });
 });
+
+describe("createMessageRouter — openPopout", () => {
+  const popoutMsg = (/** @type {string} */ url) => ({
+    type: "slideshow.openPopout",
+    payload: { url },
+  });
+
+  it("opens a popout for a Reddit URL from a content script", async () => {
+    const openPopout = vi.fn();
+    const router = makeRouter({ openPopout });
+    const result = await router(
+      popoutMsg("https://www.reddit.com/r/x/#rs-slideshow"),
+      OWN,
+    );
+    expect(openPopout).toHaveBeenCalledWith(
+      "https://www.reddit.com/r/x/#rs-slideshow",
+    );
+    expect(result).toEqual({ ok: true });
+  });
+
+  it("refuses a non-Reddit or non-HTTPS popout URL", async () => {
+    const openPopout = vi.fn();
+    const router = makeRouter({ openPopout });
+    expect(await router(popoutMsg("https://evil.example/x"), OWN)).toEqual({
+      ok: false,
+    });
+    expect(await router(popoutMsg("http://old.reddit.com/r/x/"), OWN)).toEqual({
+      ok: false,
+    });
+    expect(openPopout).not.toHaveBeenCalled();
+  });
+
+  it("refuses a popout request from an extension page (no tab)", async () => {
+    const openPopout = vi.fn();
+    const router = makeRouter({ openPopout });
+    const result = await router(popoutMsg("https://old.reddit.com/r/x/"), {
+      id: RUNTIME_ID,
+    });
+    expect(result).toEqual({ ok: false });
+    expect(openPopout).not.toHaveBeenCalled();
+  });
+});
