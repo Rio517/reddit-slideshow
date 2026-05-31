@@ -1,0 +1,22 @@
+{
+  "kind": "Listing",
+  "data": {
+    "after": "t3_catbox_after",
+    "before": null,
+    "children": [
+      {
+        "kind": "t3",
+        "data": {
+          "name": "t3_cat1",
+          "title": "Catbox clip",
+          "permalink": "/r/example/comments/cat1/catbox_clip/",
+          "domain": "files.catbox.moe",
+          "is_video": false,
+          "over_18": false,
+          "url": "https://files.catbox.moe/abcd12.mp4",
+          "url_overridden_by_dest": "https://files.catbox.moe/abcd12.mp4"
+        }
+      }
+    ]
+  }
+}

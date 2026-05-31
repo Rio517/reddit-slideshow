@@ -5,6 +5,7 @@ import galleryFixture from "../fixtures/reddit-json/gallery.json";
 import videoFixture from "../fixtures/reddit-json/reddit-video.json";
 import redgifsFixture from "../fixtures/reddit-json/redgifs.json";
 import imgurGifvFixture from "../fixtures/reddit-json/imgur-gifv.json";
+import catboxVideoFixture from "../fixtures/reddit-json/catbox-video.json";
 import crosspostFixture from "../fixtures/reddit-json/crosspost.json";
 
 describe("slidesFromListing", () => {
@@ -273,6 +274,48 @@ describe("Imgur .gifv posts", () => {
       kind: "video",
       mediaUrl: "https://i.imgur.com/ZyXwV9.mp4",
       proxied: true,
+    });
+  });
+});
+
+describe("Catbox video posts", () => {
+  it("plays a files.catbox.moe .mp4 as a direct (non-proxied) native video", () => {
+    const slides = slidesFromListing(catboxVideoFixture);
+    expect(slides[0]).toMatchObject({
+      id: "t3_cat1:0",
+      postId: "t3_cat1",
+      provider: "catbox",
+      kind: "video",
+      mediaUrl: "https://files.catbox.moe/abcd12.mp4",
+      sourceUrl: "https://files.catbox.moe/abcd12.mp4",
+      permalink: "https://old.reddit.com/r/example/comments/cat1/catbox_clip/",
+      title: "Catbox clip",
+      durationMode: "media",
+      mimeType: "video/mp4",
+      filenameHint: "t3_cat1-catbox-clip.mp4",
+    });
+    expect(slides[0].proxied).toBeUndefined(); // direct play, no background fetch
+  });
+
+  it("ignores a non-video catbox file (handled by the image path)", () => {
+    const slides = slidesFromListing({
+      data: {
+        children: [
+          {
+            kind: "t3",
+            data: {
+              name: "t3_cat2",
+              title: "Catbox image",
+              permalink: "/r/x/comments/cat2/img/",
+              url_overridden_by_dest: "https://files.catbox.moe/pic.png",
+            },
+          },
+        ],
+      },
+    });
+    expect(slides[0]).toMatchObject({
+      kind: "image",
+      provider: "reddit-image",
     });
   });
 });

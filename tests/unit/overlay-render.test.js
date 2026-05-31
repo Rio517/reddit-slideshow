@@ -96,6 +96,27 @@ describe("renderSlide", () => {
     );
   });
 
+  it("allows a direct Catbox video host", () => {
+    const el = renderSlide(
+      slide({
+        provider: "catbox",
+        kind: "video",
+        mediaUrl: "https://files.catbox.moe/abcd12.mp4",
+        mimeType: "video/mp4",
+      }),
+    );
+    expect(el.getAttribute("src")).toBe("https://files.catbox.moe/abcd12.mp4");
+    expect(
+      mediaUrlIsSafe(
+        slide({
+          provider: "catbox",
+          kind: "video",
+          mediaUrl: "https://files.catbox.moe/abcd12.mp4",
+        }),
+      ),
+    ).toBe(true);
+  });
+
   it("treats an embed as unsafe when its embedUrl is rejected (off-host/empty)", () => {
     const embed = (
       /** @type {Partial<import("../../lib/slides.js").Slide>} */ o,
