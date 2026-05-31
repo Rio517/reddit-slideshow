@@ -500,6 +500,7 @@ iframe.reddit-slideshow-media {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-width: 240px;
   padding: 14px 16px;
   border-radius: 12px;
   background: rgba(10, 12, 18, 0.96);
@@ -534,6 +535,8 @@ iframe.reddit-slideshow-media {
   background: transparent;
   color: var(--rs-fg);
   cursor: pointer;
+  /* Keep "Keep watching (5s)" on one line. */
+  white-space: nowrap;
 }
 
 .rs-confirm__btn:hover {

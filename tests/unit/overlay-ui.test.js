@@ -290,6 +290,27 @@ describe("createOverlay", () => {
     expect(onClose).toHaveBeenCalledTimes(1); // still just the X
   });
 
+  it("counts down in the Keep-watching button and auto-dismisses", () => {
+    const onClose = vi.fn();
+    const overlay = createOverlay({ ...noopHandlers(), onClose });
+    const click = (/** @type {Element | null | undefined} */ el) =>
+      el?.dispatchEvent(new Event("click", { bubbles: true }));
+    click(overlay.root.querySelector(".rs-stage"));
+    const confirm = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-confirm")
+    );
+    const keep = [...overlay.root.querySelectorAll(".rs-confirm__btn")].find(
+      (b) => !b.classList.contains("rs-confirm__btn--danger"),
+    );
+    expect(keep?.textContent).toBe("Keep watching (5s)");
+    vi.advanceTimersByTime(1000);
+    expect(keep?.textContent).toBe("Keep watching (4s)");
+    vi.advanceTimersByTime(4000); // reaches 0 → self-dismiss
+    expect(confirm?.hidden).toBe(true);
+    expect(keep?.textContent).toBe("Keep watching"); // reset
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
   it("puts the close button in the top-right corner, off the control rail", () => {
     const overlay = createOverlay(noopHandlers());
     const close = /** @type {HTMLElement | null} */ (

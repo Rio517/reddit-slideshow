@@ -26,6 +26,8 @@ export default [
         createImageBitmap: "readonly",
         setTimeout: "readonly",
         clearTimeout: "readonly",
+        setInterval: "readonly",
+        clearInterval: "readonly",
         defineBackground: "readonly",
         defineContentScript: "readonly",
       },
