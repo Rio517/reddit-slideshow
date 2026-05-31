@@ -1,10 +1,10 @@
-# Privacy Policy - Reddit Slideshow
+# Privacy Policy - Reddit Slideshow Spectacular!
 
 _Last updated: 2026-05-31_
 
-**Short version: Reddit Slideshow collects nothing, sends nothing to the
-developer, and has no analytics, tracking, ads, or accounts. Everything it does
-happens locally in your browser.** The extension turns a Reddit listing you are
+**Short version: Reddit Slideshow Spectacular! collects nothing, sends nothing to
+the developer, and has no analytics, tracking, ads, or accounts. Everything it
+does happens locally in your browser.** The extension turns a Reddit listing you are
 already viewing into a full-screen media slideshow.
 
 ## What the extension stores
@@ -17,8 +17,9 @@ information. Removing the extension removes them.
 
 ## Network requests the extension makes
 
-Requests go only to Reddit, Reddit's own media servers, and (for Redgifs posts)
-Redgifs. Never to any server operated by the developer (there is none):
+Requests go only to Reddit, Reddit's own media servers, and the content providers
+a post links to (Imgur, Redgifs, Streamable, Giphy, Catbox). Never to any server
+operated by the developer (there is none):
 
 - **Listing data.** To build the slideshow, the extension fetches the JSON for
   the listing you are on (`old.reddit.com` / `www.reddit.com`). This request
@@ -27,19 +28,23 @@ Redgifs. Never to any server operated by the developer (there is none):
   content only if your own Reddit account/session allows it. The request is made
   from the extension's background context; your cookies are sent **to Reddit
   only** and are never read, stored, or transmitted elsewhere by the extension.
-- **Media.** Images and videos are loaded directly from Reddit's media hosts
-  (`i.redd.it`, `v.redd.it`) by your browser to display each slide, the same way
-  they would load on Reddit itself.
-- **Redgifs clips.** When a post links to Redgifs, the extension's background
-  contacts Redgifs to play the clip as a normal video: it requests the clip's
-  metadata and direct video URL from `api.redgifs.com`, then downloads the video
-  from `media.redgifs.com`. Both requests are made **without cookies**
-  (`credentials: "omit"`) and with no referrer; Redgifs receives only what any
-  request to load that clip would (e.g. your IP address and standard request
-  data), subject to [Redgifs' own privacy policy](https://www.redgifs.com/privacy).
-  The extension sends Redgifs no account information or tracking of its own. (If
-  Redgifs can't be reached, the clip falls back to Redgifs' standard `<iframe>`
-  embed, loaded by your browser the same way Reddit embeds it.)
+- **Media.** Images and videos are loaded directly by your browser from wherever
+  the post links - Reddit's own hosts (`i.redd.it`, `v.redd.it`), Catbox
+  (`files.catbox.moe`), and other image hosts - the same way they would load on
+  Reddit itself.
+- **Provider clips.** Some providers don't expose a directly-playable URL, so the
+  extension's background plays their clips as native video: it fetches the video
+  bytes from the provider's media host (`media.redgifs.com`, `i.imgur.com`,
+  `*.streamable.com`, `*.giphy.com`) and, for Redgifs and Streamable, first
+  resolves the direct URL from the provider's API (`api.redgifs.com`,
+  `api.streamable.com`). These requests are made **without cookies**
+  (`credentials: "omit"`) and with no referrer; each provider receives only what
+  any request to load that clip would (e.g. your IP address and standard request
+  data), subject to that provider's own privacy policy (e.g.
+  [Redgifs'](https://www.redgifs.com/privacy)). The extension sends no account
+  information or tracking of its own. (If Redgifs or Streamable can't be reached,
+  the clip falls back to the provider's standard `<iframe>` embed, loaded by your
+  browser the same way Reddit embeds it.)
 - **Optional re-upload detection (off by default).** If you turn on "Also detect
   re-uploaded images," the extension fetches preview images from
   `preview.redd.it` / `external-preview.redd.it` to compute a local perceptual
@@ -51,12 +56,16 @@ Redgifs. Never to any server operated by the developer (there is none):
 ## Permissions and why they are needed
 
 - **`storage`** - to save your settings locally (above).
-- **Host access to `old.reddit.com`, `www.reddit.com`, `i.redd.it`,
-  `v.redd.it`** - to read the listing JSON and load slide media.
-- **Host access to `api.redgifs.com`, `media.redgifs.com`** - to resolve and
-  play Redgifs clips as native video.
-- **Optional host access to `preview.redd.it`, `external-preview.redd.it`** -
-  requested only if you enable re-upload detection.
+- **Host access to `old.reddit.com`, `www.reddit.com`** - to read the listing
+  JSON for the page you are on. (Reddit media on `i.redd.it` / `v.redd.it` and
+  other image hosts loads directly in the page and needs no permission.)
+- **Host access to `api.redgifs.com`, `media.redgifs.com`, `i.imgur.com`,
+  `*.streamable.com`, `*.giphy.com`** - so the background can resolve and fetch
+  provider clips (Redgifs, Imgur, Streamable, Giphy) and play them as native
+  video. These fetches are made without cookies.
+- **Optional host access to `i.redd.it`, `preview.redd.it`,
+  `external-preview.redd.it`** - requested only if you enable re-upload
+  detection, to fetch images for local perceptual hashing.
 
 The extension requests no other permissions: no browsing history, no bookmarks,
 no access to other sites, and no remote code.

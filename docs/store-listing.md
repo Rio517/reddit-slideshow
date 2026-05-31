@@ -32,17 +32,18 @@ keep it (Yahoo!-style mid-sentence).
 
 **Chrome Web Store - short description (must be ≤ 132 chars):**
 
-> Turn any Reddit listing into a full-screen, keyboard-driven media slideshow:
-> images, galleries, Reddit video, and Redgifs.
+> Turn any Reddit feed into a full-screen, keyboard-driven media slideshow -
+> images, galleries, video, Redgifs, Imgur, and more.
 
-(122 characters.)
+(126 characters.)
 
 **AMO - short "summary" field:**
 
 > Turn the Reddit listing you're already viewing into a full-screen,
 > keyboard-driven media slideshow. Works on old and new Reddit, reuses your
-> logged-in session (no API keys), and plays images, galleries, Reddit-hosted
-> video, and Redgifs. No analytics, no tracking, settings stored locally.
+> logged-in session (no API keys), and plays images, galleries, video, and clips
+> from Redgifs, Imgur, Streamable, Giphy, and Catbox. No analytics, no tracking,
+> settings stored locally.
 
 ---
 
@@ -63,7 +64,8 @@ WHAT IT PLAYS
 - Direct Reddit images (full-resolution i.redd.it where available)
 - Reddit galleries, expanded into one slide per image
 - Reddit-hosted video (v.redd.it)
-- Redgifs clips, played as native video
+- Redgifs, Imgur (.gifv), Streamable, and Giphy clips, played as native video
+- Catbox video and image files
 - Crossposts, resolved to the original post's media
 
 The queue is media-only: text/self posts, outbound article links, stickied
@@ -95,21 +97,22 @@ NICE TOUCHES
 
 SETTINGS (apply live, no reload)
 
-- Image timer (1-60s)
+- Time per image (1 second to 5 minutes, on a fine-at-the-low-end scale)
 - Slide transition
 - Timer bar visibility
 - How long to wait for slow media before moving on
-- Autoplay on/off, start muted on/off
+- Autoplay videos on/off, start muted on/off
 - Include NSFW - by default follows your Reddit session, showing over-18 content
   only insofar as your account already does
 - Skip duplicate media; optionally also detect re-uploaded images
-- Pan & zoom, with full control over the pan/zoom sequence
+- Pan & zoom large images (or all images), with full control over the sequence
 
 PRIVACY
 No analytics, no tracking, no ads, no accounts, and no developer servers (there
-are none). The extension only fetches the media you're viewing - from Reddit,
-and from Redgifs for Redgifs links - and stores your settings locally on your
-device. It ships no remote code. Full policy: see the privacy policy link.
+are none). The extension only fetches the media you're viewing: the listing and
+its media from Reddit, and provider clips from Imgur, Redgifs, Streamable, Giphy,
+and Catbox. Your settings are stored locally on your device, and it ships no
+remote code. Full policy: see the privacy policy link.
 
 Built as a Manifest V3 WebExtension for Firefox and Chromium browsers (Chrome,
 Edge, Brave). Open source, MIT licensed.
@@ -150,23 +153,30 @@ Host permissions (install-time):
   the user is viewing, so the slideshow knows which media to show.
 - **https://www.reddit.com/\*** - Same, for new Reddit; the slideshow can be
   launched from either frontend.
-- **https://i.redd.it/\*** - Load Reddit-hosted images to display as slides.
-- **https://v.redd.it/\*** - Load Reddit-hosted video to play as slides.
-- **https://api.redgifs.com/\*** - Resolve a Redgifs link to its direct video
-  URL (and duration/audio info) so the clip can play as native, correctly-timed
-  video. Requested without cookies.
-- **https://media.redgifs.com/\*** - Fetch the Redgifs video bytes in the
-  background (the CDN hotlink-protects against a Reddit referrer), so the clip
-  plays inline. Requested without cookies.
+- **https://api.redgifs.com/\* , https://media.redgifs.com/\*** - Resolve a
+  Redgifs link to its direct video URL and fetch the bytes in the background (the
+  CDN hotlink-protects against a Reddit referrer), so the clip plays as native,
+  correctly-timed video. Requested without cookies.
+- **https://i.imgur.com/\*** - Fetch the .mp4 for an Imgur `.gifv` in the
+  background and play it as a looping video (Imgur hotlink-protects against a
+  Reddit referrer). Requested without cookies.
+- **https://\*.streamable.com/\*** - Resolve a Streamable clip's mp4 via its
+  public API and fetch the bytes from the per-video CDN subdomain. Without
+  cookies.
+- **https://\*.giphy.com/\*** - Fetch a Giphy clip's mp4 from its media CDN and
+  play it as a looping video. Without cookies.
+
+Reddit media (`i.redd.it`, `v.redd.it`) and Catbox files (`files.catbox.moe`)
+load directly in the page as `<img>`/`<video>` and need no host permission.
 
 Optional host permissions (requested at runtime only when the user enables the
-"Also detect re-uploaded images" setting):
+"Also detect re-uploaded images" setting, to fetch images for local perceptual
+hashing; the hash never leaves the device):
 
-- **https://preview.redd.it/\*** - Fetch Reddit preview images to compute a
-  local perceptual hash so re-uploaded images can be skipped. Requested without
-  cookies; the hash never leaves the device.
-- **https://external-preview.redd.it/\*** - Same, for externally-hosted post
-  previews.
+- **https://i.redd.it/\*** - Fetch Reddit-hosted images to hash. (Display of
+  i.redd.it images needs no permission; this is only for the opt-in hashing.)
+- **https://preview.redd.it/\* , https://external-preview.redd.it/\*** - Fetch
+  Reddit preview images (incl. externally-hosted post previews) to hash.
 
 No other permissions are requested: no browsing history, no bookmarks, no
 all-URLs / broad host access, and no remote code.
@@ -194,16 +204,17 @@ Use these answers:
 - User activity (clicks, keystrokes, etc.) - **Not collected**
 - Website content - **Not collected/transmitted by us**; the extension fetches
   the listing JSON and media for the page the user is viewing, directly from
-  Reddit (and Redgifs for Redgifs links), to render the slideshow - none of it
-  is sent anywhere else
+  Reddit and the content providers a post links to (Imgur, Redgifs, Streamable,
+  Giphy, Catbox), to render the slideshow - none of it is sent anywhere else
 
 Plain-language summary to paste where a free-text box is offered:
 
 > Reddit Slideshow Spectacular! collects nothing and sends nothing to the developer - there
 > is no developer server, no analytics, no telemetry, no tracking, no ads, and
 > no accounts. It makes network requests only to Reddit, Reddit's media hosts,
-> and (for Redgifs posts) Redgifs, to fetch the media you're viewing. Redgifs
-> requests are made without cookies. The only thing it stores is your own
+> and the content providers a post links to (Imgur, Redgifs, Streamable, Giphy,
+> Catbox), to fetch the media you're viewing; those provider requests are made
+> without cookies. The only thing it stores is your own
 > settings, kept locally via the browser's extension storage; removing the
 > extension removes them. The extension contains no remote code.
 
@@ -262,15 +273,16 @@ want a third tile.)
 - **old.reddit.com / www.reddit.com** - Read the listing JSON for the page the
   user launched the slideshow from (either Reddit frontend) to build and
   paginate the slide queue.
-- **i.redd.it / v.redd.it** - Load Reddit-hosted images and video to display as
-  slides.
-- **api.redgifs.com / media.redgifs.com** - Resolve and fetch Redgifs clips so
-  they play as native, correctly-timed video instead of an opaque embed (both
-  requested without cookies).
-- **preview.redd.it / external-preview.redd.it (optional)** - Requested only at
-  runtime, and only if the user turns on "Also detect re-uploaded images," to
-  fetch preview images for an on-device perceptual hash so duplicate re-uploads
-  can be skipped.
+- **api.redgifs.com / media.redgifs.com / i.imgur.com / \*.streamable.com /
+  \*.giphy.com** - Resolve and fetch provider clips (Redgifs, Imgur `.gifv`,
+  Streamable, Giphy) in the background so they play as native, correctly-timed
+  video instead of an opaque embed (all requested without cookies). Reddit media
+  (i.redd.it, v.redd.it) and Catbox files load directly in the page and need no
+  permission.
+- **i.redd.it / preview.redd.it / external-preview.redd.it (optional)** -
+  Requested only at runtime, and only if the user turns on "Also detect
+  re-uploaded images," to fetch images for an on-device perceptual hash so
+  duplicate re-uploads can be skipped.
 
 ---
 
@@ -280,8 +292,9 @@ want a third tile.)
 > source builds the Firefox and Chrome packages. There is NO minified, obscured,
 > remote, or eval'd code - all logic ships in readable JS, and no script is
 > loaded from a remote server. No developer backend exists; the extension talks
-> only to Reddit, Reddit's media hosts, and (for Redgifs links) Redgifs, to
-> fetch the media being viewed. Settings are stored locally via storage.local.
+> only to Reddit, Reddit's media hosts, and the content providers a post links to
+> (Imgur, Redgifs, Streamable, Giphy, Catbox), to fetch the media being viewed.
+> Settings are stored locally via storage.local.
 >
 > How to test: sign in to Reddit, open any media-heavy listing on
 > old.reddit.com or www.reddit.com (e.g. https://old.reddit.com/r/aww/), and
