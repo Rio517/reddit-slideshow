@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createSettingsPanel } from "../../lib/overlay-settings.js";
+import {
+  imageTimerStopIndex,
+  imageTimerStopSeconds,
+} from "../../lib/settings.js";
 
 afterEach(() => {
   document.body.innerHTML = "";
@@ -39,7 +43,8 @@ describe("createSettingsPanel", () => {
     const checks = /** @type {NodeListOf<HTMLInputElement>} */ (
       document.querySelectorAll(".rs-set__check input")
     );
-    expect(range.value).toBe("8");
+    // The range is an index into the non-linear stops; 8s -> its stop index.
+    expect(range.value).toBe(String(imageTimerStopIndex(8)));
     // Max load wait now lives only in the full options page.
     expect(document.querySelector(".rs-set__select")).toBeNull();
     // autoplay, start-muted, NSFW, dedupe, pan-zoom, always-show-meta — all false here
@@ -58,9 +63,12 @@ describe("createSettingsPanel", () => {
     const range = /** @type {HTMLInputElement} */ (
       document.querySelector(".rs-set__range")
     );
-    range.value = "15";
+    // Move to a stop index; the panel emits that stop's seconds.
+    range.value = "10";
     range.dispatchEvent(new Event("change", { bubbles: true }));
-    expect(onChange).toHaveBeenCalledWith({ imageTimerSeconds: 15 });
+    expect(onChange).toHaveBeenCalledWith({
+      imageTimerSeconds: imageTimerStopSeconds(10),
+    });
   });
 
   it("reflects and emits the timer-bar radio", () => {

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createOverlay } from "../../lib/overlay-ui.js";
 import { createSlideshowSession } from "../../lib/session.js";
+import { imageTimerStopSeconds } from "../../lib/settings.js";
 
 const HOST = "#reddit-slideshow-host";
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
@@ -486,9 +487,11 @@ describe("createSlideshowSession", () => {
     range.value = "20";
     range.dispatchEvent(new Event("change", { bubbles: true }));
 
-    expect(saved.at(-1)).toEqual({ imageTimerSeconds: 20 });
+    // The range is a stops index; index 20 maps to its stop's seconds.
+    const expected = imageTimerStopSeconds(20);
+    expect(saved.at(-1)).toEqual({ imageTimerSeconds: expected });
     const fill = /** @type {HTMLElement | null} */ (q(".rs-timer__fill"));
-    expect(fill?.style.animation).toContain("20s");
+    expect(fill?.style.animation).toContain(`${expected}s`);
   });
 
   it("pan-zooms only oversized (UHD) images", async () => {

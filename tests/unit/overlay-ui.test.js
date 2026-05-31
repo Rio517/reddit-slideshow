@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createOverlay } from "../../lib/overlay-ui.js";
+import { imageTimerStopSeconds } from "../../lib/settings.js";
 
 /** @typedef {ReturnType<typeof createOverlay>} Overlay */
 
@@ -187,7 +188,10 @@ describe("createOverlay", () => {
       range.value = "12";
       range.dispatchEvent(new Event("change", { bubbles: true }));
     }
-    expect(onChangeSetting).toHaveBeenCalledWith({ imageTimerSeconds: 12 });
+    // The range is a stops index; the panel emits that stop's seconds.
+    expect(onChangeSetting).toHaveBeenCalledWith({
+      imageTimerSeconds: imageTimerStopSeconds(12),
+    });
   });
 
   it("renders a slide with the position counter, title, and NSFW tag", () => {

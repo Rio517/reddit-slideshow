@@ -322,15 +322,17 @@
       <label class="field">
         <span class="field__label">
           <span>Time per image</span>
-          <span><output id="timerValue">5</output> seconds</span>
+          <span><output id="timerValue">5s</output></span>
         </span>
+        <!-- Non-linear: value is an index into IMAGE_TIMER_STOPS (set live by
+             main.js); 24 = stops.length - 1, value 4 = the 5s default. -->
         <input
           id="imageTimerSeconds"
           type="range"
-          min="1"
-          max="60"
+          min="0"
+          max="24"
           step="1"
-          value="5"
+          value="4"
         />
       </label>
 

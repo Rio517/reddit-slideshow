@@ -5,6 +5,9 @@ import {
   getSettings,
   normalizeSettings,
   saveSettings,
+  imageTimerStopIndex,
+  imageTimerStopSeconds,
+  formatImageTimer,
 } from "../../lib/settings.js";
 
 describe("normalizeSettings", () => {
@@ -21,7 +24,7 @@ describe("normalizeSettings", () => {
   it("clamps and rounds out-of-range timer values", () => {
     expect(
       normalizeSettings({ imageTimerSeconds: 999 }).imageTimerSeconds,
-    ).toBe(60);
+    ).toBe(300);
     expect(normalizeSettings({ imageTimerSeconds: 0 }).imageTimerSeconds).toBe(
       1,
     );
@@ -148,6 +151,31 @@ describe("getSettings / saveSettings", () => {
 
   it("clamps out-of-range stored values on read", async () => {
     await browser.storage.local.set({ imageTimerSeconds: 999 });
-    expect((await getSettings()).imageTimerSeconds).toBe(60);
+    expect((await getSettings()).imageTimerSeconds).toBe(300);
+  });
+});
+
+describe("image timer stops", () => {
+  it("maps a slider index to seconds and a seconds value to the nearest index", () => {
+    expect(imageTimerStopSeconds(0)).toBe(1);
+    expect(imageTimerStopSeconds(4)).toBe(5);
+    expect(imageTimerStopSeconds(24)).toBe(300);
+    expect(imageTimerStopIndex(5)).toBe(4);
+    expect(imageTimerStopIndex(300)).toBe(24);
+    // Off-stop values snap to the nearest stop.
+    expect(imageTimerStopSeconds(imageTimerStopIndex(12))).toBe(10);
+    expect(imageTimerStopSeconds(imageTimerStopIndex(200))).toBe(210);
+  });
+
+  it("clamps the slider index into range", () => {
+    expect(imageTimerStopSeconds(-5)).toBe(1);
+    expect(imageTimerStopSeconds(999)).toBe(300);
+  });
+
+  it("formats durations compactly", () => {
+    expect(formatImageTimer(5)).toBe("5s");
+    expect(formatImageTimer(60)).toBe("1m");
+    expect(formatImageTimer(90)).toBe("1m 30s");
+    expect(formatImageTimer(300)).toBe("5m");
   });
 });

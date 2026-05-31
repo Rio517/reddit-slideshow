@@ -1,5 +1,11 @@
 import { browser } from "wxt/browser";
-import { getSettings, saveSettings } from "@/lib/settings.js";
+import {
+  getSettings,
+  saveSettings,
+  imageTimerStopIndex,
+  imageTimerStopSeconds,
+  formatImageTimer,
+} from "@/lib/settings.js";
 import { requiredElement } from "@/lib/dom.js";
 
 // Origins the content-dedup toggle grants/removes at runtime. Must stay in sync
@@ -56,8 +62,8 @@ const panZoomInputs = Object.fromEntries(
 
 async function load() {
   const settings = await getSettings();
-  timerSlider.value = String(settings.imageTimerSeconds);
-  timerValue.textContent = String(settings.imageTimerSeconds);
+  timerSlider.value = String(imageTimerStopIndex(settings.imageTimerSeconds));
+  timerValue.textContent = formatImageTimer(settings.imageTimerSeconds);
   autoplay.checked = settings.autoplay;
   startMuted.checked = settings.startMuted;
   includeNsfw.checked = settings.includeNsfw;
@@ -83,7 +89,7 @@ async function load() {
 async function persist() {
   try {
     await saveSettings({
-      imageTimerSeconds: Number(timerSlider.value),
+      imageTimerSeconds: imageTimerStopSeconds(timerSlider.value),
       autoplay: autoplay.checked,
       startMuted: startMuted.checked,
       includeNsfw: includeNsfw.checked,
@@ -108,7 +114,9 @@ async function persist() {
 }
 
 timerSlider.addEventListener("input", () => {
-  timerValue.textContent = timerSlider.value;
+  timerValue.textContent = formatImageTimer(
+    imageTimerStopSeconds(timerSlider.value),
+  );
 });
 timerSlider.addEventListener("change", persist);
 autoplay.addEventListener("change", persist);
