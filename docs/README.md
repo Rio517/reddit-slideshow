@@ -1,4 +1,4 @@
-# Reddit Slideshow Documentation
+# Slideshow Spectacular for Reddit — Documentation
 
 This directory holds planning material for a Firefox-first browser extension that turns the current old Reddit feed into a keyboard-driven media slideshow.
 

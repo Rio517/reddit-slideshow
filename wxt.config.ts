@@ -3,10 +3,10 @@ import { defineConfig } from "wxt";
 export default defineConfig({
   manifestVersion: 3,
   manifest: ({ browser }) => ({
-    name: "Reddit Slideshow Spectacular!",
+    name: "Slideshow Spectacular for Reddit",
     description:
       "Turn an old or new Reddit feed into a full-screen, keyboard-driven media slideshow.",
-    homepage_url: "https://github.com/Rio517/reddit-slideshow",
+    homepage_url: "https://github.com/Rio517/slideshow-spectacular-for-reddit",
     permissions: ["storage"],
     host_permissions: [
       // Listing JSON is fetched (with the session cookie) from these two.
@@ -47,7 +47,7 @@ export default defineConfig({
       128: "icon/128.png",
     },
     action: {
-      default_title: "Start Reddit Slideshow Spectacular!",
+      default_title: "Start Slideshow Spectacular for Reddit",
       default_icon: {
         16: "icon/16.png",
         32: "icon/32.png",
@@ -58,7 +58,7 @@ export default defineConfig({
     commands: {
       _execute_action: {
         suggested_key: { default: "Alt+Shift+S" },
-        description: "Start Reddit Slideshow Spectacular!",
+        description: "Start Slideshow Spectacular for Reddit",
       },
     },
     // Firefox-only: gecko id + data-collection declaration. Omitted on Chrome,
