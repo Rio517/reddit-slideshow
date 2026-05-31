@@ -46,12 +46,6 @@ Key decisions already made:
   r/aww-style listing (reuse `tests/fixtures/reddit-json/`) with a few bundled
   images, or mount `createOverlay` + `renderCurrent` over sample images in a tiny
   harness page. Output `docs/screenshots/slideshow.png`.
-- **Permission tightening — make `i.redd.it` optional.** It's fetched only by the
-  opt-in content-dedup hashing, so move it from `host_permissions` to
-  `optional_host_permissions` and add it to `CONTENT_DEDUP_ORIGINS` in
-  `entrypoints/options/main.js` (granted/removed with the toggle). Drops the
-  default install to `storage` + `old`/`www`.reddit + the two redgifs hosts.
-  Verify the permission prompt + hashing still work in real Firefox.
 
 ## 2. Next up — media providers
 

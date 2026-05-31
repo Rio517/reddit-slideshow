@@ -12,16 +12,18 @@ export default defineConfig({
       // Listing JSON is fetched (with the session cookie) from these two.
       "https://old.reddit.com/*",
       "https://www.reddit.com/*",
-      // Reddit image bytes are fetched only for opt-in content-dedup hashing.
-      "https://i.redd.it/*",
       // Redgifs: resolve the direct mp4 (api) and fetch its bytes (media) in the
       // background, so the clip plays as a native, correctly-timed video.
       "https://api.redgifs.com/*",
       "https://media.redgifs.com/*",
     ],
     // Requested at runtime only when the user enables content-based dedup
-    // (ADR 0006 Layer 2), so the background can fetch preview images to hash.
+    // (ADR 0006 Layer 2), so the background can fetch images to hash. i.redd.it
+    // is here (not required) because it's reached *only* by that opt-in hashing;
+    // display images load directly on CSP-less old.reddit without a permission.
+    // Keep this list in sync with CONTENT_DEDUP_ORIGINS in entrypoints/options/main.js.
     optional_host_permissions: [
+      "https://i.redd.it/*",
       "https://preview.redd.it/*",
       "https://external-preview.redd.it/*",
     ],

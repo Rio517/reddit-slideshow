@@ -2,7 +2,11 @@ import { browser } from "wxt/browser";
 import { getSettings, saveSettings } from "@/lib/settings.js";
 import { requiredElement } from "@/lib/dom.js";
 
+// Origins the content-dedup toggle grants/removes at runtime. Must stay in sync
+// with optional_host_permissions in wxt.config.ts. i.redd.it is optional (not a
+// default host permission) because it's fetched only for this opt-in hashing.
 const CONTENT_DEDUP_ORIGINS = [
+  "https://i.redd.it/*",
   "https://preview.redd.it/*",
   "https://external-preview.redd.it/*",
 ];
