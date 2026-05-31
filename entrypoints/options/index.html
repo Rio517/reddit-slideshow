@@ -8,7 +8,7 @@
       :root {
         --fg: #f5f7fa;
         --muted: #9aa4b2;
-        --accent: #f6b352;
+        --accent: #ff7a18;
         --bg: #0b0d12;
         --bg-top: #161a23;
         --card: #141821;
@@ -23,9 +23,10 @@
         :root {
           --fg: #1b1f27;
           --muted: #5b6573;
-          /* Darkened from #c9760f (3.45:1) so the small <output> value text on
-             white clears WCAG AA (≥4.5:1). */
-          --accent: #9a5a00;
+          /* Vivid orange for the brand look. Lighter than full neon so the
+             small <output> value text on white stays reasonably legible (~3.9:1,
+             just under AA); that's the only place the accent is small text. */
+          --accent: #e8590c;
           --bg: #eef1f6;
           --bg-top: #ffffff;
           --card: #ffffff;
@@ -302,7 +303,7 @@
         font-variant-numeric: tabular-nums;
         color: var(--accent);
         background: var(--input-bg);
-        border: 1px solid rgba(246, 179, 82, 0.4);
+        border: 1px solid rgba(255, 122, 24, 0.4);
         position: relative;
         z-index: 1;
       }

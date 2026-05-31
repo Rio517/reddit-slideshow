@@ -1,7 +1,7 @@
 #reddit-slideshow-root {
   --rs-fg: #f5f7fa;
   --rs-muted: #9aa4b2;
-  --rs-accent: #f6b352;
+  --rs-accent: #ff7a18;
   --rs-danger: #ff6b6b;
   /* Slide-change transition timing — keep --rs-tx-dur in sync with
      TRANSITION_MS in lib/overlay-ui.js. */
@@ -70,8 +70,8 @@
   width: 100%;
   transform: scaleX(0);
   transform-origin: left center;
-  background: linear-gradient(90deg, var(--rs-accent), #ffe0b0);
-  box-shadow: 0 0 14px rgba(246, 179, 82, 0.65);
+  background: linear-gradient(90deg, var(--rs-accent), #ffcf9e);
+  box-shadow: 0 0 14px rgba(255, 122, 24, 0.65);
 }
 
 @keyframes rs-sweep {
@@ -392,7 +392,7 @@ iframe.reddit-slideshow-media {
   letter-spacing: 0.14em;
   color: var(--rs-accent);
   padding: 4px 9px;
-  border: 1px solid rgba(246, 179, 82, 0.35);
+  border: 1px solid rgba(255, 122, 24, 0.35);
   border-radius: 6px;
   background: rgba(0, 0, 0, 0.35);
   font-variant-numeric: tabular-nums;
@@ -1063,8 +1063,8 @@ iframe.reddit-slideshow-media {
 }
 
 .rs-meta__counter:hover {
-  background: rgba(246, 179, 82, 0.16);
-  color: #ffe0b0;
+  background: rgba(255, 122, 24, 0.16);
+  color: #ffcf9e;
 }
 
 /* Open-original lives in the meta bar now; size it down from the rail buttons. */
@@ -1136,7 +1136,7 @@ iframe.reddit-slideshow-media {
 }
 
 .rs-jump-panel__item--current {
-  background: rgba(246, 179, 82, 0.14);
+  background: rgba(255, 122, 24, 0.14);
 }
 
 .rs-jump-panel__num {
@@ -1189,7 +1189,7 @@ iframe.reddit-slideshow-media {
 .rs-jump-panel::-webkit-scrollbar-thumb:hover,
 .rs-skipped-panel::-webkit-scrollbar-thumb:hover,
 .rs-settings-panel::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(246, 179, 82, 0.55);
+  background-color: rgba(255, 122, 24, 0.55);
 }
 
 /* Shared keyboard focus ring for the overlay's interactive elements that lack
