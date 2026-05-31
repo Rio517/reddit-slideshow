@@ -13,7 +13,6 @@ describe("buildQueuePage", () => {
 
     expect(page).toMatchObject({
       after: "t3_beta",
-      before: null,
       postsScanned: 2,
       exhausted: false,
     });

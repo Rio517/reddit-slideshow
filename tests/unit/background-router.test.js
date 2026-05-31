@@ -11,7 +11,6 @@ function makeRouter(overrides = {}) {
     fetchQueuePage: async () => ({
       slides: [{ id: "a" }],
       after: "t3_x",
-      before: null,
       postsScanned: 50,
       exhausted: false,
     }),

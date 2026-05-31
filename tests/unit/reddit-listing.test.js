@@ -81,7 +81,6 @@ describe("summarizeListing", () => {
       jsonUrl: "https://old.reddit.com/r/example/.json",
       childCount: 2,
       after: "t3_beta",
-      before: null,
     });
   });
 });
