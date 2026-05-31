@@ -21,7 +21,7 @@ Mirror the Redgifs native-video flow (ADR 0010):
   iframe-embed slide (`streamable.com/e/<id>`) as a fallback.
 - A background resolver (`lib/streamable.js`) resolves the mp4 from the API and
   upgrades the embed to a **proxied native-video** slide (the background fetches
-  the bytes — no reddit `Referer` — and plays them as a `blob:`). Resolution
+  the bytes - no reddit `Referer` - and plays them as a `blob:`). Resolution
   failures keep the iframe embed.
 - The resolver validates the API-returned mp4 host (`*.streamable.com`) before
   trusting it; the background fetch allowlist enforces it again.
@@ -31,7 +31,7 @@ proxy-fetch allowlist gains a domain-**suffix** rule (`.streamable.com`) in
 addition to the exact-host set. The leading dot is required so a look-alike host
 (`evilstreamable.com`) cannot match. Install-time `host_permissions` gain a
 single `https://*.streamable.com/*` entry covering both the API and the CDN
-subdomains, scoped to the `streamable.com` domain (no all-URLs — ADR 0004).
+subdomains, scoped to the `streamable.com` domain (no all-URLs - ADR 0004).
 
 `streamable.com` is added to the iframe-embed host allowlist
 (`EMBED_HOSTS`) for the fallback.

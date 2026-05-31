@@ -47,7 +47,7 @@ describe("createSettingsPanel", () => {
     expect(range.value).toBe(String(imageTimerStopIndex(8)));
     // Max load wait now lives only in the full options page.
     expect(document.querySelector(".rs-set__select")).toBeNull();
-    // autoplay, start-muted, NSFW, dedupe, pan-zoom, always-show-meta — all false here
+    // autoplay, start-muted, NSFW, dedupe, pan-zoom, always-show-meta - all false here
     expect([...checks].map((c) => c.checked)).toEqual([
       false,
       false,
@@ -66,7 +66,7 @@ describe("createSettingsPanel", () => {
     // User dragged to a high stop and is still holding the thumb.
     range.value = "18";
     range.focus();
-    // applyLiveSettings re-populates with the stored value — must not move it.
+    // applyLiveSettings re-populates with the stored value - must not move it.
     panel.setValues(/** @type {any} */ ({ ...SETTINGS, imageTimerSeconds: 5 }));
     expect(range.value).toBe("18");
     // Once it's not focused, setValues repositions it.

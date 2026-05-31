@@ -1,4 +1,4 @@
-# Reddit Slideshow Spectacular! — Product Spec Draft
+# Reddit Slideshow Spectacular! - Product Spec Draft
 
 Date: 2026-05-29
 Status: Draft
@@ -51,7 +51,7 @@ When the queue nears the end, the extension fetches the next listing page using 
 
 If a post has multiple media items, such as a Reddit gallery, each media item becomes its own slide while preserving the post-level context.
 
-The queue is **media-only by definition.** Text/self posts, outbound article links, stickied/announcement posts, and promoted/ad posts are dropped from the queue, not shown as placeholder slides — a linear auto-advancing slideshow that lands on non-media breaks the lean-back experience. Placeholder slides are reserved for the rare case of a _resolution failure on something that should have rendered_ (e.g. a blocked Redgifs clip). This "skip anything not renderable" behavior is core to v1, not a configurable filter. Because most of a listing page can be non-media, pagination must be triggered on _posts scanned_, not _slides produced_, so a sparse page does not cause back-to-back fetches.
+The queue is **media-only by definition.** Text/self posts, outbound article links, stickied/announcement posts, and promoted/ad posts are dropped from the queue, not shown as placeholder slides - a linear auto-advancing slideshow that lands on non-media breaks the lean-back experience. Placeholder slides are reserved for the rare case of a _resolution failure on something that should have rendered_ (e.g. a blocked Redgifs clip). This "skip anything not renderable" behavior is core to v1, not a configurable filter. Because most of a listing page can be non-media, pagination must be triggered on _posts scanned_, not _slides produced_, so a sparse page does not cause back-to-back fetches.
 
 ## Media Support
 
@@ -71,7 +71,7 @@ v.redd.it is DASH/HLS with separated tracks. The listing's `secure_media.reddit_
 
 ### Redgifs
 
-Redgifs is a first-class provider — the single most common media domain on real
+Redgifs is a first-class provider - the single most common media domain on real
 NSFW feeds. It plays as **native `<video>`** (ADR 0010):
 
 - Parse the id from `redgifs.com/watch/<id>` (or `/ifr/<id>`). The background
@@ -79,7 +79,7 @@ NSFW feeds. It plays as **native `<video>`** (ADR 0010):
   API (`api.redgifs.com`, token cached, concurrency-limited and timed out).
 - The CDN (`media.redgifs.com`) hotlink-protects against a reddit `Referer`, so
   the background fetches the bytes (no Referer, no cookies, with a byte cap) and
-  the content script plays them as a `blob:` URL — which also satisfies the
+  the content script plays them as a `blob:` URL - which also satisfies the
   www-Reddit CSP. This gives correct timing (advances on the real clip end),
   global mute/unmute, and no per-clip unmute.
 - If resolution fails (API down, timeout), the slide falls back to the Redgifs
@@ -98,7 +98,7 @@ Other external hosts are out of v1 unless they are simple direct media links. Th
 - Image timer: any value from 1 to 60 seconds via a slider (default 5).
 - Start muted: on/off (inert until an audio-capable playback path exists).
 - Autoplay slideshow: on/off (off starts the slideshow paused).
-- Include NSFW: follow Reddit / always hide. **Default: follow Reddit** — show over-18 content only insofar as the signed-in session already exposes it. This is the least-surprising default and avoids the extension becoming an NSFW-unlocking tool.
+- Include NSFW: follow Reddit / always hide. **Default: follow Reddit** - show over-18 content only insofar as the signed-in session already exposes it. This is the least-surprising default and avoids the extension becoming an NSFW-unlocking tool.
 - Provider permissions: Redgifs should be requested only if needed or clearly disclosed.
 
 ## Permissions
@@ -106,10 +106,10 @@ Other external hosts are out of v1 unless they are simple direct media links. Th
 Install-time host permissions are scoped to the hosts the extension actually
 fetches from (see ADR 0004):
 
-- `https://old.reddit.com/*`, `https://www.reddit.com/*` — listing JSON for both
+- `https://old.reddit.com/*`, `https://www.reddit.com/*` - listing JSON for both
   frontends (ADR 0008).
-- `https://i.redd.it/*`, `https://v.redd.it/*` — Reddit image and video media.
-- `https://api.redgifs.com/*`, `https://media.redgifs.com/*` — resolve and fetch
+- `https://i.redd.it/*`, `https://v.redd.it/*` - Reddit image and video media.
+- `https://api.redgifs.com/*`, `https://media.redgifs.com/*` - resolve and fetch
   native Redgifs video (ADR 0010).
 
 Plus the `storage` API permission for settings.
@@ -219,5 +219,5 @@ Outcome criteria (what "good" means for a lean-back tool):
 
 - Time-to-first-slide after launch is under ~1 second on a typical listing.
 - The fraction of feed media posts that render (vs fall back) is high; the fallback rate is visible and explainable.
-- Slide-to-slide transitions are smooth — a preloaded next slide (1–2 ahead) is ready before its turn, so advancing does not stutter.
+- Slide-to-slide transitions are smooth - a preloaded next slide (1-2 ahead) is ready before its turn, so advancing does not stutter.
 - A position/progress affordance lets the user tell where they are and whether more is loading.

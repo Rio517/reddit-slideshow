@@ -302,11 +302,11 @@ describe("createOverlay", () => {
     const click = (/** @type {Element | null | undefined} */ el) =>
       el?.dispatchEvent(new Event("click", { bubbles: true }));
 
-    click(overlay.root.querySelector(".rs-slide")); // the media — no close
-    click(overlay.root.querySelector(".rs-btn")); // a control — no close
+    click(overlay.root.querySelector(".rs-slide")); // the media - no close
+    click(overlay.root.querySelector(".rs-btn")); // a control - no close
     expect(onClose).not.toHaveBeenCalled();
 
-    // A backdrop click guards against an accidental click — it confirms first.
+    // A backdrop click guards against an accidental click - it confirms first.
     click(overlay.root.querySelector(".rs-stage"));
     expect(onClose).not.toHaveBeenCalled();
     const confirm = /** @type {HTMLElement | null} */ (
@@ -409,7 +409,7 @@ describe("createOverlay", () => {
     /** @type {any} */
     let overlay;
     // The real wiring swaps the icon on toggle, which detaches the click
-    // target — the backdrop-close handler must not mistake that for a backdrop.
+    // target - the backdrop-close handler must not mistake that for a backdrop.
     const onTogglePlay = vi.fn(() => overlay.setPlaying(false));
     overlay = createOverlay({ ...noopHandlers(), onClose, onTogglePlay });
     overlay.renderCurrent(imageSlide(), {
@@ -740,7 +740,7 @@ describe("createOverlay", () => {
     await markImageReady(overlay, "a");
     expect(overlay.root.querySelectorAll(".rs-slide").length).toBe(1);
 
-    // Advance to B but never ready it — A stays visible under the pending B.
+    // Advance to B but never ready it - A stays visible under the pending B.
     renderImageAt(overlay, "b", 1);
     expect(overlay.root.querySelectorAll(".rs-slide").length).toBe(2);
 

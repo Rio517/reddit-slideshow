@@ -62,7 +62,7 @@ const panZoomInputs = Object.fromEntries(
 
 /**
  * Display text for a pan-zoom range value. Only the oversize threshold is
- * special: at its 1× minimum it reads "All images" — pan & zoom every image,
+ * special: at its 1× minimum it reads "All images" - pan & zoom every image,
  * not just oversized ones. (The "×" lives in the output, not static markup.)
  * @param {string} id
  * @param {string} value

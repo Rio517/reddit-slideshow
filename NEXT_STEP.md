@@ -1,4 +1,4 @@
-# NEXT_STEP — Reddit Slideshow Spectacular!
+# NEXT_STEP - Reddit Slideshow Spectacular!
 
 **Doc updated:** 2026-05-31 · **Branch:** `main` · **Status:** shipped-ready on `old.reddit.com` + `www.reddit.com`; CI green; store-listing copy drafted. The single-clip providers (Redgifs, Imgur `.gifv`, Streamable, Giphy, Catbox) and the shadow-root overlay have landed. Open: tip jar, Imgur albums, Redgifs streaming (§1). The shadow-root overlay and the new providers still need a real-Firefox pass (§5).
 
@@ -31,24 +31,24 @@ Key decisions already made:
 
 ## 1. Open work
 
-Three near-term items remain; each has a real blocker. Keep small commits — do
+Three near-term items remain; each has a real blocker. Keep small commits - do
 not batch multiple slices into one giant commit.
 
-- **Tip jar** — on hold. Intended: a GitHub Sponsors link in the options-page
+- **Tip jar** - on hold. Intended: a GitHub Sponsors link in the options-page
   footer and a small one in the overlay (by the "Full preferences" link). Keep it
   a plain external link; mind each store's donation policy. Blocker: confirm the
   exact Sponsors URL (e.g. `github.com/sponsors/Rio517`) and that Sponsors is
-  enabled before wiring — don't ship a dead link.
+  enabled before wiring - don't ship a dead link.
 - **Imgur albums** (`imgur.com/a/…`, `/gallery/…`) → expand one post into the
   image list. The only provider that's a 1→N async resolve (a queue change).
   Blocker: needs an Imgur API **Client-ID** (a registered Imgur app), or the
   fragile unofficial `ajaxalbums` endpoint. `.gifv` → `.mp4` native video (ADR 0011) and single `i.imgur.com` images already work.
-- **Redgifs streaming** — avoid buffering the whole mp4 to a blob first
+- **Redgifs streaming** - avoid buffering the whole mp4 to a blob first
   (MediaSource / range requests). Browser-only: can't be verified headless, and
   it risks regressing the working proxied-blob playback. Recommended: defer to a
   focused real-Firefox effort.
 
-### Media providers — the pattern
+### Media providers - the pattern
 
 Each provider mirrors Redgifs: detection in the `lib/slides.js` provider
 dispatch, a background resolver (`lib/redgifs.js` / `lib/streamable.js`-style)
@@ -58,7 +58,7 @@ plus a fixture and a resolver/detection test. Providers whose media is on varyin
 CDN subdomains use the proxy allowlist's dot-prefixed domain-suffix rule in
 `lib/background-router.js`.
 
-Done: Redgifs, Imgur `.gifv`, Streamable, Giphy, Catbox (ADRs 0010–0014).
+Done: Redgifs, Imgur `.gifv`, Streamable, Giphy, Catbox (ADRs 0010-0014).
 Skip: Gfycat (shut down 2023 → Redgifs); YouTube / Vimeo / Twitter (poor
 slideshow fit).
 
@@ -70,18 +70,18 @@ slideshow fit).
   RES/old.reddit, the `inert` focus trap (Tab can't escape the overlay),
   backdrop/control clicks, and `f` fullscreen from inside the shadow.
 - **Real-Firefox re-check (new providers):** confirm Imgur `.gifv`, Streamable,
-  and Giphy proxied playback and Catbox direct video in a logged-in profile —
+  and Giphy proxied playback and Catbox direct video in a logged-in profile -
   detection + resolvers are unit-tested, but live playback wasn't exercised here.
-- **Real-Firefox re-check:** the dropped iframe `allow-same-origin` (security M1)
-  — confirm Redgifs `/ifr/` playback still works while logged in; revert that one
+- **Real-Firefox re-check:** the dropped iframe `allow-same-origin` (security M1).
+  Confirm Redgifs `/ifr/` playback still works while logged in; revert that one
   line if it regresses.
 - **Mute control + real audio** (needs a bundled HLS/DASH player).
 - **Redgifs lazy resolution** (push a page before its embeds resolve).
 - **Content-dedup hashing** from a Reddit preview URL (or HEAD-gate on size)
   instead of the full display image.
-- **Split `lib/overlay-ui.js`** if it keeps growing — jump-list, skipped-list, and
+- **Split `lib/overlay-ui.js`** if it keeps growing - jump-list, skipped-list, and
   media-lifecycle seams, with `createOverlay` as the assembly point.
-- **AMO + Chrome Web Store submission** — copy is ready in `docs/store-listing.md`;
+- **AMO + Chrome Web Store submission** - copy is ready in `docs/store-listing.md`;
   package with `npm run zip` / `npm run zip:chrome`.
 
 ---
@@ -198,7 +198,7 @@ Confirmed in a real logged-in Firefox profile:
 
 - Session-cookie `.json` access returns logged-in JSON (incl. NSFW), with `X-Ratelimit-*` headers.
 - v.redd.it video plays and Redgifs `/ifr/<id>` iframe plays **without** a `redgifs.com` host permission.
-- Navigation, automatic pagination to subsequent pages, and RES coexistence (with RES + Reddit Deduplicator) — no keyboard/DOM conflicts.
+- Navigation, automatic pagination to subsequent pages, and RES coexistence (with RES + Reddit Deduplicator) - no keyboard/DOM conflicts.
 - Sanitized fixtures exist for image/gallery/video/redgifs/crosspost (crosspost hand-authored; capture a real one if convenient).
 
 Not yet verified in real Firefox (see the §1 re-check items): the shadow-root

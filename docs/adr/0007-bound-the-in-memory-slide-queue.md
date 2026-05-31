@@ -7,7 +7,7 @@ Status: Accepted
 
 The slideshow keeps every slide it has built in `SlideshowController.slides` so
 the user can navigate backward. Pagination appends a new page each time the
-queue nears its end, so over a long session this array grows without bound —
+queue nears its end, so over a long session this array grows without bound -
 hundreds of `Slide` objects, each holding several URL strings, a title, and
 dimensions, retained for the lifetime of the tab. A self-audit flagged this as
 the main source of session-long memory growth.
@@ -22,7 +22,7 @@ Cap the retained **already-shown** history at `maxBackHistory` slides (default
 **50**) behind the current slide. On each render, evict the excess from the
 front of `slides` and advance an `evicted` counter by the same amount.
 
-- `index` and `evicted` move together, so **absolute position is unchanged** —
+- `index` and `evicted` move together, so **absolute position is unchanged** -
   the position counter still reads the true `N / total`.
 - Pagination (`shouldFetchNextPage`, `peekNext`) operates on the retained window
   using the local `index`/`length`, which are consistent after eviction, so the
@@ -33,7 +33,7 @@ front of `slides` and advance an `evicted` counter by the same amount.
 
 The duplicate-detection state (ADR 0006) is bounded separately. Its `keys` and
 `hashes` are capped to the most recent **50,000** media (FIFO), independent of
-the much smaller back-history window — dedup must span the whole session, not
+the much smaller back-history window - dedup must span the whole session, not
 just what is navigable. Beyond the cap the oldest entries are dropped, so a
 repost seen tens of thousands of slides ago may re-appear; that is acceptable
 for a lean-back tool, and it keeps memory (~5 MB worst case) and the Layer-2

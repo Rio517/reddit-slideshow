@@ -7,7 +7,7 @@ Status: Active
 
 This codebase is plain JavaScript (ESM) typed via JSDoc and checked with
 `tsc --noEmit` (`npm run typecheck`). There are **no `.ts` source files by
-design** — the only TypeScript file is `wxt.config.ts`. This document is the
+design** - the only TypeScript file is `wxt.config.ts`. This document is the
 standing guide for how we manage types here: where shared types live, how we
 type the Reddit listing JSON, which `tsconfig` strictness flags we run, and the
 conventions that keep `any` out of the codebase.
@@ -17,7 +17,7 @@ pipeline, so the same type decisions are not re-derived each time.
 
 ## Source Summary
 
-- TypeScript 5.5 release notes — the `@import` JSDoc tag:
+- TypeScript 5.5 release notes - the `@import` JSDoc tag:
   https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html
 - TypeScript JSDoc reference (supported tags/syntax):
   https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html
@@ -54,7 +54,7 @@ they currently lean entirely on `any`.
 
 ### Where the types live
 
-Put listing types in a **types-only module `lib/reddit-types.js`** — a `.js`
+Put listing types in a **types-only module `lib/reddit-types.js`** - a `.js`
 file containing only `@typedef`s plus a trailing `export {};` so it stays an ES
 module. Do **not** use a `.d.ts`: that would be the codebase's only non-JS,
 non-WXT source file and breaks the "plain JS by design" invariant.
@@ -76,7 +76,7 @@ already probe defensively (`post.crosspost_parent_list?.[0] ?? post`,
 everywhere. Optional-everywhere matches reality (crossposts, deleted gallery
 items, missing previews) and keeps `tsc` green against the existing code.
 
-Type only the **subset of fields the resolvers actually read** — this is not the
+Type only the **subset of fields the resolvers actually read** - this is not the
 full Reddit schema. The shape below is grounded in
 `tests/fixtures/reddit-json/*.json`:
 
@@ -142,7 +142,7 @@ export {};
 - `slidesFromPost` → `@param {RedditPost | undefined} post`.
 - `imageSlides` / `gallerySlides` / `redditVideoSlides` / `redgifsSlides` →
   `media` and `context` are both `RedditPost` (media is where the bytes live,
-  context is the post the user sees — crossposts split these).
+  context is the post the user sees - crossposts split these).
 - The `is*Post` / `redditVideoOf` / `filenameHint` helpers →
   `@param {RedditPost | undefined}` (they all already `?.`-guard).
 - `summarizeListing` (`reddit-listing.js`) and `buildQueuePage` (`queue.js`) →
@@ -150,29 +150,29 @@ export {};
   `Promise<{ listing: RedditListing, summary: ListingSummary }>`.
 
 Practical rule: when Reddit adds a field a resolver needs to read, add it to
-`reddit-types.js` as optional — never reach for `any` to dodge a missing field.
+`reddit-types.js` as optional - never reach for `any` to dodge a missing field.
 
 ## tsconfig strictness
 
 `strict: true` is on. The remaining safe progression, in order:
 
-1. **`noUncheckedIndexedAccess`** — adds `| undefined` to array/index access.
+1. **`noUncheckedIndexedAccess`** - adds `| undefined` to array/index access.
    The code is already written for it (`children?.[0]`,
    `media_metadata?.[item?.media_id]`, `match[1]` in `redgifsId`). Watch
    `entrypoints/options/main.js`: the `panZoomInputs[id]` reads and the
    `PAN_ZOOM_RANGES.map(([id]) => ...)` destructuring become `| undefined` and
    may need a guard. Do this alongside the Reddit typedefs.
 
-2. **`exactOptionalPropertyTypes`** — distinguishes `prop?: T` from
+2. **`exactOptionalPropertyTypes`** - distinguishes `prop?: T` from
    `prop: T | undefined`. This one needs prep: several `Slide` builders set
    optional props explicitly to `undefined` (`mimeType: mimeTypeFromUrl(url)`,
    `durationSeconds: ... : undefined`, `sourceWidth: previewSource?.width`).
    Before enabling, widen those `Slide`/`RedgifsMedia`/`ListingSummary`
    properties to explicit `| undefined` (e.g. `@property {number | undefined}
 sourceWidth` rather than `@property {number} [sourceWidth]`). Highest churn
-   of the three — land it after step 1 is green.
+   of the three - land it after step 1 is green.
 
-3. **`noPropertyAccessFromIndexSignature`** — low value here (only
+3. **`noPropertyAccessFromIndexSignature`** - low value here (only
    `media_metadata` and the `settings[id]` access are affected). Optional.
 
 Target after step 1:
@@ -249,12 +249,12 @@ so the DOM element constructors must be added to the `globals` block in
    */
   ```
 
-  Keep the runtime guards (`typeof pageUrl !== "string"`) — the wire is
+  Keep the runtime guards (`typeof pageUrl !== "string"`) - the wire is
   untrusted. Types are additive validation, not a replacement. A typed response
   lets `session.js` drop `requestPage: (after?) => Promise<any>`.
 
 - **No `any`, no `@ts-ignore`.** There are currently zero `@ts-ignore` /
-  `@ts-expect-error` in the tree — keep it that way. If a suppression is ever
+  `@ts-expect-error` in the tree - keep it that way. If a suppression is ever
   truly needed, prefer `@ts-expect-error` (it fails once the underlying error is
   fixed, so it can't rot). Type third-party JSON (e.g. the Redgifs auth/gif
   responses in `redgifs.js`) with a small typedef rather than reading off `any`.

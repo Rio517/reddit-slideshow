@@ -5,9 +5,9 @@ Status: Accepted
 
 ## Context
 
-v1 shipped Firefox-MV3 only. The core is already browser-agnostic — it uses
+v1 shipped Firefox-MV3 only. The core is already browser-agnostic - it uses
 `browser.*` through WXT, a fetch-based background, and no Firefox-only runtime
-APIs — and both old and new Reddit work in Chrome. WXT builds multiple browsers
+APIs - and both old and new Reddit work in Chrome. WXT builds multiple browsers
 from one source. Research: `docs/research/chrome-support.md`.
 
 The only real divergences are manifest-level (background type, icon format, a
@@ -45,14 +45,14 @@ Firefox-only settings block), which WXT can express per browser.
   MV3 service worker registers, the content script injects on Reddit, the overlay
   (`#reddit-slideshow-root`) renders, and the SW's `credentials: "include"`
   listing fetch attaches the user's Reddit cookies. A full media-render pass needs
-  a logged-in session — Reddit `403`s anonymous `.json` from a fresh automated
-  profile — so that last step is a manual check.
+  a logged-in session - Reddit `403`s anonymous `.json` from a fresh automated
+  profile - so that last step is a manual check.
 
 ## Alternatives Considered
 
 - **Firefox-only:** simplest, but Chrome is the larger audience and the
   cross-browser cost here is low. Rejected.
-- **A separate Chrome codebase:** unnecessary — WXT gives one source, two
+- **A separate Chrome codebase:** unnecessary - WXT gives one source, two
   outputs. Rejected.
 - **SVG icons only:** incompatible with Chrome. Rejected.
 - **Generate icons at build time** (e.g. a WXT auto-icons module): committed PNGs
@@ -61,6 +61,6 @@ Firefox-only settings block), which WXT can express per browser.
 ## Follow-Up
 
 - Confirm a logged-in media-render pass in real Chrome (load unpacked, log into
-  Reddit, run the slideshow on old + www) — the one smoke-test step that needs a
+  Reddit, run the slideshow on old + www) - the one smoke-test step that needs a
   human session.
 - Create the Chrome Web Store listing.

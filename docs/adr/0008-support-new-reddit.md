@@ -5,7 +5,7 @@ Status: Proposed
 
 ## Context
 
-v1 runs only on `old.reddit.com` — the content script, the listing `.json` data
+v1 runs only on `old.reddit.com` - the content script, the listing `.json` data
 fetch, and the overlay all assume it. Old Reddit is not deprecated today, but it
 is a legacy surface Reddit could remove, and the product should not depend on it
 surviving.
@@ -32,7 +32,7 @@ session, found:
    so it keeps working if old Reddit is ever removed. (Earlier "render on new,
    fetch from old" is rejected for exactly this reason.)
 3. **Render the overlay directly in the page on both,** relying on new Reddit's
-   permissive logged-in CSP — no extension-page-iframe workaround now. Media that
+   permissive logged-in CSP - no extension-page-iframe workaround now. Media that
    the CSP blocks already degrades to the existing placeholder card. The iframe
    overlay is recorded as the known mitigation **if** Reddit later tightens the
    CSP, but it is not built unless needed.
@@ -43,10 +43,10 @@ session, found:
    `matches`.
 6. **Resolve relative listing URLs (post `permalink`) against the page's own
    origin,** not a hardcoded `old.reddit.com`. Otherwise "open original" on a www
-   page links back to old Reddit — a live dependency the self-contained path must
+   page links back to old Reddit - a live dependency the self-contained path must
    not have.
 
-**Scope:** new Reddit means `www.reddit.com` only. `sh.reddit.com` is excluded —
+**Scope:** new Reddit means `www.reddit.com` only. `sh.reddit.com` is excluded -
 it is a share/redirect/login surface, not a primary listing-browsing host;
 revisit if users actually land there. Soft (client-side) navigation in the
 shreddit SPA does not re-run the content script, but the listing URL is read from
@@ -73,7 +73,7 @@ correct listing; overlay reset across in-SPA route changes is a verification ite
 - **Render on new, fetch from old:** simplest data reuse, but depends on old
   Reddit surviving. Rejected per the future-proofing goal.
 - **New-Reddit only (drop old):** fewer matches, but abandons working old-Reddit
-  users for no gain. Rejected — keep both, each self-contained.
+  users for no gain. Rejected - keep both, each self-contained.
 - **Extension-page-iframe overlay up front:** robust against any CSP, but a
   significant overlay rewrite. Deferred until/unless Reddit's CSP blocks direct
   rendering.

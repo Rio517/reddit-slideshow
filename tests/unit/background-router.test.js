@@ -19,7 +19,7 @@ function makeRouter(overrides = {}) {
   });
 }
 
-describe("createMessageRouter — sender validation", () => {
+describe("createMessageRouter - sender validation", () => {
   it("ignores messages from a foreign sender", () => {
     const router = makeRouter();
     expect(
@@ -41,7 +41,7 @@ describe("createMessageRouter — sender validation", () => {
   });
 });
 
-describe("createMessageRouter — requestPage", () => {
+describe("createMessageRouter - requestPage", () => {
   it("returns a built page for a valid request", async () => {
     const router = makeRouter();
     const result = await router(
@@ -132,7 +132,7 @@ describe("createMessageRouter — requestPage", () => {
   });
 });
 
-describe("createMessageRouter — fetchImage", () => {
+describe("createMessageRouter - fetchImage", () => {
   it("returns bytes for a valid url", async () => {
     const router = makeRouter();
     const result = await router(
@@ -220,7 +220,7 @@ describe("createMessageRouter — fetchImage", () => {
   });
 });
 
-describe("createMessageRouter — fetchMedia", () => {
+describe("createMessageRouter - fetchMedia", () => {
   it("returns bytes for a Redgifs media url", async () => {
     const router = makeRouter({
       fetchMediaBytes: async () => new ArrayBuffer(16),
@@ -332,7 +332,7 @@ describe("createMessageRouter — fetchMedia", () => {
   });
 });
 
-describe("createMessageRouter — openOptions", () => {
+describe("createMessageRouter - openOptions", () => {
   it("opens the options page for an own-sender request", async () => {
     const openOptionsPage = vi.fn();
     const router = makeRouter({ openOptionsPage });
@@ -351,7 +351,7 @@ describe("createMessageRouter — openOptions", () => {
   });
 });
 
-describe("createMessageRouter — openPopout", () => {
+describe("createMessageRouter - openPopout", () => {
   const popoutMsg = (/** @type {string} */ url) => ({
     type: "slideshow.openPopout",
     payload: { url },

@@ -25,7 +25,7 @@ Sources:
 
 Reddit listing endpoints use common `after`, `before`, `limit`, `count`, and `show` parameters. Reddit's documentation says listing responses contain `after` and `before` fields equivalent to old site's next/previous controls. This is the likely mechanism for keeping the slideshow queue going past the current page.
 
-Rate limits: free-tier OAuth is **100 queries/min** (≈10-minute averaging window); unauthenticated _API_ requests are rejected. The session-cookie `.json` website path used here is a different surface that works while logged in, and `X-Ratelimit-*` headers (`remaining`/`used`/`reset`) are present on it, so `403`/`429` backoff can read them. Always request with `raw_json=1` — without it, `preview` and `media_metadata` URLs come back HTML-entity-encoded (`&amp;`).
+Rate limits: free-tier OAuth is **100 queries/min** (≈10-minute averaging window); unauthenticated _API_ requests are rejected. The session-cookie `.json` website path used here is a different surface that works while logged in, and `X-Ratelimit-*` headers (`remaining`/`used`/`reset`) are present on it, so `403`/`429` backoff can read them. Always request with `raw_json=1` - without it, `preview` and `media_metadata` URLs come back HTML-entity-encoded (`&amp;`).
 
 Source:
 
@@ -65,28 +65,28 @@ logged-in session (front page plus several default subreddits). A census of
 Redgifs all common; crossposts were absent from the sample, so they are rare in
 practice but still handled defensively.
 
-- **Direct image** — `domain: i.redd.it`, `post_hint: "image"`, media in
+- **Direct image** - `domain: i.redd.it`, `post_hint: "image"`, media in
   `url_overridden_by_dest` (or `url`); `preview.images[0].source` carries the
   original `width`/`height`. Normalized with `quality: "original"` for
   `i.redd.it` and `quality: "preview"` for `preview.redd.it` fallbacks.
-  `sourceWidth`/`sourceHeight` come from `preview.images[0].source` — the
+  `sourceWidth`/`sourceHeight` come from `preview.images[0].source` - the
   best-known source metadata, not proof of the original file dimensions.
-- **Gallery** — `is_gallery: true` (no `post_hint`); `gallery_data.items[]` gives
+- **Gallery** - `is_gallery: true` (no `post_hint`); `gallery_data.items[]` gives
   ordered `{ media_id }`, and `media_metadata[media_id]` carries `m` (mime),
   `s.u` (full-resolution source URL, on `preview.redd.it`, signed with `s=`), and
   `p[]` (smaller previews). Each item becomes its own slide.
-- **Reddit-hosted video** — `domain: v.redd.it`, `post_hint: "hosted:video"`,
+- **Reddit-hosted video** - `domain: v.redd.it`, `post_hint: "hosted:video"`,
   `is_video: true`; `secure_media.reddit_video` (mirrored in `media.reddit_video`)
   carries `fallback_url` (a `CMAF_*.mp4`), `dash_url`, `hls_url`, `duration`,
   `width`, `height`, `is_gif`, and `has_audio`. Audio availability is therefore
   known from the data; `fallback_url` is the plain-`<video>` (muted) path, while
   audio needs DASH/HLS.
-- **Redgifs** — `domain: redgifs.com` (also `v3.redgifs.com`),
+- **Redgifs** - `domain: redgifs.com` (also `v3.redgifs.com`),
   `post_hint: "rich:video"`, `url`/`url_overridden_by_dest` is
   `https://www.redgifs.com/watch/<id>`. `secure_media.oembed` carries `width`,
   `height`, and `thumbnail_url`, so aspect ratio is available from the listing
   without calling `api.redgifs.com`.
-- **Crosspost** — the outer post carries no own media; the original lives in
+- **Crosspost** - the outer post carries no own media; the original lives in
   `crosspost_parent_list[0]`, which is a full post object resolved with the same
   rules. Display context (permalink/title) comes from the outer post.
 
@@ -110,8 +110,8 @@ Redgifs is a first-class provider, and a large share of real feeds: it was the s
 
 `old.reddit.com` sends **no Content-Security-Policy** (no response header and no
 `<meta>` CSP). A content-script overlay can therefore load cross-origin media
-directly in injected elements — `<img>` from `i.redd.it`/`preview.redd.it`,
-`<video>` from `v.redd.it`, and the Redgifs `<iframe>` — with no host
+directly in injected elements - `<img>` from `i.redd.it`/`preview.redd.it`,
+`<video>` from `v.redd.it`, and the Redgifs `<iframe>` - with no host
 permission and no CSP relaxation. This matches old Reddit/RES expandos, which
 already embed these hosts inline. Actual playback (v.redd.it muted, Redgifs
 iframe) still wants a live Firefox confirmation.

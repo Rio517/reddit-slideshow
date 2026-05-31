@@ -13,10 +13,10 @@ Imgur serves the same clip as an `.mp4` at the same id (`/<id>.mp4`). Direct
 
 Two ways to play the `.mp4`:
 
-1. **Direct** — set it as a `<video src>` on the Reddit page. Imgur hotlink-
+1. **Direct** - set it as a `<video src>` on the Reddit page. Imgur hotlink-
    protects against a non-Imgur `Referer` (it serves a placeholder for hotlinked
    media), so a clip embedded from a reddit page is unreliable.
-2. **Proxied** — the background fetches the bytes (no reddit `Referer`) and the
+2. **Proxied** - the background fetches the bytes (no reddit `Referer`) and the
    content script plays them as a `blob:` URL. This mirrors the Redgifs native-
    video path (ADR 0010) and is robust against the hotlink protection.
 
@@ -24,11 +24,11 @@ Two ways to play the `.mp4`:
 
 Detect `*.imgur.com/<id>.gifv` posts in the `lib/slides.js` provider dispatch and
 emit a single **proxied, looping video** slide whose `mediaUrl` is the
-transformed `https://i.imgur.com/<id>.mp4`. The transform is a pure URL rewrite —
+transformed `https://i.imgur.com/<id>.mp4`. The transform is a pure URL rewrite -
 no network resolve, so no provider resolver module is needed (unlike Redgifs).
 
 The slide is `kind: "video"`, `proxied: true`, `isGif: true` (silent loop), and
-`durationMode: "media"` — so it advances on the controller's media safety-net
+`durationMode: "media"` - so it advances on the controller's media safety-net
 timer (`imageTimerSeconds + 2s`) while looping, matching reddit-hosted GIFs.
 
 Add `https://i.imgur.com/*` to install-time `host_permissions` (the background

@@ -14,7 +14,7 @@ via the generic image path (ADR 0002); only **video** files (`.mp4`, `.webm`,
 ## Decision
 
 Detect `files.catbox.moe/<id>.{mp4,webm,mov}` posts in the `lib/slides.js`
-dispatch and emit a single **direct** (non-proxied) native-video slide — the file
+dispatch and emit a single **direct** (non-proxied) native-video slide - the file
 is loaded straight into a `<video>` on the page, like reddit-hosted `v.redd.it`
 video. No background proxy and no `host_permission` are needed, because nothing is
 extension-fetched: the bytes load as a page resource.
@@ -37,7 +37,7 @@ Costs:
 
 - Direct cross-origin video is subject to the page CSP. It loads on CSP-less
   old.reddit; on www.reddit (whose logged-in CSP is `media-src *.redd.it`) it may
-  be blocked — the same constraint that makes Redgifs/Imgur use the proxied path.
+  be blocked - the same constraint that makes Redgifs/Imgur use the proxied path.
 - The allowlist trusts `files.catbox.moe` as a video sink; this is exact-host,
   HTTPS-only, so the scope is narrow.
 

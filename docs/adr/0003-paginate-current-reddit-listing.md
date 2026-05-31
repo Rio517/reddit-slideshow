@@ -34,7 +34,7 @@ This carries modest but real ToS/AMO risk, so the extension adopts and documents
 - Acts only on behalf of the logged-in user, on data already visible to that user.
 - Human-scale request rates: one pagination request at a time, only for the active queue, no indefinite prefetch.
 - Stores nothing server-side; no bulk collection, no redistribution, no analytics.
-- Degrades on `403`/`429` (and `X-Ratelimit-*` headers when present — note they are often **absent** on the cookie-session website path, so `403`/`429` must also drive backoff).
+- Degrades on `403`/`429` (and `X-Ratelimit-*` headers when present - note they are often **absent** on the cookie-session website path, so `403`/`429` must also drive backoff).
 - Keeps the listing transport swappable (the ADR 0002 resolver layer) so optional per-user OAuth is an escape hatch if the cookie path is ever blocked. The extension must **not** ship app OAuth client credentials.
 - Always sends `raw_json=1` (load-bearing invariant): without it, `preview` and `media_metadata` URLs are HTML-entity-encoded.
 
@@ -42,4 +42,4 @@ This posture reduces real risk, but it does not remove the need to validate Redd
 
 ## Follow-Up
 
-Implementation should include saved JSON fixtures for front page, subreddit, gallery, video, and Redgifs examples — captured from real responses, not hand-authored, so field shapes (`gallery_data`, `media_metadata`, crosspost media in `crosspost_parent_list[0]`) match reality. Pagination behavior should be tested with `after` tokens and with end-of-list/error responses. Before building further, spike live Reddit access in Firefox to confirm the session-cookie path survives at slideshow-realistic volume.
+Implementation should include saved JSON fixtures for front page, subreddit, gallery, video, and Redgifs examples - captured from real responses, not hand-authored, so field shapes (`gallery_data`, `media_metadata`, crosspost media in `crosspost_parent_list[0]`) match reality. Pagination behavior should be tested with `after` tokens and with end-of-list/error responses. Before building further, spike live Reddit access in Firefox to confirm the session-cookie path survives at slideshow-realistic volume.

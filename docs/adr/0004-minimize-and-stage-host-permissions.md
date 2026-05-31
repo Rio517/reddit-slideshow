@@ -16,19 +16,19 @@ Use the narrowest practical install-time host permissions and stage the rest.
 **Install-time `host_permissions`** are the hosts the extension must fetch from
 to function:
 
-- `old.reddit.com`, `www.reddit.com` — listing JSON for both frontends (ADR 0008).
-- `i.redd.it`, `v.redd.it` — Reddit-hosted images and video.
-- `api.redgifs.com`, `media.redgifs.com` — Redgifs is played as native video
+- `old.reddit.com`, `www.reddit.com` - listing JSON for both frontends (ADR 0008).
+- `i.redd.it`, `v.redd.it` - Reddit-hosted images and video.
+- `api.redgifs.com`, `media.redgifs.com` - Redgifs is played as native video
   (ADR 0010): the background resolves the clip's direct mp4 from the API and
   fetches the bytes, because the CDN hotlink-protects against a reddit `Referer`.
   That is an extension-initiated fetch, so it needs the host permission. (The
   iframe fallback, used only when resolution fails, is a page element and needs
-  no host permission — just the page's `frame-src`.)
+  no host permission - just the page's `frame-src`.)
 
 **Optional `optional_host_permissions`**, requested from a user gesture only when
 the feature is enabled and removed when it is disabled:
 
-- `preview.redd.it`, `external-preview.redd.it` — read pixels for the opt-in
+- `preview.redd.it`, `external-preview.redd.it` - read pixels for the opt-in
   content-based duplicate detection (ADR 0006 Layer 2).
 
 No all-URLs or broad host access is requested.

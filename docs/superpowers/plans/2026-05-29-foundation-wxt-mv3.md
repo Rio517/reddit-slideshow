@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Stand up a runnable Firefox **MV3** WebExtension scaffold built with **WXT**, plus offline fixtures and unit tests for old Reddit URL/listing parsing — with no live Reddit dependency.
+**Goal:** Stand up a runnable Firefox **MV3** WebExtension scaffold built with **WXT**, plus offline fixtures and unit tests for old Reddit URL/listing parsing - with no live Reddit dependency.
 
 **Architecture:** A WXT (Vite) project. Entrypoints (`background`, `content`, `options`) live under `entrypoints/`; shared, bundled logic lives under `lib/`. The background is a non-persistent **event page**; the content script injects an overlay root. The first slice proves we can parse committed HTML/JSON fixtures into normalized slide candidates. Settings flow through one validated path (`lib/settings.js`), consumed by the options page.
 
@@ -11,8 +11,8 @@
 **Decisions baked in (see [ADR 0005](../../adr/0005-manifest-v3-event-page-and-wxt-build.md)):**
 
 - MV3 + event page + `action`; use WXT so shared modules are bundled instead of relying on browser-specific content-script module loading.
-- Host scope is **`old.reddit.com` only** for v1 — `www.reddit.com` is not in permissions or `SUPPORTED_HOSTS`.
-- `options` consumes `lib/settings.js` via a single `getSettings()`/`saveSettings()` path — no duplicated defaults.
+- Host scope is **`old.reddit.com` only** for v1 - `www.reddit.com` is not in permissions or `SUPPORTED_HOSTS`.
+- `options` consumes `lib/settings.js` via a single `getSettings()`/`saveSettings()` path - no duplicated defaults.
 - `browser_specific_settings.gecko.id` is set.
 - `filenameHint` guards missing/non-ASCII titles; the preview-image case asserts `mediaUrl`; the URL converter rejects comment permalinks.
 
@@ -833,7 +833,7 @@ const SUPPORTED_HOSTS = new Set(["old.reddit.com"]);
 
 /**
  * Convert an old Reddit listing page URL to its JSON listing URL.
- * Assumes a *listing* context (subreddit, front page, multireddit, search) —
+ * Assumes a *listing* context (subreddit, front page, multireddit, search) -
  * comment permalinks are rejected because they return a different JSON shape.
  *
  * @param {string} pageUrl
@@ -873,7 +873,7 @@ Run:
 npm test -- tests/unit/reddit-url.test.js
 ```
 
-Expected: PASS. (Query order: `set` preserves insertion, so existing params come first, then `raw_json`, then `after` — matching the assertions.)
+Expected: PASS. (Query order: `set` preserves insertion, so existing params come first, then `raw_json`, then `after` - matching the assertions.)
 
 - [ ] **Step 5: Commit URL conversion**
 

@@ -10,7 +10,7 @@ Two facts constrain the manifest and build choices for this extension:
 1. **Firefox MV3 uses non-persistent event pages, not service workers, and MV3
    removes persistent background pages.** MV2 is not deprecated on Firefox
    (Mozilla promises ≥12 months' notice), but it carries no functional advantage
-   here — this extension has no blocking `webRequest` need (the one real Firefox
+   here - this extension has no blocking `webRequest` need (the one real Firefox
    MV2 advantage). Chrome has fully removed MV2 (139+), so any future
    cross-browser build requires MV3.
 
@@ -29,7 +29,7 @@ The project's code style (static HTML/CSS/JS modules, `textContent`, no
 1. **Target Manifest V3 with a non-persistent event page.** Use the `action`
    key (not `browser_action`), `host_permissions` for Reddit hosts, and
    `optional_host_permissions` for any later optional provider host (e.g. the
-   optional `api.redgifs.com` metadata endpoint — note Redgifs playback itself
+   optional `api.redgifs.com` metadata endpoint - note Redgifs playback itself
    needs no host permission; see ADR 0004). Background is
    `background: { scripts: [...], persistent: false }` (event page); a Chrome
    `service_worker` key may be added later for cross-browser builds.

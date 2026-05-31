@@ -49,7 +49,7 @@ const slides = [
   imageSlide(2, "She finally trusts me enough to nap on my lap", 1500, 1000),
   imageSlide(
     3,
-    "First snow — he has absolutely no idea what to do",
+    "First snow - he has absolutely no idea what to do",
     1600,
     1200,
   ),

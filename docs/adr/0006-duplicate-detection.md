@@ -33,10 +33,10 @@ Two platform constraints shape the design:
 ## Decision
 
 Add duplicate detection in two layers, gated by a single "Hide duplicates"
-setting (default on). Detection state is **session-scoped** — it resets each
+setting (default on). Detection state is **session-scoped** - it resets each
 time a slideshow starts and is never persisted (no new storage, no tracking).
 
-### Layer 1 — identity key (always available, no permissions)
+### Layer 1 - identity key (always available, no permissions)
 
 Derive a stable key per slide and drop slides whose key was already enqueued:
 
@@ -50,7 +50,7 @@ This is synchronous, runs in the queue alongside the NSFW filter, and catches
 exact reposts, crossposts, repeated galleries, and preview-vs-original of the
 same post. It covers the large majority of real duplicates at zero cost.
 
-### Layer 2 — perceptual hash for images (optional, staged)
+### Layer 2 - perceptual hash for images (optional, staged)
 
 To also catch re-uploads and resizes (different ids, visually identical),
 compute a **64-bit difference hash (dHash)**: downscale to 9×8 grayscale,

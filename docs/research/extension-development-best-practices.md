@@ -182,7 +182,7 @@ Practical rule:
 - Default muted playback should be the safer setting because browsers are stricter about autoplay with sound.
 - Do not bypass provider restrictions through brittle private endpoints.
 
-Important caveat for Reddit-hosted video (v.redd.it): `secure_media.reddit_video.fallback_url` is a **video-only** DASH rendition. Pointing a plain `<video>` at it plays with **no audio** — the audio is a separate track reachable only through the DASH manifest (`dash_url`) or HLS playlist (`hls_url`). For v1, either play muted-only and set `audioAvailable: false` (simplest, honest), or bundle an HLS player (e.g. hls.js — bundled, never remote-loaded, to satisfy AMO) and feed it `hls_url`. Do not assume `fallback_url` carries sound.
+Important caveat for Reddit-hosted video (v.redd.it): `secure_media.reddit_video.fallback_url` is a **video-only** DASH rendition. Pointing a plain `<video>` at it plays with **no audio** - the audio is a separate track reachable only through the DASH manifest (`dash_url`) or HLS playlist (`hls_url`). For v1, either play muted-only and set `audioAvailable: false` (simplest, honest), or bundle an HLS player (e.g. hls.js - bundled, never remote-loaded, to satisfy AMO) and feed it `hls_url`. Do not assume `fallback_url` carries sound.
 
 ### Preserve original image quality metadata
 
@@ -233,17 +233,17 @@ Reddit's current policy surface is broader than the old unauthenticated `.json` 
 Firefox supports both MV2 and MV3, but the background model differs from Chromium, and the difference is easy to state wrong. Verified facts (2026):
 
 - MV2 is **not** deprecated on Firefox; Mozilla has committed to at least 12 months' notice if that changes ([Mozilla, 2024-03](https://blog.mozilla.org/addons/2024/03/13/manifest-v3-manifest-v2-march-2024-update/)).
-- Firefox MV3 does **not** use service workers. It uses **non-persistent event pages** (`background.scripts` + `"persistent": false`). The claim "Firefox doesn't support `background.service_worker`" is true but stale — the modern Firefox model is the event page, and MV3 _removes_ persistent background pages entirely.
+- Firefox MV3 does **not** use service workers. It uses **non-persistent event pages** (`background.scripts` + `"persistent": false`). The claim "Firefox doesn't support `background.service_worker`" is true but stale - the modern Firefox model is the event page, and MV3 _removes_ persistent background pages entirely.
 - Choosing MV2 _specifically to keep a persistent background_ opts into the pattern being phased out. This extension has no blocking-`webRequest` need (the one real Firefox MV2 advantage), so MV2 buys nothing functional here.
 - Chrome has fully removed MV2 (Chrome 139+), so any future cross-browser build requires MV3.
 - The intended code style (static HTML/CSS/JS modules, `textContent`, no `innerHTML`/`eval`) already satisfies the strict MV3 CSP, so migration cost is near zero now and grows with the codebase.
 
 Recommendation:
 
-- Prefer **MV3 with an event page and the `action` key** for a new 2026 extension. If MV2 is kept for short-term speed, treat it as a conscious, time-boxed tradeoff — not as "Firefox supports persistent backgrounds cleanly."
+- Prefer **MV3 with an event page and the `action` key** for a new 2026 extension. If MV2 is kept for short-term speed, treat it as a conscious, time-boxed tradeoff - not as "Firefox supports persistent backgrounds cleanly."
 - Use a build tool that can emit a Firefox build and a Chrome MV3 build from one source (see "Build tooling" below) rather than distorting the architecture for one browser.
 - Document the chosen manifest model in an ADR before implementation.
-- MV3 caveat for later: host permissions become user-revocable, so a content script won't auto-inject without a granted host permission — check `permissions.contains` / `permissions.request`. Not an issue under MV2.
+- MV3 caveat for later: host permissions become user-revocable, so a content script won't auto-inject without a granted host permission - check `permissions.contains` / `permissions.request`. Not an issue under MV2.
 
 ### Build tooling: use a bundler from the start
 

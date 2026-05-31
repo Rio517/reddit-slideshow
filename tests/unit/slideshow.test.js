@@ -87,7 +87,7 @@ describe("SlideshowController", () => {
       postsScanned: 2,
     });
     controller.markReady();
-    vi.advanceTimersByTime(5000); // 10s dwell — not yet
+    vi.advanceTimersByTime(5000); // 10s dwell - not yet
     expect(rendered).toEqual(["a"]);
     controller.setImageTimerSeconds(2); // shorten live → restart from now
     vi.advanceTimersByTime(2000);

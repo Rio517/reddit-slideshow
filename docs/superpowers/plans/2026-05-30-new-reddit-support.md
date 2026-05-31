@@ -38,7 +38,7 @@ it("preserves the host (no old/new cross-mapping)", () => {
 - [ ] **Step 2: Run the tests to verify they fail**
 
 Run: `npx vitest run tests/unit/reddit-url.test.js`
-Expected: FAIL — the new www cases throw "Unsupported Reddit listing URL".
+Expected: FAIL - the new www cases throw "Unsupported Reddit listing URL".
 
 - [ ] **Step 3: Add www.reddit.com to the supported hosts**
 
@@ -164,7 +164,7 @@ listing (acceptable). Build this only if start-from-scroll is wanted on www.
 - Modify: `entrypoints/content.js` (use the new reader in `getStartCursor`)
 - Test: `tests/unit/reddit-dom.test.js`
 
-- [ ] **Step 1: Spike — capture the real shreddit post shape**
+- [ ] **Step 1: Spike - capture the real shreddit post shape**
 
 In a logged-in browser on `https://www.reddit.com/r/pics/`, open devtools and run:
 
@@ -211,7 +211,7 @@ other than `id`.)
 - [ ] **Step 3: Run the test to verify it fails**
 
 Run: `npx vitest run tests/unit/reddit-dom.test.js`
-Expected: FAIL — `lib/reddit-dom.js` does not exist.
+Expected: FAIL - `lib/reddit-dom.js` does not exist.
 
 - [ ] **Step 4: Implement the reader**
 
@@ -288,7 +288,7 @@ git commit -m "feat: start-from-viewport cursor on new Reddit (shreddit)"
   Task 3, no code change needed); shreddit cursor with top fallback (Task 4 +
   the existing empty-posts → `undefined` → top behavior); www permission/match
   (Task 2). All covered.
-- **Placeholder scan:** none — Task 4 Step 1 is a real spike with exact commands,
+- **Placeholder scan:** none - Task 4 Step 1 is a real spike with exact commands,
   and Step 2 notes to adjust the selector if the attribute differs.
 - **Type consistency:** `listingPostFullnames(doc)` is defined in Task 4 Step 4
   and used in Step 6; `afterCursorForViewport` already exists and takes

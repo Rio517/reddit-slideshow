@@ -3,7 +3,7 @@
   --rs-muted: #9aa4b2;
   --rs-accent: #ff7a18;
   --rs-danger: #ff6b6b;
-  /* Slide-change transition timing — keep --rs-tx-dur in sync with
+  /* Slide-change transition timing - keep --rs-tx-dur in sync with
      TRANSITION_MS in lib/overlay-ui.js. */
   --rs-tx-dur: 0.45s;
   --rs-tx-ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -49,7 +49,7 @@
   white-space: nowrap;
 }
 
-/* Top per-slide timer sweep — above the media so tall images can't cover it */
+/* Top per-slide timer sweep - above the media so tall images can't cover it */
 .rs-timer {
   position: absolute;
   top: 0;
@@ -120,7 +120,7 @@
   animation: rs-exit-fade var(--rs-tx-dur) var(--rs-tx-ease) both;
 }
 
-/* fade — pure cross-fade (default) */
+/* fade - pure cross-fade (default) */
 .rs-tx-fade.rs-slide--enter {
   animation-name: rs-enter-fade;
 }
@@ -128,7 +128,7 @@
   animation-name: rs-exit-fade;
 }
 
-/* zoom — incoming scales up into place, outgoing scales away */
+/* zoom - incoming scales up into place, outgoing scales away */
 .rs-tx-zoom.rs-slide--enter {
   animation-name: rs-enter-zoom;
 }
@@ -136,7 +136,7 @@
   animation-name: rs-exit-zoom;
 }
 
-/* slide — directional slide + fade */
+/* slide - directional slide + fade */
 .rs-tx-slide.rs-dir-fwd.rs-slide--enter {
   animation-name: rs-enter-slide-fwd;
 }
@@ -150,7 +150,7 @@
   animation-name: rs-exit-slide-back;
 }
 
-/* push — directional, fully opaque conveyor */
+/* push - directional, fully opaque conveyor */
 .rs-tx-push.rs-dir-fwd.rs-slide--enter {
   animation-name: rs-enter-push-fwd;
 }
@@ -164,7 +164,7 @@
   animation-name: rs-exit-push-back;
 }
 
-/* flip — 3D card flip around the vertical axis */
+/* flip - 3D card flip around the vertical axis */
 .rs-tx-flip {
   backface-visibility: hidden;
 }
@@ -419,7 +419,7 @@ iframe.reddit-slideshow-media {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  /* Soft layered shadow so the title stays legible over a bright image —
+  /* Soft layered shadow so the title stays legible over a bright image -
      a glow/drop, not a hard outline. */
   text-shadow:
     0 1px 2px rgba(0, 0, 0, 0.75),
@@ -534,7 +534,7 @@ iframe.reddit-slideshow-media {
   outline-offset: 2px;
 }
 
-/* Close button — standalone in the top-right corner, off the rail. */
+/* Close button - standalone in the top-right corner, off the rail. */
 .rs-close-top {
   position: absolute;
   top: 18px;

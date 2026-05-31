@@ -1,13 +1,13 @@
 # Reddit Slideshow Spectacular!
 
 A full-screen, keyboard-driven slideshow of the images and videos in **your own
-Reddit** — the feed you're already looking at. Open your Home feed, a community
+Reddit** - the feed you're already looking at. Open your Home feed, a community
 you've joined, one of your Custom Feeds (multireddits), any subreddit, your saved
 posts, or a search on `old.reddit.com` or `www.reddit.com`, hit the toolbar icon
 (or **Alt+Shift+S**), and that exact view becomes the slideshow.
 
 **Private, and built on your existing setup.** It reuses your logged-in Reddit
-session — no API keys, no separate account, nothing to re-subscribe to — and runs
+session - no API keys, no separate account, nothing to re-subscribe to - and runs
 entirely in your browser. No analytics, no tracking, no developer servers (there
 are none); your settings stay on your device. It plays direct images, galleries,
 Reddit-hosted video, Redgifs, Imgur, Streamable, Giphy, Catbox, and crossposts.
@@ -20,32 +20,32 @@ Reddit-hosted video, Redgifs, Imgur, Streamable, Giphy, Catbox, and crossposts.
 ## Features
 
 - Launch from any `old.reddit.com` or `www.reddit.com` feed via the toolbar icon
-  or **Alt+Shift+S** — it starts at the post nearest your scroll position.
+  or **Alt+Shift+S** - it starts at the post nearest your scroll position.
 - Auto-advance on a timer or arrow through manually; videos advance when they end.
-- Pages forever — follows Reddit's pagination so the show keeps going.
+- Pages forever - follows Reddit's pagination so the show keeps going.
 - Per-kind rendering: `<img>` for images/galleries and native `<video>` for
   `v.redd.it`, Redgifs, Imgur, Streamable, Giphy, and Catbox.
 - Skips duplicates (reposts, crossposts, repeated galleries) and broken media.
-- Lots to tune from the overlay's gear, applied live with no reload — see
+- Lots to tune from the overlay's gear, applied live with no reload - see
   [Settings](#settings).
 
 ## Settings
 
-Tune it from the gear in the overlay or the full options page — changes apply
+Tune it from the gear in the overlay or the full options page - changes apply
 live, no reload:
 
-- **Seconds per image** — and how long to wait for slow media before skipping it
-- **Slide transition** — fade, slide, push, zoom, flip, or none
-- **Top countdown bar** — on video slides, every slide, or never
+- **Seconds per image** - and how long to wait for slow media before skipping it
+- **Slide transition** - fade, slide, push, zoom, flip, or none
+- **Top countdown bar** - on video slides, every slide, or never
 - **Autoplay videos** and **start muted**
-- **Include NSFW** — follows your logged-in Reddit session by default
-- **Skip duplicates** — reposts, crossposts, repeated galleries; optionally also
+- **Include NSFW** - follows your logged-in Reddit session by default
+- **Skip duplicates** - reposts, crossposts, repeated galleries; optionally also
   re-uploaded images via a local perceptual hash (opt-in)
-- **Pan & zoom** for images too big to see at once — a slow push-in and drift
+- **Pan & zoom** for images too big to see at once - a slow push-in and drift
   across, with full control of the sequence
 - **Always show the position counter & title**
 
-> Maintainer note: `npm run screenshots` regenerates the add-on-store assets — a
+> Maintainer note: `npm run screenshots` regenerates the add-on-store assets - a
 > slideshow shot plus the options page in light and dark. The Chromium binary
 > isn't fetched by `npm install`, so run `npx playwright install chromium` once
 > first.
@@ -71,7 +71,7 @@ npm run build:chrome  # Chrome  → .output/chrome-mv3/
    `.output/firefox-mv3/manifest.json`.
 3. After code changes, re-run `npm run build` and click **Reload**.
 
-Temporary add-ons are removed when you restart Firefox — just load it again. For
+Temporary add-ons are removed when you restart Firefox - just load it again. For
 a permanent install, use Firefox Developer Edition / Nightly / ESR, set
 `xpinstall.signatures.required` to `false` in `about:config`, then install the
 `npm run zip` package from `about:addons` → **Install Add-on From File…**.
@@ -102,7 +102,7 @@ startup that you can dismiss).
 ## Commands
 
 ```sh
-npm run dev          # WXT dev runner (fresh Firefox profile — not logged in)
+npm run dev          # WXT dev runner (fresh Firefox profile - not logged in)
 npm run build        # build BOTH → .output/firefox-mv3/ and .output/chrome-mv3/
 npm run build:firefox # Firefox MV3 only
 npm run build:chrome # Chrome MV3 only
@@ -130,7 +130,7 @@ Reddit, so prefer the temporary-add-on flow above for real testing.
 ## Publishing
 
 Both stores take the `wxt zip` output; submission is manual (no automated
-release yet). Bump `version` in `package.json` before each release — both
+release yet). Bump `version` in `package.json` before each release - both
 stores reject a re-used version.
 
 **Firefox (AMO):**
@@ -178,7 +178,7 @@ done yet.
 
 ## Privacy
 
-No analytics, no tracking, no developer servers — the extension only fetches the
+No analytics, no tracking, no developer servers - the extension only fetches the
 media you are viewing (Reddit, and Redgifs for Redgifs links) and stores your
 settings locally. See [PRIVACY.md](PRIVACY.md).
 
