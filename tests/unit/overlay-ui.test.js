@@ -123,6 +123,15 @@ describe("createOverlay", () => {
     overlay.host.remove();
   });
 
+  it("flags the play button as paused (turquoise pulse) only while paused", () => {
+    const overlay = createOverlay(noopHandlers());
+    const play = overlay.root.querySelector(".rs-btn--primary");
+    overlay.setPlaying(false);
+    expect(play?.classList.contains("rs-btn--paused")).toBe(true);
+    overlay.setPlaying(true);
+    expect(play?.classList.contains("rs-btn--paused")).toBe(false);
+  });
+
   it("wires the popout control to onPopout", () => {
     const onPopout = vi.fn();
     const overlay = createOverlay({ ...noopHandlers(), onPopout });
