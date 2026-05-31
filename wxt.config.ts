@@ -4,13 +4,16 @@ export default defineConfig({
   manifestVersion: 3,
   manifest: ({ browser }) => ({
     name: "Reddit Slideshow",
-    description: "Turn Reddit listings into a media slideshow.",
+    description:
+      "Turn an old or new Reddit feed into a full-screen, keyboard-driven media slideshow.",
+    homepage_url: "https://github.com/Rio517/reddit-slideshow",
     permissions: ["storage"],
     host_permissions: [
+      // Listing JSON is fetched (with the session cookie) from these two.
       "https://old.reddit.com/*",
       "https://www.reddit.com/*",
+      // Reddit image bytes are fetched only for opt-in content-dedup hashing.
       "https://i.redd.it/*",
-      "https://v.redd.it/*",
       // Redgifs: resolve the direct mp4 (api) and fetch its bytes (media) in the
       // background, so the clip plays as a native, correctly-timed video.
       "https://api.redgifs.com/*",
