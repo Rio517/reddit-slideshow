@@ -58,6 +58,23 @@ describe("createSettingsPanel", () => {
     ]);
   });
 
+  it("keeps the timer slider put while it's focused (no bounce mid-drag)", () => {
+    const { panel } = make();
+    const range = /** @type {HTMLInputElement} */ (
+      document.querySelector(".rs-set__range")
+    );
+    // User dragged to a high stop and is still holding the thumb.
+    range.value = "18";
+    range.focus();
+    // applyLiveSettings re-populates with the stored value — must not move it.
+    panel.setValues(/** @type {any} */ ({ ...SETTINGS, imageTimerSeconds: 5 }));
+    expect(range.value).toBe("18");
+    // Once it's not focused, setValues repositions it.
+    range.blur();
+    panel.setValues(/** @type {any} */ ({ ...SETTINGS, imageTimerSeconds: 5 }));
+    expect(range.value).toBe(String(imageTimerStopIndex(5)));
+  });
+
   it("emits a patch when the timer changes", () => {
     const { onChange } = make();
     const range = /** @type {HTMLInputElement} */ (
