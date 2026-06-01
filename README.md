@@ -47,7 +47,8 @@ live, no reload:
   hash
 - **Pan & zoom** for images too big to see at once - a slow push-in and drift
   across, with full control of the sequence
-- **Always show the position counter & title**
+- **Always show the position counter, title & skipped count** so a gap in the
+  count from a skipped item stays explained even after the controls fade
 
 > Maintainer note: `npm run screenshots` regenerates the add-on-store assets - a
 > slideshow shot plus the options page in light and dark. The Chromium binary
