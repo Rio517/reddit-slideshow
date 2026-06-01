@@ -24,6 +24,8 @@ describe("createImgurAlbumResolver", () => {
         width: 3000,
         height: 4000,
         animated: false,
+        hasSound: false,
+        looping: false,
       },
       {
         hash: "Rg6ZisF",
@@ -31,6 +33,8 @@ describe("createImgurAlbumResolver", () => {
         width: 3000,
         height: 4000,
         animated: false,
+        hasSound: false,
+        looping: false,
       },
     ]);
     expect(fetchImpl).toHaveBeenCalledWith(
@@ -62,7 +66,7 @@ describe("createImgurAlbumResolver", () => {
           count: 3,
           images: [
             { hash: "has-hyphen", ext: ".jpg" },
-            { hash: "ValidHash", ext: ".mp4" },
+            { hash: "ValidHash", ext: ".webm" }, // unsupported ext, filtered
             { ext: ".png" },
           ],
         },
@@ -93,7 +97,51 @@ describe("createImgurAlbumResolver", () => {
     });
     const images = await resolve("mixed");
     expect(images).toEqual([
-      { hash: "GoodOne", ext: ".png", width: 10, height: 20, animated: false },
+      {
+        hash: "GoodOne",
+        ext: ".png",
+        width: 10,
+        height: 20,
+        animated: false,
+        hasSound: false,
+        looping: false,
+      },
+    ]);
+  });
+
+  it("keeps a .mp4 video entry with its sound/loop flags", async () => {
+    const fetchImpl = async () =>
+      jsonResponse({
+        data: {
+          count: 1,
+          images: [
+            {
+              hash: "VidHash",
+              ext: ".mp4",
+              width: 854,
+              height: 480,
+              animated: true,
+              has_sound: true,
+              looping: true,
+            },
+          ],
+        },
+        success: true,
+        status: 200,
+      });
+    const { resolve } = createImgurAlbumResolver({
+      fetchImpl: /** @type {any} */ (fetchImpl),
+    });
+    expect(await resolve("vid")).toEqual([
+      {
+        hash: "VidHash",
+        ext: ".mp4",
+        width: 854,
+        height: 480,
+        animated: true,
+        hasSound: true,
+        looping: true,
+      },
     ]);
   });
 });

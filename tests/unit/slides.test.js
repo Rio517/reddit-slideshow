@@ -499,6 +499,31 @@ describe("Imgur album posts", () => {
     expect(slides[0].galleryIndex).toBeUndefined();
     expect(slides[0].galleryTotal).toBeUndefined();
   });
+
+  it("builds a native video slide for a .mp4 album member", () => {
+    /** @type {any} */
+    const placeholder = { postId: "t3_alb3", title: "Mixed" };
+    const slides = buildImgurAlbumImageSlides(placeholder, [
+      { hash: "PicHash", ext: ".jpg" },
+      { hash: "Loud", ext: ".mp4", hasSound: true, looping: true },
+      { hash: "Quiet", ext: ".mp4", hasSound: false, looping: true },
+    ]);
+    // Image member stays an image.
+    expect(slides[0]).toMatchObject({ kind: "image", mimeType: "image/jpeg" });
+    // A .mp4 with sound plays through once as a direct video (not proxied, not a gif).
+    expect(slides[1]).toMatchObject({
+      kind: "video",
+      mediaUrl: "https://i.imgur.com/Loud.mp4",
+      durationMode: "media",
+      mimeType: "video/mp4",
+      audioAvailable: true,
+    });
+    expect(slides[1].isGif).toBe(false);
+    expect(slides[1].proxied).toBeUndefined();
+    // A silent looping .mp4 reads as a gif (fills, loops, no pan/zoom).
+    expect(slides[2]).toMatchObject({ kind: "video", audioAvailable: false });
+    expect(slides[2].isGif).toBe(true);
+  });
 });
 
 describe("crossposts", () => {

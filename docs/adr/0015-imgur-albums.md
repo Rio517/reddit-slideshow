@@ -49,7 +49,8 @@ Verified behavior (real album `2orxIa1`, captured in
   `{ "data": { "count": N, "images": [ … ], "include_album_ads": false },
 "success": true, "status": 200 }`. Each image carries `hash`, `ext`
   (e.g. `".jpg"`), `width`, `height`, `animated`, `prefer_video`, plus metadata.
-  The direct file is `https://i.imgur.com/<hash><ext>`.
+  A **video** member has `ext: ".mp4"` with `animated`/`prefer_video`/`looping`
+  true and a `has_sound` flag. The direct file is `https://i.imgur.com/<hash><ext>`.
 - **No header required.** A plain GET returns the full JSON; an
   `X-Requested-With: XMLHttpRequest` header makes no difference.
 - **Empty / invalid album does not error.** A missing id still returns HTTP 200
@@ -57,12 +58,15 @@ Verified behavior (real album `2orxIa1`, captured in
   **type of `data`**: an object (with `images[]`) means a real album; an empty
   **array** means nothing to show. HTTP status and `success` are useless for
   detecting emptiness.
-- **Direct image hotlinking works from a Reddit page.** `i.imgur.com/<hash><ext>`
-  returns HTTP 200 `image/jpeg` whether the request carries no `Referer`, a
-  `www.reddit.com` `Referer`, or an `old.reddit.com` `Referer` - no redirect to a
-  "removed" placeholder. So the expanded images render directly in an `<img>`; no
-  blob proxy is needed (unlike Imgur `.gifv` → `.mp4`, ADR 0011, whose binary CDN
-  path does 403 a reddit referer).
+- **Direct hotlinking works from a Reddit page.** `i.imgur.com/<hash><ext>`
+  returns HTTP 200 (`image/jpeg` for images, `video/mp4` for `.mp4`) whether the
+  request carries no `Referer`, a `www.reddit.com` `Referer`, or an
+  `old.reddit.com` `Referer` - no redirect to a "removed" placeholder. So an
+  image member renders directly in an `<img>` and a `.mp4` member in a `<video>`;
+  no blob proxy is needed on a referer-free CDN like this. (Imgur `.gifv` → `.mp4`,
+  ADR 0011, is the separate single-clip path whose binary CDN does 403 a referer;
+  `i.imgur.com` mp4 album files do not, so they play direct with the blob proxy
+  only as the CSP fallback - ADR 0011/0013/0014's direct-with-proxy-fallback.)
 
 ## Decision
 
@@ -77,11 +81,14 @@ but as a **1 → N expansion** rather than a 1 → 1 upgrade.
   `sourceUrl`) and the post's display context (title, NSFW, permalink) but no
   renderable media - it exists only to be expanded.
 - **Resolver (`lib/imgur.js`).** A background resolver fetches the `ajaxalbums`
-  JSON and returns the image list. `resolveImgurAlbumSlides` replaces each
-  `imgur-album` placeholder with N plain **image** slides
-  (`https://i.imgur.com/<hash><ext>`, `provider: "imgur"`, `kind: "image"`),
-  numbered with `galleryIndex`/`galleryTotal` when N > 1 so the jump list
-  disambiguates them (same treatment as a native Reddit gallery). It is
+  JSON and returns the member list. `resolveImgurAlbumSlides` replaces each
+  `imgur-album` placeholder with N member slides
+  (`https://i.imgur.com/<hash><ext>`, `provider: "imgur"`), numbered with
+  `galleryIndex`/`galleryTotal` when N > 1 so the jump list disambiguates them
+  (same treatment as a native Reddit gallery). A `.jpg`/`.png`/… member becomes
+  an `image` slide; a `.mp4` member becomes a direct `video` slide
+  (`durationMode: "media"`, `audioAvailable` from `has_sound`, and `isGif` -
+  filling/looping - only when it is a silent looping clip). It is
   concurrency-limited and timed out via the shared `lib/async-pool.js`.
 - **Background wiring (`entrypoints/background.js`).** `fetchQueuePageWithProviders`
   runs the album expansion alongside the Redgifs/Streamable upgrades, so the
@@ -123,9 +130,10 @@ Costs / limits:
   vanish. The fail-soft path degrades to "album shows nothing" rather than a
   broken slideshow, and the placeholder/resolver split means a future official
   path could be swapped in behind the same `imgur-album` marker.
-- **Animated members render as `<img>` GIFs**, not as the silent looping `.mp4`
-  the `.gifv` path uses. Acceptable for v1; an animated member could later be
-  upgraded to a proxied video using its `prefer_video`/`ext` hints.
+- **A `.mp4` member plays as a direct `<video>`** (Chrome and Firefox), with the
+  blob proxy as the CSP fallback. An animated **`.gif`** member still renders as
+  an `<img>` GIF rather than its `.mp4` twin - acceptable, since the gif loops
+  fine in an `<img>`; it could later be upgraded via the `prefer_video` hint.
 
 ## Implementation Guidance
 
@@ -135,5 +143,6 @@ Costs / limits:
   host before trusting them, matching the discipline of the other resolvers.
 - Keep the resolver concurrency-limited and timed out; one slow album must not
   hold up the page.
-- Do not add a blob proxy for album images - direct `<img>` hotlinking is
-  verified to work from a reddit referer.
+- Image members hotlink directly in an `<img>`; `.mp4` members play directly in a
+  `<video>` (`i.imgur.com` is a `DIRECT_VIDEO_HOST`), with the background blob
+  proxy used only as the CSP fallback - both verified from a reddit referer.
