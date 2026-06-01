@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { slidesFromListing } from "../../lib/slides.js";
+import {
+  slidesFromListing,
+  imgurAlbumId,
+  buildImgurAlbumImageSlides,
+} from "../../lib/slides.js";
 import fixture from "../fixtures/reddit-json/subreddit-direct-images.json";
 import galleryFixture from "../fixtures/reddit-json/gallery.json";
 import videoFixture from "../fixtures/reddit-json/reddit-video.json";
@@ -9,6 +13,7 @@ import catboxVideoFixture from "../fixtures/reddit-json/catbox-video.json";
 import streamableFixture from "../fixtures/reddit-json/streamable.json";
 import giphyFixture from "../fixtures/reddit-json/giphy.json";
 import crosspostFixture from "../fixtures/reddit-json/crosspost.json";
+import imgurAlbumFixture from "../fixtures/reddit-json/imgur-album.json";
 
 describe("slidesFromListing", () => {
   it("normalizes direct i.redd.it images as original quality slides", () => {
@@ -402,6 +407,68 @@ describe("Giphy posts", () => {
       },
     });
     expect(slides[0]).toMatchObject({ kind: "image" });
+  });
+});
+
+describe("Imgur album posts", () => {
+  it("emits a single placeholder slide carrying the album id and context", () => {
+    const slides = slidesFromListing(imgurAlbumFixture);
+    expect(slides).toHaveLength(1);
+    expect(slides[0]).toMatchObject({
+      id: "t3_alb1:album",
+      postId: "t3_alb1",
+      provider: "imgur-album",
+      kind: "image",
+      mediaUrl: "",
+      sourceUrl: "https://imgur.com/a/AbCd12",
+      title: "Imgur album",
+    });
+  });
+
+  it("extracts the album/gallery id from the various Imgur URL shapes", () => {
+    expect(imgurAlbumId("https://imgur.com/a/AbCd12")).toBe("AbCd12");
+    expect(
+      imgurAlbumId(
+        "https://imgur.com/gallery/photo-of-pup-tiger-lilly-1254-2orxIa1",
+      ),
+    ).toBe("2orxIa1");
+    expect(imgurAlbumId("https://imgur.com/gallery/2orxIa1")).toBe("2orxIa1");
+    expect(imgurAlbumId("https://i.imgur.com/abc.jpg")).toBeUndefined();
+    expect(imgurAlbumId("https://imgur.com/AbCd12")).toBeUndefined();
+  });
+
+  it("builds numbered i.imgur.com image slides for a multi-image album", () => {
+    /** @type {any} */
+    const placeholder = {
+      postId: "t3_alb1",
+      permalink: "https://old.reddit.com/r/x/comments/alb1/album/",
+      title: "Imgur album",
+      over18: false,
+    };
+    const slides = buildImgurAlbumImageSlides(placeholder, [
+      { hash: "XV5chUH", ext: ".jpg", width: 3000, height: 4000 },
+      { hash: "Rg6ZisF", ext: ".jpg", width: 3000, height: 4000 },
+    ]);
+    expect(slides.map((s) => s.mediaUrl)).toEqual([
+      "https://i.imgur.com/XV5chUH.jpg",
+      "https://i.imgur.com/Rg6ZisF.jpg",
+    ]);
+    expect(slides.map((s) => [s.galleryIndex, s.galleryTotal])).toEqual([
+      [1, 2],
+      [2, 2],
+    ]);
+  });
+
+  it("leaves a single-image album unnumbered (no '1/1')", () => {
+    /** @type {any} */
+    const placeholder = { postId: "t3_alb2", title: "Solo" };
+    const slides = buildImgurAlbumImageSlides(placeholder, [
+      { hash: "OneHash", ext: ".png" },
+    ]);
+    expect(slides).toHaveLength(1);
+    expect(slides[0].mediaUrl).toBe("https://i.imgur.com/OneHash.png");
+    expect(slides[0].galleryIndex).toBeUndefined();
+    expect(slides[0].galleryTotal).toBeUndefined();
   });
 });
 

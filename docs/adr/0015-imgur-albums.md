@@ -1,0 +1,137 @@
+# ADR 0015: Imgur Albums Via The Keyless `ajaxalbums` Endpoint
+
+Date: 2026-06-01
+Status: Accepted
+
+## Context
+
+Imgur album and gallery links arrive in Reddit listings as a bare page URL with
+`post_hint: "link"` and no media payload:
+
+- `https://imgur.com/a/<id>`
+- `https://imgur.com/gallery/<slug>-<id>` (or `/gallery/<id>`)
+
+The listing JSON carries only the link - no image list, no thumbnails we can use.
+Until now these posts produced **zero** slides (the generic image path rejects a
+non-image URL), so multi-image Imgur posts silently vanished from the slideshow.
+
+### Why not the official API
+
+The documented way to expand an album is `GET api.imgur.com/3/album/<id>`, which
+requires an `Authorization: Client-ID <key>` header. We do **not** use it:
+
+- **Key registration is closed.** Imgur has disabled new application
+  registration, so we cannot obtain a Client-ID at all. This is not a
+  preference - the door is shut.
+- **A shipped key is a shared quota we'd own.** Even if registration reopened, a
+  Client-ID baked into a published extension is a single application credential
+  whose rate limit is shared across every install. We would be on the hook for a
+  pooled quota we cannot meter. (The Client-**Secret** must never ship; only the
+  Client-ID is public - but that is moot while registration is closed.)
+- **Per-IP is what actually governs.** Imgur's practical rate limiting is
+  per-client-IP for the front-end endpoints, which is why long-lived consumers
+  like RES have hotlinked Imgur for years without owning an app quota. Each
+  user's browser makes its own requests from its own IP.
+
+### The keyless endpoint
+
+Imgur's own album page fetches its images from an unauthenticated front-end
+endpoint that needs no key and no special header:
+
+```
+GET https://imgur.com/ajaxalbums/getimages/<id>/hit.json
+```
+
+Verified behavior (real album `2orxIa1`, captured in
+`tests/fixtures/imgur/album-2orxIa1.json`):
+
+- **Success:** HTTP 200, `Content-Type: application/json`. Body shape:
+  `{ "data": { "count": N, "images": [ … ], "include_album_ads": false },
+"success": true, "status": 200 }`. Each image carries `hash`, `ext`
+  (e.g. `".jpg"`), `width`, `height`, `animated`, `prefer_video`, plus metadata.
+  The direct file is `https://i.imgur.com/<hash><ext>`.
+- **No header required.** A plain GET returns the full JSON; an
+  `X-Requested-With: XMLHttpRequest` header makes no difference.
+- **Empty / invalid album does not error.** A missing id still returns HTTP 200
+  with `{ "data": [], "success": true, "status": 200 }`. The discriminator is the
+  **type of `data`**: an object (with `images[]`) means a real album; an empty
+  **array** means nothing to show. HTTP status and `success` are useless for
+  detecting emptiness.
+- **Direct image hotlinking works from a Reddit page.** `i.imgur.com/<hash><ext>`
+  returns HTTP 200 `image/jpeg` whether the request carries no `Referer`, a
+  `www.reddit.com` `Referer`, or an `old.reddit.com` `Referer` - no redirect to a
+  "removed" placeholder. So the expanded images render directly in an `<img>`; no
+  blob proxy is needed (unlike Imgur `.gifv` → `.mp4`, ADR 0011, whose binary CDN
+  path does 403 a reddit referer).
+
+## Decision
+
+Expand an Imgur album link into its member images in the background, before the
+content script ever sees the slides - mirroring how Redgifs/Streamable resolve,
+but as a **1 → N expansion** rather than a 1 → 1 upgrade.
+
+- **Detection (`lib/slides.js`).** A post on `imgur.com` (or a `*.imgur.com`
+  host that is not the `i.` media host) whose path is `/a/<id>` or
+  `/gallery/<…-><id>` emits a single **placeholder** slide with a new
+  `provider: "imgur-album"` marker. The placeholder carries the album id (via its
+  `sourceUrl`) and the post's display context (title, NSFW, permalink) but no
+  renderable media - it exists only to be expanded.
+- **Resolver (`lib/imgur.js`).** A background resolver fetches the `ajaxalbums`
+  JSON and returns the image list. `resolveImgurAlbumSlides` replaces each
+  `imgur-album` placeholder with N plain **image** slides
+  (`https://i.imgur.com/<hash><ext>`, `provider: "imgur"`, `kind: "image"`),
+  numbered with `galleryIndex`/`galleryTotal` when N > 1 so the jump list
+  disambiguates them (same treatment as a native Reddit gallery). It is
+  concurrency-limited and timed out via the shared `lib/async-pool.js`.
+- **Background wiring (`entrypoints/background.js`).** `fetchQueuePageWithProviders`
+  runs the album expansion alongside the Redgifs/Streamable upgrades, so the
+  content script receives a fully expanded, ready-to-render queue.
+- **Host permission (`wxt.config.ts`).** Add `https://imgur.com/*` for the
+  `ajaxalbums` fetch. The image bytes live on `i.imgur.com`, which is already
+  permitted (ADR 0011). The fetch is a plain background `fetch` gated only by the
+  host permission - it does not go through the proxy-fetch byte allowlist, since
+  the images load directly in an `<img>`.
+
+### Fail-soft
+
+A placeholder whose album resolves to **zero images** (empty array) or whose
+lookup **fails** (network, timeout, malformed JSON) is **dropped** - the post
+contributes no slides, exactly as a bare album link did before this change. We do
+not synthesize a broken slide or a skip entry, because no media load was ever
+attempted; there is nothing the user could act on. The drop is logged.
+
+## Consequences
+
+Benefits:
+
+- Multi-image Imgur albums/galleries play inline as a numbered image run, with no
+  API key, no shared quota, and no per-image proxy.
+- The expansion is invisible to the content script - it consumes the same
+  ready-to-render queue it always has.
+
+Costs / limits:
+
+- **Layer-2 perceptual dedup does not cover Imgur images.** The hashable-host
+  allowlist (`HASHABLE_HOSTS`) stays Reddit-only, so Imgur album images dedup by
+  Layer-1 URL key (`url:/<hash><ext>`) only - exact reposts of the same Imgur
+  file collapse, but a re-upload of the same picture under a new hash will not.
+  Extending perceptual hashing to `i.imgur.com` is a separate dedup-scope
+  decision (would need `i.imgur.com` in `HASHABLE_HOSTS`).
+- **Unofficial endpoint.** `ajaxalbums` is undocumented and could change or
+  vanish. The fail-soft path degrades to "album shows nothing" rather than a
+  broken slideshow, and the placeholder/resolver split means a future official
+  path could be swapped in behind the same `imgur-album` marker.
+- **Animated members render as `<img>` GIFs**, not as the silent looping `.mp4`
+  the `.gifv` path uses. Acceptable for v1; an animated member could later be
+  upgraded to a proxied video using its `prefer_video`/`ext` hints.
+
+## Implementation Guidance
+
+- Detect a real album by `data` being an **object** with a non-empty `images`
+  array; treat `data` being an array (or absent/empty `images`) as "no images".
+- Construct image URLs as `https://i.imgur.com/<hash><ext>` and validate the
+  host before trusting them, matching the discipline of the other resolvers.
+- Keep the resolver concurrency-limited and timed out; one slow album must not
+  hold up the page.
+- Do not add a blob proxy for album images - direct `<img>` hotlinking is
+  verified to work from a reddit referer.

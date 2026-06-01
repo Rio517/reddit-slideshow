@@ -1,0 +1,40 @@
+{
+  "data": {
+    "count": 2,
+    "images": [
+      {
+        "hash": "XV5chUH",
+        "title": "",
+        "description": "Freshly bathed with a brand new collar!",
+        "has_sound": false,
+        "width": 3000,
+        "height": 4000,
+        "size": 4160612,
+        "ext": ".jpg",
+        "animated": false,
+        "prefer_video": false,
+        "looping": false,
+        "datetime": "2026-05-31 06:34:43",
+        "edited": "0"
+      },
+      {
+        "hash": "Rg6ZisF",
+        "title": "",
+        "description": "**The Poofball tax** Fresh water.",
+        "has_sound": false,
+        "width": 3000,
+        "height": 4000,
+        "size": 3845728,
+        "ext": ".jpg",
+        "animated": false,
+        "prefer_video": false,
+        "looping": false,
+        "datetime": "2026-05-31 06:34:45",
+        "edited": "0"
+      }
+    ],
+    "include_album_ads": false
+  },
+  "success": true,
+  "status": 200
+}

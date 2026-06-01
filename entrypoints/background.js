@@ -6,6 +6,10 @@ import {
   resolveStreamableSlides,
 } from "@/lib/streamable.js";
 import {
+  createImgurAlbumResolver,
+  resolveImgurAlbumSlides,
+} from "@/lib/imgur.js";
+import {
   fetchCappedBytes,
   MAX_IMAGE_BYTES,
   MAX_MEDIA_BYTES,
@@ -21,11 +25,14 @@ export default defineBackground(() => {
 
   const redgifs = createRedgifsResolver();
   const streamable = createStreamableResolver();
+  const imgur = createImgurAlbumResolver();
 
   /**
    * Build a queue page, then upgrade provider iframe embeds (Redgifs, Streamable)
-   * to native (proxied) video slides so they time and unmute correctly. Each
-   * resolver leaves the iframe fallback in place when its lookup fails.
+   * to native (proxied) video slides so they time and unmute correctly, and
+   * expand Imgur album placeholders 1→N into their member image slides. Each
+   * resolver leaves the iframe fallback in place when its lookup fails; a failed
+   * album expansion drops to no slides.
    * @param {string} pageUrl
    * @param {{ after?: string }} options
    */
@@ -36,6 +43,7 @@ export default defineBackground(() => {
       page.slides,
       streamable.resolve,
     );
+    page.slides = await resolveImgurAlbumSlides(page.slides, imgur.resolve);
     return page;
   };
 
