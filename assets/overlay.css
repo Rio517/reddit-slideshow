@@ -426,7 +426,8 @@ iframe.reddit-slideshow-media {
   align-items: center;
   gap: 8px;
   min-width: 0;
-  color: var(--rs-muted);
+  /* Lighter than --rs-muted so the title reads clearly over busy media. */
+  color: #c1c8d3;
   font-size: 14px;
   font-weight: 300;
   /* A light glow for legibility over a bright image - small enough that it
