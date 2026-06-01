@@ -41,7 +41,7 @@ live, no reload:
 - **Slide transition** - fade, slide, push, zoom, flip, or none
 - **Top countdown bar** - on video slides, every slide, or never
 - **Autoplay videos** and **start muted**
-- **Toggleß NSFW** - follows your logged-in Reddit session by default
+- **Toggle NSFW** - follows your logged-in Reddit session by default
 - **Skip duplicates** - reposts, crossposts, repeated galleries, and (on by
   default) the same image re-uploaded under a new link, via a local perceptual
   hash
