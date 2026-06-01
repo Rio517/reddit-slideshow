@@ -933,8 +933,7 @@ describe("help panel", () => {
     );
   }
   /** @param {Overlay} overlay @returns {HTMLElement | null} */
-  const helpPanel = (overlay) =>
-    overlay.root.querySelector(".rs-help-panel");
+  const helpPanel = (overlay) => overlay.root.querySelector(".rs-help-panel");
   /** @param {Overlay} overlay @returns {HTMLElement | null} */
   const settingsPanel = (overlay) =>
     overlay.root.querySelector(".rs-settings-panel");
@@ -1031,7 +1030,9 @@ describe("auto-hide video controls", () => {
         playing: true,
       },
     );
-    return /** @type {HTMLVideoElement} */ (overlay.root.querySelector("video"));
+    return /** @type {HTMLVideoElement} */ (
+      overlay.root.querySelector("video")
+    );
   }
 
   it("starts with native controls hidden", () => {
