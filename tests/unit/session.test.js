@@ -497,6 +497,30 @@ describe("createSlideshowSession", () => {
     expect(text(".rs-skipped")).toBe("1 skipped");
   });
 
+  it("holds on the failure card when the user pauses, instead of advancing", async () => {
+    const { session } = makeSession({
+      settingsOverrides: { autoplay: true }, // a playing show the user then pauses
+      pages: [
+        {
+          slides: [imageSlide("a"), imageSlide("b")],
+          after: null,
+          exhausted: true,
+          postsScanned: 2,
+        },
+      ],
+    });
+    await session.start();
+    expect(mediaSrc()).toBe("https://i.redd.it/a.jpg");
+
+    session.handleKeydown(key(" ")); // pause the playing show
+    q(".reddit-slideshow-media")?.dispatchEvent(new Event("error"));
+
+    // Paused: show the broken-media card and stay on "a"; don't advance to "b".
+    expect(q(".rs-placeholder")).not.toBeNull();
+    expect(text(".rs-meta__counter")).toBe("1 / 2");
+    expect(text(".rs-skipped")).toBe("1 skipped");
+  });
+
   it("steps back over a skipped slide without re-skipping it", async () => {
     const { session } = makeSession({
       pages: [
