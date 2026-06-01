@@ -3,8 +3,8 @@
 A full-screen, keyboard-driven slideshow of the images and videos in **your own
 Reddit** - the feed you're already looking at. Open your Home feed, a community
 you've joined, one of your Custom Feeds (multireddits), any subreddit, your saved
-posts, or a search on `old.reddit.com` or `www.reddit.com`, hit the toolbar icon
-(or **Alt+Shift+S**), and that exact view becomes the slideshow.
+posts, or a search on `old.reddit.com` or `www.reddit.com`. Open with the toolbar icon
+or keyboard shortcut, and that exact view becomes the slideshow.
 
 **Private, and built on your existing setup.** It reuses your logged-in Reddit
 session - no API keys, no separate account, nothing to re-subscribe to - and runs
@@ -41,7 +41,7 @@ live, no reload:
 - **Slide transition** - fade, slide, push, zoom, flip, or none
 - **Top countdown bar** - on video slides, every slide, or never
 - **Autoplay videos** and **start muted**
-- **Include NSFW** - follows your logged-in Reddit session by default
+- **Toggleß NSFW** - follows your logged-in Reddit session by default
 - **Skip duplicates** - reposts, crossposts, repeated galleries, and (on by
   default) the same image re-uploaded under a new link, via a local perceptual
   hash
@@ -49,11 +49,6 @@ live, no reload:
   across, with full control of the sequence
 - **Always show the position counter, title & skipped count** so a gap in the
   count from a skipped item stays explained even after the controls fade
-
-> Maintainer note: `npm run screenshots` regenerates the add-on-store assets - a
-> slideshow shot plus the options page in light and dark. The Chromium binary
-> isn't fetched by `npm install`, so run `npx playwright install chromium` once
-> first.
 
 ## Install
 
@@ -131,6 +126,13 @@ librsvg (`rsvg-convert`), so it runs on macOS/Linux (or WSL), not bare Windows.
 
 `npm run dev` launches a clean Firefox profile that is **not** logged into
 Reddit, so prefer the temporary-add-on flow above for real testing.
+
+## Regenerating Screenshots
+
+> Maintainer note: `npm run screenshots` regenerates the add-on-store assets - a
+> slideshow shot plus the options page in light and dark. The Chromium binary
+> isn't fetched by `npm install`, so run `npx playwright install chromium` once
+> first.
 
 ## Publishing
 
