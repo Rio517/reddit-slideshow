@@ -1276,3 +1276,42 @@ describe("auto-hide video controls", () => {
     expect(video.controls).toBe(false);
   });
 });
+
+describe("mute state (single source of truth)", () => {
+  /**
+   * @param {Overlay} overlay
+   * @returns {HTMLVideoElement}
+   */
+  function renderRedditVideo(overlay) {
+    overlay.renderCurrent(
+      imageSlide({
+        kind: "video",
+        durationMode: "media",
+        mediaUrl: "https://v.redd.it/abc/DASH_720.mp4",
+        sourceUrl: "https://v.redd.it/abc/DASH_720.mp4",
+      }),
+      {
+        index: 0,
+        total: 1,
+        exhausted: true,
+        effectiveSeconds: 5,
+        playing: true,
+      },
+    );
+    return /** @type {HTMLVideoElement} */ (
+      overlay.root.querySelector("video")
+    );
+  }
+
+  it("reads the muted state from the isMuted handler at render", () => {
+    const overlay = createOverlay({ ...noopHandlers(), isMuted: () => false });
+    overlay.show();
+    expect(renderRedditVideo(overlay).muted).toBe(false);
+  });
+
+  it("defaults to muted when no isMuted handler is provided", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    expect(renderRedditVideo(overlay).muted).toBe(true);
+  });
+});
