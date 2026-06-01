@@ -72,8 +72,9 @@ slideshow fit).
   backdrop/control clicks, and `f` fullscreen from inside the shadow.
 - **Real-Firefox re-check (providers):** confirm Imgur `.gifv` and Giphy proxied
   playback, Catbox + Streamable direct video, and Imgur-album image expansion in a
-  logged-in profile (detection + resolvers are unit-tested). Streamable plays in
-  Firefox; verify the Chrome ORB fix (direct, non-proxied video) on real Chrome.
+  logged-in profile (detection + resolvers are unit-tested). Streamable direct
+  video is confirmed in **both Firefox and Chrome** (the Chrome ORB fix works);
+  the rest still want a live look.
 - **Real-Firefox re-check:** the dropped iframe `allow-same-origin` (security M1).
   Confirm Redgifs `/ifr/` playback still works while logged in; revert that one
   line if it regresses.
@@ -203,16 +204,18 @@ Before calling provider/media work done:
 
 ## 5. Validation Status
 
-Confirmed in a real logged-in Firefox profile:
+Confirmed in a real logged-in profile:
 
 - Session-cookie `.json` access returns logged-in JSON (incl. NSFW), with `X-Ratelimit-*` headers.
 - v.redd.it video plays and Redgifs `/ifr/<id>` iframe plays **without** a `redgifs.com` host permission.
 - Navigation, automatic pagination to subsequent pages, and RES coexistence (with RES + Reddit Deduplicator) - no keyboard/DOM conflicts.
+- **Streamable direct video plays in Chrome** (the ORB fix) - user-confirmed.
 - Sanitized fixtures exist for image/gallery/video/redgifs/crosspost (crosspost hand-authored; capture a real one if convenient).
 
-Not yet verified in real Firefox (see the §1 re-check items): the shadow-root
-overlay (CSS isolation, `inert` focus trap, fullscreen) and live playback of the
-new providers (Imgur `.gifv`, Streamable, Giphy, Catbox).
+Not yet verified in a real browser (see the §1 re-check items): the shadow-root
+overlay (CSS isolation, `inert` focus trap, fullscreen), the solo-vs-gallery
+dedup skip, and live playback of the remaining providers (Imgur `.gifv` + albums,
+Giphy, Catbox).
 
 ---
 
