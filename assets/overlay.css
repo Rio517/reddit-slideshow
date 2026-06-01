@@ -565,9 +565,9 @@ iframe.reddit-slideshow-media {
   transform: translate(-50%, 14px);
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  min-width: 240px;
-  padding: 14px 16px;
+  gap: 16px;
+  width: 300px;
+  padding: 22px 22px 18px;
   border-radius: 12px;
   background: rgba(10, 12, 18, 0.96);
   backdrop-filter: blur(16px);
@@ -582,7 +582,8 @@ iframe.reddit-slideshow-media {
 
 .rs-confirm__text {
   margin: 0;
-  font-size: 13px;
+  font-size: 14px;
+  line-height: 1.5;
   color: var(--rs-fg);
 }
 
@@ -1307,7 +1308,7 @@ iframe.reddit-slideshow-media {
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 8;
-  width: min(360px, calc(100vw - 48px));
+  width: min(400px, calc(100vw - 48px));
   max-height: 84vh;
   overflow-y: auto;
   padding: 16px 18px 18px;
@@ -1374,13 +1375,14 @@ iframe.reddit-slideshow-media {
 
 .rs-help-panel__keys {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   /* Right-align in a fixed-width column so every description starts at the same
-     x and a wide chord (Page Up / Page Down) wraps instead of leaking across. */
+     x; the column is wide enough for the widest chord so nothing ever wraps. */
   justify-content: flex-end;
   gap: 5px;
-  flex: 0 0 132px;
+  flex: 0 0 180px;
+  white-space: nowrap;
 }
 
 .rs-help-panel__key {

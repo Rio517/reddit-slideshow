@@ -289,13 +289,14 @@ describe("createOverlay", () => {
     expect(video?.getAttribute("src")).toBe("blob:fake-123");
   });
 
-  it("a backdrop click asks before closing; media/control clicks do not", () => {
+  it("a backdrop click asks before closing once well into the show; media/control clicks do not", () => {
     const onClose = vi.fn();
     const overlay = createOverlay({ ...noopHandlers(), onClose });
+    // Past slide 20, so a backdrop click guards instead of closing outright.
     overlay.renderCurrent(imageSlide(), {
-      index: 0,
-      total: 1,
-      exhausted: true,
+      index: 24,
+      total: 50,
+      exhausted: false,
       effectiveSeconds: 5,
       playing: true,
     });
@@ -317,9 +318,39 @@ describe("createOverlay", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
+  it("a backdrop click closes immediately in the first 20 slides (no confirm)", () => {
+    const onClose = vi.fn();
+    const overlay = createOverlay({ ...noopHandlers(), onClose });
+    overlay.renderCurrent(imageSlide(), {
+      index: 5,
+      total: 50,
+      exhausted: false,
+      effectiveSeconds: 5,
+      playing: true,
+    });
+    overlay.root
+      .querySelector(".rs-stage")
+      ?.dispatchEvent(new Event("click", { bubbles: true }));
+    // No confirm popover; the show just closes.
+    expect(
+      /** @type {HTMLElement | null} */ (
+        overlay.root.querySelector(".rs-confirm")
+      )?.hidden,
+    ).toBe(true);
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
   it("the X button and Keep-watching skip / dismiss the confirm", () => {
     const onClose = vi.fn();
     const overlay = createOverlay({ ...noopHandlers(), onClose });
+    // Past slide 20 so a backdrop click confirms rather than closing outright.
+    overlay.renderCurrent(imageSlide(), {
+      index: 24,
+      total: 50,
+      exhausted: false,
+      effectiveSeconds: 5,
+      playing: true,
+    });
     const click = (/** @type {Element | null | undefined} */ el) =>
       el?.dispatchEvent(new Event("click", { bubbles: true }));
     const confirm = /** @type {HTMLElement | null} */ (
@@ -345,6 +376,13 @@ describe("createOverlay", () => {
   it("counts down in the Keep-watching button and auto-dismisses", () => {
     const onClose = vi.fn();
     const overlay = createOverlay({ ...noopHandlers(), onClose });
+    overlay.renderCurrent(imageSlide(), {
+      index: 24,
+      total: 50,
+      exhausted: false,
+      effectiveSeconds: 5,
+      playing: true,
+    });
     const click = (/** @type {Element | null | undefined} */ el) =>
       el?.dispatchEvent(new Event("click", { bubbles: true }));
     click(overlay.root.querySelector(".rs-stage"));
@@ -912,6 +950,14 @@ describe("createOverlay", () => {
     const click = (/** @type {Element | null | undefined} */ el) =>
       el?.dispatchEvent(new Event("click", { bubbles: true }));
     overlay.show();
+    // Past slide 20 so a backdrop click raises the confirm.
+    overlay.renderCurrent(imageSlide(), {
+      index: 24,
+      total: 50,
+      exhausted: false,
+      effectiveSeconds: 5,
+      playing: true,
+    });
     click(overlay.root.querySelector(".rs-stage")); // backdrop → confirm
     const confirm = /** @type {HTMLElement | null} */ (
       overlay.root.querySelector(".rs-confirm")
