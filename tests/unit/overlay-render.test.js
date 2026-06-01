@@ -41,6 +41,33 @@ describe("renderSlide", () => {
     expect(el.dataset.slideId).toBe("t3_x:0");
   });
 
+  it("fills the viewport for videos and gif images, but not static images", () => {
+    const fill = `${MEDIA_CLASS}--fill`;
+    expect(renderSlide(slide()).classList.contains(fill)).toBe(false);
+    expect(
+      renderSlide(
+        slide({
+          provider: "redgifs",
+          kind: "video",
+          mediaUrl: "https://media.redgifs.com/x.mp4",
+          proxied: true,
+        }),
+      ).classList.contains(fill),
+    ).toBe(true);
+    // A gif shown as an <img>, by mime type or the isGif flag.
+    expect(
+      renderSlide(
+        slide({
+          mediaUrl: "https://media.giphy.com/x.gif",
+          mimeType: "image/gif",
+        }),
+      ).classList.contains(fill),
+    ).toBe(true);
+    expect(renderSlide(slide({ isGif: true })).classList.contains(fill)).toBe(
+      true,
+    );
+  });
+
   it("renders Reddit video muted and autoplaying, not looping", () => {
     const el = /** @type {HTMLVideoElement} */ (
       renderSlide(
