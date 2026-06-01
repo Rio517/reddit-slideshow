@@ -1,0 +1,49 @@
+name: Release zips
+
+# Build the store-ready zips and attach them to the GitHub release. Fires on any
+# published release; the manual trigger lets us (re)build zips for an existing tag.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing release tag to build + attach store zips to (e.g. v0.1.0)"
+        required: true
+
+# Uploading assets to a release needs write access to repo contents.
+permissions:
+  contents: write
+
+# postinstall only needs `wxt prepare`; skip Playwright's browser download.
+env:
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+
+jobs:
+  zip:
+    name: build store zips · attach to release
+    runs-on: ubuntu-latest
+    # The released tag (from the event) or the manually-supplied one. Held in an
+    # env var so it's referenced as "$TAG" in shell, never interpolated straight
+    # into a run: command (avoids command injection via a crafted tag name).
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Build from the released tag's code, not the branch tip.
+          ref: ${{ env.TAG }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # `wxt zip` builds then packages: Firefox emits the extension zip + an AMO
+      # sources zip, Chrome emits its store zip - all under .output/.
+      - run: npm run zip
+      - run: npm run zip:chrome
+      - run: ls -la .output/*.zip
+      - name: Attach store zips to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$TAG" .output/*.zip --clobber
