@@ -560,6 +560,7 @@ describe("createOverlay", () => {
       .querySelector(".reddit-slideshow-media")
       ?.dispatchEvent(new Event("error"));
     expect(onMediaFailed).toHaveBeenCalledTimes(1);
+    expect(onMediaFailed.mock.calls[0][1]).toBe("Image didn't load");
     expect(overlay.root.querySelector(".rs-placeholder")).toBeNull();
   });
 
@@ -647,6 +648,7 @@ describe("createOverlay", () => {
     await Promise.resolve();
     await Promise.resolve();
     expect(onMediaFailed).toHaveBeenCalledTimes(1);
+    expect(onMediaFailed.mock.calls[0][1]).toBe("Unsupported link");
   });
 
   it("swaps in a placeholder when media fails to load", () => {
