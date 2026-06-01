@@ -627,6 +627,39 @@ describe("createOverlay", () => {
     );
   });
 
+  it("scrolls to the current post once the jump panel is shown, not while hidden", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.setJumpList(
+      [
+        imageSlide({ title: "a" }),
+        imageSlide({ title: "b" }),
+        imageSlide({ title: "c" }),
+      ],
+      2,
+      1,
+    );
+    const panel = /** @type {HTMLElement} */ (
+      overlay.root.querySelector(".rs-jump-panel")
+    );
+    // scrollIntoView is a no-op while the panel is display:none, so the fix must
+    // scroll only after it's unhidden. Record the panel's hidden state per call.
+    /** @type {boolean[]} */
+    const hiddenAtScroll = [];
+    const spy = vi
+      .spyOn(Element.prototype, "scrollIntoView")
+      .mockImplementation(() => {
+        hiddenAtScroll.push(panel.hidden);
+      });
+    try {
+      /** @type {HTMLElement} */ (
+        overlay.root.querySelector(".rs-meta__counter")
+      ).dispatchEvent(new Event("click", { bubbles: true }));
+    } finally {
+      spy.mockRestore();
+    }
+    expect(hiddenAtScroll).toEqual([false]);
+  });
+
   it("pulses the position counter on a manual nav", () => {
     const overlay = createOverlay(noopHandlers());
     const counter = overlay.root.querySelector(".rs-meta__counter");
