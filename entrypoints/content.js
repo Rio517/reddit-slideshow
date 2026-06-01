@@ -79,6 +79,8 @@ export default defineContentScript({
         );
       },
       createImage: () => new Image(),
+      // A detached <video> used only to warm the cache for the next direct clip.
+      createVideo: () => document.createElement("video"),
       // Layer 2 dedup: the background fetches the bytes (privileged), then we
       // downscale to 9x8 and difference-hash. Returns null on any failure.
       computeImageHash: async (url) => {

@@ -51,6 +51,26 @@ function imageSlide(id, overrides) {
   });
 }
 
+/** @param {string} id @param {Record<string, unknown>} [overrides] */
+function videoSlide(id, overrides) {
+  return /** @type {any} */ ({
+    id,
+    postId: id,
+    provider: "reddit-video",
+    kind: "video",
+    mediaUrl: `https://v.redd.it/${id}/CMAF_720.mp4`,
+    sourceUrl: `https://v.redd.it/${id}`,
+    permalink: "https://old.reddit.com/r/x/comments/x/x/",
+    title: id,
+    over18: false,
+    durationMode: "media",
+    audioAvailable: false,
+    quality: "original",
+    filenameHint: `${id}.mp4`,
+    ...overrides,
+  });
+}
+
 /** @param {string} id @param {string | null} after */
 function pageOf(id, after) {
   return {
@@ -110,7 +130,7 @@ function fakeRequest(pages) {
 }
 
 /**
- * @param {{ pages?: any[], settingsOverrides?: Record<string, unknown>, openUrl?: (url: string) => void, openPopout?: () => void, saveSettings?: (patch: object) => Promise<unknown>, computeImageHash?: (url: string) => Promise<string | null>, createImage?: () => { src: string, decoding?: string }, resolveMedia?: (url: string) => Promise<string | null> }} [opts]
+ * @param {{ pages?: any[], settingsOverrides?: Record<string, unknown>, openUrl?: (url: string) => void, openPopout?: () => void, saveSettings?: (patch: object) => Promise<unknown>, computeImageHash?: (url: string) => Promise<string | null>, createImage?: () => { src: string, decoding?: string }, createVideo?: () => { src: string, preload?: string, muted?: boolean }, resolveMedia?: (url: string) => Promise<string | null> }} [opts]
  */
 function makeSession({
   pages,
@@ -120,6 +140,7 @@ function makeSession({
   saveSettings,
   computeImageHash,
   createImage,
+  createVideo,
   resolveMedia,
 } = {}) {
   const request = fakeRequest(
@@ -142,6 +163,7 @@ function makeSession({
     openUrl: openUrl ?? (() => {}),
     openPopout,
     createImage: createImage ?? (() => ({ src: "", decoding: "" })),
+    createVideo,
     computeImageHash,
     resolveMedia,
   });
@@ -489,6 +511,40 @@ describe("createSlideshowSession", () => {
     expect(created.every((img) => img.src !== "http://i.redd.it/bad.jpg")).toBe(
       true,
     );
+  });
+
+  it("warms the cache for the nearest upcoming direct video, skipping proxied", async () => {
+    /** @type {Array<{ src: string, preload?: string }>} */
+    const videos = [];
+    const { session } = makeSession({
+      pages: [
+        {
+          // A proxied clip sits between "a" and a direct one: it can't be
+          // cache-warmed here, so the preloader reaches past it to the direct clip.
+          slides: [
+            imageSlide("a"),
+            videoSlide("prox", { proxied: true }),
+            videoSlide("vid"),
+          ],
+          after: null,
+          exhausted: true,
+          postsScanned: 3,
+        },
+      ],
+      createVideo: () => {
+        const v = { src: "", preload: "" };
+        videos.push(v);
+        return v;
+      },
+    });
+    await session.start();
+    const buffered = videos.filter((v) => v.src !== "");
+    expect(buffered.map((v) => v.src)).toEqual([
+      "https://v.redd.it/vid/CMAF_720.mp4",
+    ]);
+    expect(buffered[0].preload).toBe("auto");
+    session.close();
+    expect(videos.every((v) => v.src === "")).toBe(true);
   });
 
   it("suppresses handled keys but not others", async () => {
