@@ -565,6 +565,38 @@ describe("createSlideshowSession", () => {
     expect(text(".rs-skipped")).toBe("1 skipped");
   });
 
+  it("falls back to the provider iframe when a proxied video's fetch fails", async () => {
+    /** @type {any} */
+    const redgifs = {
+      id: "rg",
+      postId: "rg",
+      provider: "redgifs",
+      kind: "video",
+      mediaUrl: "https://media.redgifs.com/X.mp4",
+      sourceUrl: "https://www.redgifs.com/watch/x",
+      embedUrl: "https://www.redgifs.com/ifr/x",
+      permalink: "https://old.reddit.com/r/x/comments/x/x/",
+      title: "rg",
+      over18: false,
+      durationMode: "media",
+      audioAvailable: true,
+      proxied: true,
+      quality: "original",
+      filenameHint: "x.mp4",
+    };
+    const { session } = makeSession({
+      pages: [
+        { slides: [redgifs], after: null, exhausted: true, postsScanned: 1 },
+      ],
+    });
+    await session.start();
+    await flush(); // proxied fetch → null (no resolveMedia) → fall back to embed
+    const iframe = /** @type {HTMLIFrameElement | null} */ (
+      q("iframe.reddit-slideshow-media")
+    );
+    expect(iframe?.getAttribute("src")).toBe("https://www.redgifs.com/ifr/x");
+  });
+
   it("steps back over a skipped slide without re-skipping it", async () => {
     const { session } = makeSession({
       pages: [
