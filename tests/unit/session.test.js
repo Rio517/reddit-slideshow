@@ -563,6 +563,10 @@ describe("createSlideshowSession", () => {
     expect(q(".rs-placeholder")).not.toBeNull();
     expect(text(".rs-meta__counter")).toBe("1 / 2");
     expect(text(".rs-skipped")).toBe("1 skipped");
+
+    // Resuming moves on at once, not after a full dwell on the broken slide.
+    session.handleKeydown(key(" "));
+    expect(mediaSrc()).toBe("https://i.redd.it/b.jpg");
   });
 
   it("falls back to the provider iframe when a proxied video's fetch fails", async () => {

@@ -371,10 +371,13 @@ video.reddit-slideshow-media {
 
 /* Videos and animated gifs fill the viewport (object-fit keeps aspect) so a
    small clip - a Giphy gif, a low-res mp4 - scales up instead of sitting tiny.
-   Static images keep their intrinsic size (and pan & zoom when large). */
-.reddit-slideshow-media--fill {
+   Static images keep their intrinsic size (and pan & zoom when large). The
+   double class outweighs `img.reddit-slideshow-media`'s width/height:auto. */
+.reddit-slideshow-media.reddit-slideshow-media--fill {
   width: 100vw;
   height: 100vh;
+  /* Full-bleed: rounded corners would clip oddly at the viewport edge. */
+  border-radius: 0;
 }
 
 iframe.reddit-slideshow-media {
