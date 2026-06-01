@@ -172,6 +172,13 @@ describe("image timer stops", () => {
     expect(imageTimerStopSeconds(999)).toBe(300);
   });
 
+  it("falls back to the default dwell for non-numeric input", () => {
+    expect(imageTimerStopSeconds(NaN)).toBe(DEFAULT_SETTINGS.imageTimerSeconds);
+    expect(imageTimerStopSeconds("abc")).toBe(
+      DEFAULT_SETTINGS.imageTimerSeconds,
+    );
+  });
+
   it("formats durations compactly", () => {
     expect(formatImageTimer(5)).toBe("5s");
     expect(formatImageTimer(60)).toBe("1m");

@@ -98,6 +98,10 @@ describe("differenceHash + hammingDistanceHex", () => {
     expect(distance).toBeGreaterThan(0);
     expect(distance).toBeLessThanOrEqual(2);
   });
+
+  it("throws on a grid smaller than width*height", () => {
+    expect(() => differenceHash([1, 2, 3], 9, 8)).toThrow();
+  });
 });
 
 describe("luminanceFromImageData", () => {
