@@ -207,9 +207,9 @@ describe("createOverlay", () => {
     expect(overlay.root.querySelector(".rs-meta__counter")?.textContent).toBe(
       "1 / 50+",
     );
-    expect(overlay.root.querySelector(".rs-meta__title")?.textContent).toBe(
-      "Hello",
-    );
+    expect(
+      overlay.root.querySelector(".rs-meta__title-text")?.textContent,
+    ).toBe("Hello");
     const nsfw = /** @type {HTMLElement | null} */ (
       overlay.root.querySelector(".rs-meta__nsfw")
     );
@@ -217,6 +217,88 @@ describe("createOverlay", () => {
     expect(
       overlay.root.querySelector("img.reddit-slideshow-media"),
     ).toBeTruthy();
+  });
+
+  it("truncates a long title to 50 chars + ellipsis, keeping the full title on hover", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    const full =
+      "This is a very long title that goes well beyond fifty characters in length";
+    overlay.renderCurrent(imageSlide({ title: full }), {
+      index: 0,
+      total: 1,
+      exhausted: true,
+      effectiveSeconds: 5,
+      playing: true,
+    });
+    const text = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-meta__title-text")
+    );
+    expect(text?.textContent).toBe(`${full.slice(0, 50).trimEnd()}…`);
+    // Truncated visible text is 50 chars of title plus the ellipsis.
+    expect(text?.textContent?.length).toBe(51);
+    expect(text?.title).toBe(full);
+  });
+
+  it("renders a clickable /u/author byline rooted at the permalink origin", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    overlay.renderCurrent(
+      imageSlide({
+        author: "alice",
+        permalink: "https://old.reddit.com/r/x/comments/1/t/",
+      }),
+      {
+        index: 0,
+        total: 1,
+        exhausted: true,
+        effectiveSeconds: 5,
+        playing: true,
+      },
+    );
+    const author = /** @type {HTMLAnchorElement | null} */ (
+      overlay.root.querySelector(".rs-meta__author")
+    );
+    expect(author?.hidden).toBe(false);
+    expect(author?.textContent).toBe("/u/alice");
+    expect(author?.href).toBe("https://old.reddit.com/user/alice");
+  });
+
+  it("hides the author byline when the slide has no author", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    overlay.renderCurrent(imageSlide({ author: undefined }), {
+      index: 0,
+      total: 1,
+      exhausted: true,
+      effectiveSeconds: 5,
+      playing: true,
+    });
+    const author = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-meta__author")
+    );
+    expect(author?.hidden).toBe(true);
+  });
+
+  it("shows the title spinner during the pending window and clears it on failure", () => {
+    const overlay = createOverlay({ ...noopHandlers(), onMediaFailed() {} });
+    overlay.show();
+    overlay.renderCurrent(imageSlide(), {
+      index: 0,
+      total: 1,
+      exhausted: false,
+      effectiveSeconds: 5,
+      playing: true,
+    });
+    const spinner = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-meta__spinner")
+    );
+    // On while the next slide's media is still loading.
+    expect(spinner?.classList.contains("rs-meta__spinner--on")).toBe(true);
+    overlay.root
+      .querySelector(".reddit-slideshow-media")
+      ?.dispatchEvent(new Event("error"));
+    expect(spinner?.classList.contains("rs-meta__spinner--on")).toBe(false);
   });
 
   it("drops the + from the counter when the queue is exhausted", () => {

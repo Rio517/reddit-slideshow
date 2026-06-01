@@ -433,6 +433,42 @@ iframe.reddit-slideshow-media {
   text-shadow: 0 0 0.2rem #000;
 }
 
+.rs-meta__author {
+  margin-left: 8px;
+  color: var(--rs-accent);
+  text-decoration: none;
+}
+
+.rs-meta__author:hover,
+.rs-meta__author:focus-visible {
+  text-decoration: underline;
+}
+
+.rs-meta__author[hidden] {
+  display: none;
+}
+
+/* Inline "loading next media" ring. Appears instantly when shown, then fades out
+   over 200ms via the base transition once the class is removed. */
+.rs-meta__spinner {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  margin-left: 8px;
+  vertical-align: middle;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: var(--rs-accent);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  animation: rs-spin 0.7s linear infinite;
+}
+
+.rs-meta__spinner--on {
+  opacity: 1;
+  transition: none;
+}
+
 /* Control bar */
 .rs-controls {
   position: absolute;

@@ -102,6 +102,37 @@ describe("slidesFromListing", () => {
       mimeType: "image/webp",
     });
   });
+
+  /**
+   * @param {string} author
+   * @returns {import("../../lib/slides.js").Slide}
+   */
+  function singleAuthorSlide(author) {
+    return slidesFromListing({
+      data: {
+        children: [
+          {
+            kind: "t3",
+            data: {
+              name: "t3_byline",
+              title: "Byline post",
+              author,
+              url: "https://i.redd.it/x.jpg",
+              post_hint: "image",
+            },
+          },
+        ],
+      },
+    })[0];
+  }
+
+  it("attaches the post author to its slides as the byline", () => {
+    expect(singleAuthorSlide("alice").author).toBe("alice");
+  });
+
+  it("treats a [deleted] author as no byline", () => {
+    expect(singleAuthorSlide("[deleted]").author).toBeUndefined();
+  });
 });
 
 describe("gallery posts", () => {
