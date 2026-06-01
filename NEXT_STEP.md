@@ -1,6 +1,6 @@
 # NEXT_STEP - Reddit Slideshow Spectacular!
 
-**Doc updated:** 2026-06-01 · **Branch:** `main` · **Status:** shipped-ready on `old.reddit.com` + `www.reddit.com`; CI green; store-listing copy drafted. Current capabilities are described just below; open work is in §1 and the pending real-Firefox passes in §5.
+**Doc updated:** 2026-06-02 · **Branch:** `main` · **Status:** shipped-ready on `old.reddit.com` + `www.reddit.com`; CI green; store-listing copy drafted. Current capabilities are described just below; open work is in §1 and the pending real-Firefox passes in §5.
 
 > **Hard rule:** work directly on `main`. Do not create branches or worktrees unless the user explicitly asks. See `AGENTS.md`.
 
@@ -34,30 +34,31 @@ Key decisions already made:
 Near-term items, roughly in priority; most have a real blocker noted. Keep small
 commits - do not batch multiple slices into one giant commit.
 
-- **Video→next prefetch** - consecutive clips each load from scratch, and proxied
-  clips (Redgifs/Imgur `.gifv`/Giphy) fully download to a blob before they can
-  play, so there's a visible gap. Pre-resolve the next proxied clip's blob while
-  the current one plays; mind blob lifecycle/memory (revoke on eviction). Pairs
-  with Redgifs streaming below.
 - **Options-page donation link** - the in-overlay help-panel about line and the
   repo Sponsor button (`.github/FUNDING.yml`) already point at
   `github.com/sponsors/Rio517`; optionally add a small Sponsors link to the
   options-page footer too. Keep it a plain external link; mind each store's
   donation policy.
-- **Redgifs streaming** - avoid buffering the whole mp4 to a blob first
-  (MediaSource / range requests). Browser-only: can't be verified headless, and
-  it risks regressing the working proxied-blob playback. Recommended: defer to a
+- **Streaming on the proxy fallback** - direct playback already streams the mp4
+  (no whole-file blob), and the nearest upcoming direct clip is cache-warmed by
+  `preloadUpcoming`. The remaining gap is the CSP-fallback path on `www.reddit`,
+  where a blocked direct load still downloads the whole mp4 to a blob before it
+  plays. Streaming that (MediaSource / range requests) is browser-only, can't be
+  verified headless, and risks regressing working blob playback - defer to a
   focused real-Firefox effort.
 
 ### Media providers - the pattern
 
 Each provider mirrors Redgifs: detection in the `lib/slides.js` provider
 dispatch, a background resolver (`lib/redgifs.js` / `lib/streamable.js`-style)
-where a network resolve is needed, then play as a proxied `<video>` blob or
-render as images. Every new fetch host needs a scoped `host_permission` + an ADR,
-plus a fixture and a resolver/detection test. Providers whose media is on varying
-CDN subdomains use the proxy allowlist's dot-prefixed domain-suffix rule in
-`lib/background-router.js`.
+where a network resolve is needed, then play the mp4 directly in a `<video>`
+(the CDN serves it; Redgifs alone needs `referrerpolicy="no-referrer"`) or render
+as images. The background blob proxy is the per-slide fallback for pages whose
+CSP blocks cross-origin media (`www.reddit`): a failed direct load flips the slide
+to proxied and re-renders once. Every new fetch host needs a scoped
+`host_permission` + an ADR, plus a fixture and a resolver/detection test.
+Providers whose media is on varying CDN subdomains use the dot-prefixed
+domain-suffix rule in the host allowlists (`lib/provider-hosts.js`).
 
 Done: Redgifs, Imgur `.gifv`, Imgur albums, Streamable, Giphy, Catbox (ADRs 0010-0015).
 Skip: Gfycat (shut down 2023 → Redgifs); YouTube / Vimeo / Twitter (poor
@@ -70,11 +71,13 @@ slideshow fit).
   Confirm in a logged-in profile what headless can't: CSS isolation against real
   RES/old.reddit, the `inert` focus trap (Tab can't escape the overlay),
   backdrop/control clicks, and `f` fullscreen from inside the shadow.
-- **Real-Firefox re-check (providers):** confirm Imgur `.gifv` and Giphy proxied
-  playback, Catbox + Streamable direct video, and Imgur-album image expansion in a
-  logged-in profile (detection + resolvers are unit-tested). Streamable direct
-  video is confirmed in **both Firefox and Chrome** (the Chrome ORB fix works);
-  the rest still want a live look.
+- **Real-Firefox/Chrome re-check (providers):** confirm direct playback of Imgur
+  `.gifv`, Giphy, Redgifs, Catbox, Streamable, and Imgur-album members (images +
+  `.mp4` videos) in a logged-in profile (detection + resolvers are unit-tested),
+  and that a CSP-blocked direct load on `www.reddit` falls back to the blob proxy.
+  Streamable direct video is confirmed in **both Firefox and Chrome** (the Chrome
+  ORB fix works); the newly-direct Redgifs/Imgur/Giphy path wants a live look in
+  both - especially Redgifs' `referrerpolicy="no-referrer"` and the proxy fallback.
 - **Real-Firefox re-check:** the dropped iframe `allow-same-origin` (security M1).
   Confirm Redgifs `/ifr/` playback still works while logged in; revert that one
   line if it regresses.
@@ -214,8 +217,9 @@ Confirmed in a real logged-in profile:
 
 Not yet verified in a real browser (see the §1 re-check items): the shadow-root
 overlay (CSS isolation, `inert` focus trap, fullscreen), the solo-vs-gallery
-dedup skip, and live playback of the remaining providers (Imgur `.gifv` + albums,
-Giphy, Catbox).
+dedup skip, and the newly-direct provider playback in both browsers - Imgur
+`.gifv` + albums (now including `.mp4` members), Giphy, Redgifs, Catbox - plus the
+`www.reddit` CSP blob-proxy fallback.
 
 ---
 
