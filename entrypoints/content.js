@@ -3,8 +3,6 @@
 import overlayCss from "@/assets/overlay.css?inline";
 import { createOverlay } from "@/lib/overlay-ui.js";
 import { getSettings, saveSettings } from "@/lib/settings.js";
-import { afterCursorForViewport } from "@/lib/page-cursor.js";
-import { listingPostElements, postFullname } from "@/lib/reddit-dom.js";
 import { createSlideshowSession } from "@/lib/session.js";
 import { differenceHash, luminanceFromImageData } from "@/lib/dedup.js";
 import { createLogger } from "@/lib/log.js";
@@ -39,16 +37,8 @@ export default defineContentScript({
           };
         }
       },
-      // Start from the post nearest the top of the viewport so the slideshow
-      // begins where the user is, not at the top of the first page. Works on
-      // both old Reddit (div.thing) and new Reddit (shreddit-post).
-      getStartCursor: () => {
-        const posts = listingPostElements(document).map((el) => ({
-          fullname: postFullname(el),
-          bottom: el.getBoundingClientRect().bottom,
-        }));
-        return afterCursorForViewport(posts);
-      },
+      // No start cursor: begin from the top of the current listing so the newest
+      // posts (above wherever the user has scrolled) are included.
       openUrl: (url) => window.open(url, "_blank", "noopener"),
       // The options page can only be opened from a privileged context, so ask
       // the background to open it.

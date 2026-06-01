@@ -25,7 +25,7 @@ Key decisions already made:
 - Keep v1 old-Reddit-only: `old.reddit.com`.
 - Use offline fixtures for unit tests instead of live Reddit.
 - Resolve images, galleries, video, Redgifs, Imgur `.gifv`, Imgur albums, Streamable, Giphy, Catbox, and crossposts via the provider dispatch in `lib/slides.js`; CDN-subdomain providers use a dot-prefixed host-suffix allowlist.
-- Launch from the toolbar action (icon) or Alt+Shift+S; the slideshow seeds from the post nearest the current viewport.
+- Launch from the toolbar action (icon) or Alt+Shift+S; the slideshow starts from the top of the current listing (the page's own sort).
 
 ---
 
@@ -48,13 +48,6 @@ commits - do not batch multiple slices into one giant commit.
   (MediaSource / range requests). Browser-only: can't be verified headless, and
   it risks regressing the working proxied-blob playback. Recommended: defer to a
   focused real-Firefox effort.
-- **Newer posts above the launch point are skipped.** The show seeds from the
-  post nearest the viewport (`afterCursorForViewport`) and pages forward only via
-  `after` (`lib/slideshow.js`, `lib/queue.js`), so everything above the seed is
-  never fetched - on a `hot` feed that's where the newest posts sit. Not a cache
-  bug (Reddit's listing JSON is `no-store`; we keep no page cache). Decide the
-  intended behavior: seed from the top, add a "start here vs whole feed" choice,
-  or document that the show follows the page's scroll + sort.
 
 ### Media providers - the pattern
 
