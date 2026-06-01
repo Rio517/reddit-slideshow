@@ -378,6 +378,50 @@ describe("createSlideshowSession", () => {
     expect(mediaSrc()).toBe("https://i.redd.it/c.jpg");
   });
 
+  it("records a slide's hash even if the show advances before it resolves", async () => {
+    /** @type {Record<string, string>} */
+    const hashes = {
+      "https://i.redd.it/a.jpg": "ffffffffffffffff",
+      "https://i.redd.it/b.jpg": "0000000000000000",
+      "https://i.redd.it/c.jpg": "ffffffffffffffff", // a perceptual dup of "a"
+    };
+    // Defer "a"'s hash so the show can advance off it before it resolves - the
+    // race that used to discard the first copy's hash.
+    /** @type {(value?: unknown) => void} */
+    let releaseA = () => {};
+    const aHashed = new Promise((resolve) => {
+      releaseA = resolve;
+    });
+    const { session } = makeSession({
+      settingsOverrides: { contentDedup: true },
+      computeImageHash: async (url) => {
+        if (url === "https://i.redd.it/a.jpg") await aHashed;
+        return hashes[url] ?? null;
+      },
+      pages: [
+        {
+          slides: [imageSlide("a"), imageSlide("b"), imageSlide("c")],
+          after: null,
+          exhausted: true,
+          postsScanned: 3,
+        },
+      ],
+    });
+    await session.start();
+    session.handleKeydown(key("ArrowRight")); // -> "b" before "a" finished hashing
+    await flush();
+    expect(mediaSrc()).toBe("https://i.redd.it/b.jpg");
+
+    releaseA(); // "a"'s hash resolves now, while "a" is no longer current
+    await flush();
+
+    // "c" is a perceptual dup of "a"; it's skipped only if "a"'s hash was
+    // recorded despite the race.
+    session.handleKeydown(key("ArrowRight")); // -> "c"
+    await flush();
+    expect(text(".rs-skipped")).toBe("1 skipped");
+  });
+
   it("locks page scroll while open and restores it on close", async () => {
     document.documentElement.style.overflow = "scroll";
     const { session } = makeSession();
