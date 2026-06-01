@@ -60,4 +60,55 @@ describe("createHelpPanel", () => {
     expect(text).toContain("\u2190");
     expect(text).toContain("\u2192");
   });
+
+  it("renders an intro line with the italicized product name", () => {
+    const { root } = make();
+    const intro = /** @type {HTMLElement} */ (
+      root.querySelector(".rs-help-panel__intro")
+    );
+    expect(intro.textContent).toContain(
+      "optimized for hands-free or keyboard navigation",
+    );
+    const em = /** @type {HTMLElement} */ (intro.querySelector("em"));
+    expect(em.textContent).toBe("Reddit Slideshow Spectacular!");
+  });
+
+  it("renders an about footer with open-source and donation links", () => {
+    const { root } = make();
+    const about = /** @type {HTMLElement} */ (
+      root.querySelector(".rs-help-panel__about")
+    );
+    const links = /** @type {NodeListOf<HTMLAnchorElement>} */ (
+      about.querySelectorAll("a")
+    );
+    expect(links).toHaveLength(2);
+    const [source, donation] = links;
+    expect(source.getAttribute("href")).toBe(
+      "https://github.com/Rio517/reddit-slideshow-spectacular",
+    );
+    expect(donation.getAttribute("href")).toBe(
+      "https://github.com/sponsors/Rio517",
+    );
+    for (const a of links) {
+      expect(a.getAttribute("target")).toBe("_blank");
+      expect(a.getAttribute("rel")).toContain("noopener");
+    }
+  });
+
+  it("orders the panel as intro, list, about", () => {
+    const { root } = make();
+    const intro = /** @type {HTMLElement} */ (
+      root.querySelector(".rs-help-panel__intro")
+    );
+    const list = /** @type {HTMLElement} */ (
+      root.querySelector(".rs-help-panel__list")
+    );
+    const about = /** @type {HTMLElement} */ (
+      root.querySelector(".rs-help-panel__about")
+    );
+    // Intro precedes the list; about follows it (DOM document order).
+    const following = intro.DOCUMENT_POSITION_FOLLOWING;
+    expect(intro.compareDocumentPosition(list) & following).toBeTruthy();
+    expect(list.compareDocumentPosition(about) & following).toBeTruthy();
+  });
 });

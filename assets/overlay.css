@@ -1362,6 +1362,13 @@ iframe.reddit-slideshow-media {
   background: rgba(255, 255, 255, 0.1);
 }
 
+.rs-help-panel__intro {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--rs-muted);
+}
+
 .rs-help-panel__list {
   display: flex;
   flex-direction: column;
@@ -1413,4 +1420,23 @@ iframe.reddit-slideshow-media {
   font-size: 13px;
   flex: 1;
   color: var(--rs-fg);
+}
+
+.rs-help-panel__about {
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--rs-muted);
+}
+
+.rs-help-panel__link {
+  color: var(--rs-accent);
+  text-decoration: none;
+}
+
+.rs-help-panel__link:hover,
+.rs-help-panel__link:focus-visible {
+  text-decoration: underline;
 }
