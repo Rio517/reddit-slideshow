@@ -422,19 +422,31 @@ iframe.reddit-slideshow-media {
 }
 
 .rs-meta__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
   color: var(--rs-muted);
   font-size: 14px;
   font-weight: 300;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   /* A light glow for legibility over a bright image - small enough that it
      reads as a faint edge, not a filled background behind the text. */
   text-shadow: 0 0 0.2rem #000;
 }
 
+/* Only the title text ellipsizes; the byline and spinner sit beside it as
+   flex:none siblings so they're never clipped (and no stray "…" on short
+   titles, which the old container-level ellipsis produced). */
+.rs-meta__title-text {
+  flex: 0 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .rs-meta__author {
-  margin-left: 8px;
+  flex: none;
   color: var(--rs-accent);
   text-decoration: none;
 }
@@ -451,10 +463,10 @@ iframe.reddit-slideshow-media {
 /* Inline "loading next media" ring. Appears instantly when shown, then fades out
    over 200ms via the base transition once the class is removed. */
 .rs-meta__spinner {
+  flex: none;
   display: inline-block;
   width: 11px;
   height: 11px;
-  margin-left: 8px;
   vertical-align: middle;
   border: 2px solid rgba(255, 255, 255, 0.25);
   border-top-color: var(--rs-accent);
