@@ -56,7 +56,7 @@ commits - do not batch multiple slices into one giant commit.
   it risks regressing the working proxied-blob playback. Recommended: defer to a
   focused real-Firefox effort.
 - Ideal video state: while the controls were disruptive, not having access to them when you want to skip ahead is annoying. can we make it so that those controls are hidden unless the user mouse moves while above the video? I dont want them visible at the start and end, as the default behavior seems to be.
-- 
+-
 
 ### Media providers - the pattern
 

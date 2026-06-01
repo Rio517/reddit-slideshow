@@ -799,7 +799,8 @@ describe("PageUp / PageDown ±10", () => {
   });
 
   it("does not restart from the end card on PageDown", async () => {
-    const { session } = makeSession({ pages: [slidesPage(3)] });
+    // Same page twice: a restart re-fetches from the start cursor.
+    const { session } = makeSession({ pages: [slidesPage(3), slidesPage(3)] });
     await session.start();
     await flush();
     session.handleKeydown(key("ArrowRight")); // s1
@@ -819,8 +820,7 @@ describe("PageUp / PageDown ±10", () => {
 
 describe("Shift+ArrowRight skips the current gallery", () => {
   /** @param {string} id @param {Record<string, unknown>} [o] */
-  const gallery = (id, o) =>
-    imageSlide(id, { postId: id.split(":")[0], ...o });
+  const gallery = (id, o) => imageSlide(id, { postId: id.split(":")[0], ...o });
   const shiftRight = () =>
     /** @type {any} */ ({
       key: "ArrowRight",
