@@ -34,6 +34,7 @@ Key decisions already made:
 Near-term items, roughly in priority; most have a real blocker noted. Keep small
 commits - do not batch multiple slices into one giant commit.
 
+- How do users learn about our shortcuts? can we add a (?) help icon to the controls that pops up the list?
 - **Add Pagedown/up** - Use pagedown and pageup to skip ahead or go back by 10.
   No blocker; a small handler in `session.js` + the controller (skip 10, clamped).
 - **Video→next prefetch** - consecutive clips each load from scratch, and proxied
@@ -54,6 +55,8 @@ commits - do not batch multiple slices into one giant commit.
   (MediaSource / range requests). Browser-only: can't be verified headless, and
   it risks regressing the working proxied-blob playback. Recommended: defer to a
   focused real-Firefox effort.
+- Ideal video state: while the controls were disruptive, not having access to them when you want to skip ahead is annoying. can we make it so that those controls are hidden unless the user mouse moves while above the video? I dont want them visible at the start and end, as the default behavior seems to be.
+- 
 
 ### Media providers - the pattern
 
