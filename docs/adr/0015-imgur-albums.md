@@ -111,12 +111,14 @@ Benefits:
 
 Costs / limits:
 
-- **Layer-2 perceptual dedup does not cover Imgur images.** The hashable-host
-  allowlist (`HASHABLE_HOSTS`) stays Reddit-only, so Imgur album images dedup by
-  Layer-1 URL key (`url:/<hash><ext>`) only - exact reposts of the same Imgur
-  file collapse, but a re-upload of the same picture under a new hash will not.
-  Extending perceptual hashing to `i.imgur.com` is a separate dedup-scope
-  decision (would need `i.imgur.com` in `HASHABLE_HOSTS`).
+- **Imgur images participate in Layer-2 perceptual dedup.** `i.imgur.com` is on
+  the hashable-host allowlist (`HASHABLE_HOSTS`), so the background hashes album
+  images the same way it hashes reddit images - an album picture re-uploaded
+  standalone (on reddit or imgur) is caught as a perceptual duplicate, not just
+  by the exact-URL Layer-1 key. The hash fetch is the privileged byte path
+  (host-gated in `background-router.js`), distinct from the direct `<img>`
+  display load. Cost: hashing background-fetches each Imgur image (capped, like
+  reddit images) when content dedup is on.
 - **Unofficial endpoint.** `ajaxalbums` is undocumented and could change or
   vanish. The fail-soft path degrades to "album shows nothing" rather than a
   broken slideshow, and the placeholder/resolver split means a future official

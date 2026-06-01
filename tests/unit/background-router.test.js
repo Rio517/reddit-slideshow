@@ -146,6 +146,19 @@ describe("createMessageRouter - fetchImage", () => {
     expect(result.bytes).toBeInstanceOf(ArrayBuffer);
   });
 
+  it("returns bytes for an i.imgur.com image (Imgur dedup, ADR 0015)", async () => {
+    const router = makeRouter();
+    const result = await router(
+      {
+        type: "slideshow.fetchImage",
+        payload: { url: "https://i.imgur.com/XV5chUH.jpg" },
+      },
+      OWN,
+    );
+    expect(result.ok).toBe(true);
+    expect(result.bytes).toBeInstanceOf(ArrayBuffer);
+  });
+
   it("fails closed when the fetch rejects", async () => {
     const router = makeRouter({
       fetchImageBytes: async () => {
