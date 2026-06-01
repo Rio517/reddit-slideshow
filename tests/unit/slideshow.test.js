@@ -468,3 +468,61 @@ describe("skip(n)", () => {
     expect(controller.current?.id).toBe("s12");
   });
 });
+
+describe("skipPostGroup()", () => {
+  /** @param {string} id @param {string} postId */
+  const s = (id, postId) => slideWithId(id, { postId });
+  /** @param {import("../../lib/slides.js").Slide[]} slides */
+  const grp = (slides) => ({
+    slides,
+    after: null,
+    exhausted: true,
+    postsScanned: slides.length,
+  });
+
+  it("jumps from a gallery to the next post", () => {
+    const { controller } = makeController();
+    controller.start(
+      grp([s("p1:0", "p1"), s("p1:1", "p1"), s("p1:2", "p1"), s("p2:0", "p2")]),
+    );
+    controller.next(); // into the gallery (p1:1)
+    controller.skipPostGroup();
+    expect(controller.current?.id).toBe("p2:0");
+  });
+
+  it("from a standalone post advances to the next post", () => {
+    const { controller } = makeController();
+    controller.start(grp([s("a:0", "a"), s("b:0", "b")]));
+    controller.skipPostGroup();
+    expect(controller.current?.id).toBe("b:0");
+  });
+
+  it("skips over an already-skipped slide to the next real post", () => {
+    const { controller } = makeController();
+    controller.start(grp([s("p1:0", "p1"), s("p2:0", "p2"), s("p3:0", "p3")]));
+    controller.slides[1].skipReason = "Unavailable";
+    controller.skipPostGroup();
+    expect(controller.current?.id).toBe("p3:0");
+  });
+
+  it("ends the show when the trailing gallery is the last content", () => {
+    const { controller, ended } = makeController();
+    controller.start(grp([s("a:0", "a"), s("g:0", "g"), s("g:1", "g")]));
+    controller.next(); // g:0
+    controller.skipPostGroup(); // nothing after this post -> end
+    expect(ended()).toBe(1);
+  });
+
+  it("paginates when the trailing gallery is not yet exhausted", () => {
+    const { controller, requested } = makeController();
+    controller.start({
+      slides: [s("a:0", "a"), s("g:0", "g"), s("g:1", "g")],
+      after: "t3_next",
+      exhausted: false,
+      postsScanned: 50,
+    });
+    controller.next(); // g:0
+    controller.skipPostGroup();
+    expect(requested).toContain("t3_next");
+  });
+});

@@ -816,3 +816,60 @@ describe("PageUp / PageDown ±10", () => {
     expect(mediaSrc()).toContain("/0.jpg");
   });
 });
+
+describe("Shift+ArrowRight skips the current gallery", () => {
+  /** @param {string} id @param {Record<string, unknown>} [o] */
+  const gallery = (id, o) =>
+    imageSlide(id, { postId: id.split(":")[0], ...o });
+  const shiftRight = () =>
+    /** @type {any} */ ({
+      key: "ArrowRight",
+      shiftKey: true,
+      preventDefault() {},
+      stopImmediatePropagation() {},
+    });
+
+  it("jumps out of a gallery to the next post", async () => {
+    const { session } = makeSession({
+      pages: [
+        {
+          slides: [
+            gallery("p1:0"),
+            gallery("p1:1"),
+            gallery("p1:2"),
+            gallery("p2:0"),
+          ],
+          after: null,
+          exhausted: true,
+          postsScanned: 4,
+        },
+      ],
+    });
+    await session.start();
+    await flush();
+    session.handleKeydown(key("ArrowRight")); // into the gallery (p1:1)
+    await flush();
+    expect(mediaSrc()).toContain("/p1:1.jpg");
+    session.handleKeydown(shiftRight());
+    await flush();
+    expect(mediaSrc()).toContain("/p2:0.jpg");
+  });
+
+  it("a plain ArrowRight still advances one slide (no shift)", async () => {
+    const { session } = makeSession({
+      pages: [
+        {
+          slides: [gallery("p1:0"), gallery("p1:1"), gallery("p2:0")],
+          after: null,
+          exhausted: true,
+          postsScanned: 3,
+        },
+      ],
+    });
+    await session.start();
+    await flush();
+    session.handleKeydown(key("ArrowRight"));
+    await flush();
+    expect(mediaSrc()).toContain("/p1:1.jpg"); // next gallery item, not next post
+  });
+});

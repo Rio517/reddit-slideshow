@@ -41,7 +41,7 @@ describe("createHelpPanel", () => {
   it("lists one row per shortcut, each with a key badge and a description", () => {
     const panel = make();
     const rows = panel.root.querySelectorAll(".rs-help-panel__row");
-    expect(rows.length).toBe(7);
+    expect(rows.length).toBe(8);
     for (const row of rows) {
       expect(row.querySelector(".rs-help-panel__key")).not.toBeNull();
       expect(
@@ -55,9 +55,9 @@ describe("createHelpPanel", () => {
     const text = panel.root.textContent ?? "";
     expect(text).toContain("Alt");
     expect(text).toContain("Shift");
-    expect(text).toContain("Esc");
-    expect(text).toContain("←");
-    expect(text).toContain("→");
     expect(text).toContain("Page");
+    expect(text).toContain("Esc");
+    expect(text).toContain("\u2190");
+    expect(text).toContain("\u2192");
   });
 });
