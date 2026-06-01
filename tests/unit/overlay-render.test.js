@@ -171,6 +171,27 @@ describe("renderSlide", () => {
     ).toBe(false);
   });
 
+  it("suppresses the Referer for Redgifs direct video only", () => {
+    const redgifs = renderSlide(
+      slide({
+        provider: "redgifs",
+        kind: "video",
+        mediaUrl: "https://media.redgifs.com/X.mp4",
+      }),
+    );
+    expect(redgifs.getAttribute("src")).toBe("https://media.redgifs.com/X.mp4");
+    expect(redgifs.getAttribute("referrerpolicy")).toBe("no-referrer");
+    // v.redd.it doesn't need it - keep its Referer.
+    const vreddit = renderSlide(
+      slide({
+        provider: "reddit-video",
+        kind: "video",
+        mediaUrl: "https://v.redd.it/x/CMAF_720.mp4",
+      }),
+    );
+    expect(vreddit.getAttribute("referrerpolicy")).toBeNull();
+  });
+
   it("treats an embed as unsafe when its embedUrl is rejected (off-host/empty)", () => {
     const embed = (
       /** @type {Partial<import("../../lib/slides.js").Slide>} */ o,

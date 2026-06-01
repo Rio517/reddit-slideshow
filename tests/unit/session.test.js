@@ -110,7 +110,7 @@ function fakeRequest(pages) {
 }
 
 /**
- * @param {{ pages?: any[], settingsOverrides?: Record<string, unknown>, openUrl?: (url: string) => void, openPopout?: () => void, saveSettings?: (patch: object) => Promise<unknown>, computeImageHash?: (url: string) => Promise<string | null>, createImage?: () => { src: string, decoding?: string } }} [opts]
+ * @param {{ pages?: any[], settingsOverrides?: Record<string, unknown>, openUrl?: (url: string) => void, openPopout?: () => void, saveSettings?: (patch: object) => Promise<unknown>, computeImageHash?: (url: string) => Promise<string | null>, createImage?: () => { src: string, decoding?: string }, resolveMedia?: (url: string) => Promise<string | null> }} [opts]
  */
 function makeSession({
   pages,
@@ -120,6 +120,7 @@ function makeSession({
   saveSettings,
   computeImageHash,
   createImage,
+  resolveMedia,
 } = {}) {
   const request = fakeRequest(
     pages ?? [
@@ -142,6 +143,7 @@ function makeSession({
     openPopout,
     createImage: createImage ?? (() => ({ src: "", decoding: "" })),
     computeImageHash,
+    resolveMedia,
   });
   sessions.push(session);
   return { session, request };
@@ -569,36 +571,37 @@ describe("createSlideshowSession", () => {
     expect(mediaSrc()).toBe("https://i.redd.it/b.jpg");
   });
 
-  it("falls back to the provider iframe when a proxied video's fetch fails", async () => {
+  it("falls back to the blob proxy when a direct CDN video fails", async () => {
     /** @type {any} */
     const redgifs = {
       id: "rg",
       postId: "rg",
       provider: "redgifs",
       kind: "video",
-      mediaUrl: "https://media.redgifs.com/X.mp4",
+      mediaUrl: "https://media.redgifs.com/X.mp4", // a proxy-capable host
       sourceUrl: "https://www.redgifs.com/watch/x",
-      embedUrl: "https://www.redgifs.com/ifr/x",
       permalink: "https://old.reddit.com/r/x/comments/x/x/",
       title: "rg",
       over18: false,
       durationMode: "media",
       audioAvailable: true,
-      proxied: true,
       quality: "original",
-      filenameHint: "x.mp4",
+      filenameHint: "x.mp4", // not proxied → renders direct first
     };
     const { session } = makeSession({
+      resolveMedia: async () => "blob:fake", // the proxy fallback succeeds
       pages: [
         { slides: [redgifs], after: null, exhausted: true, postsScanned: 1 },
       ],
     });
     await session.start();
-    await flush(); // proxied fetch → null (no resolveMedia) → fall back to embed
-    const iframe = /** @type {HTMLIFrameElement | null} */ (
-      q("iframe.reddit-slideshow-media")
+    // The direct CDN <video> errors (e.g. a CSP-blocked page) → fall back to the
+    // background blob proxy, which re-renders the same slide with a blob: src.
+    q("video.reddit-slideshow-media")?.dispatchEvent(new Event("error"));
+    await flush();
+    expect(q("video.reddit-slideshow-media")?.getAttribute("src")).toBe(
+      "blob:fake",
     );
-    expect(iframe?.getAttribute("src")).toBe("https://www.redgifs.com/ifr/x");
   });
 
   it("steps back over a skipped slide without re-skipping it", async () => {

@@ -268,7 +268,7 @@ describe("Redgifs posts", () => {
 });
 
 describe("Imgur .gifv posts", () => {
-  it("plays the .mp4 (transformed from .gifv) as a proxied, looping video", () => {
+  it("plays the .mp4 (transformed from .gifv) as a direct, looping video", () => {
     const slides = slidesFromListing(imgurGifvFixture);
     expect(slides[0]).toMatchObject({
       id: "t3_img1:0",
@@ -283,7 +283,6 @@ describe("Imgur .gifv posts", () => {
       durationMode: "media",
       audioAvailable: false,
       isGif: true,
-      proxied: true,
       mimeType: "video/mp4",
       sourceWidth: 800,
       sourceHeight: 600,
@@ -311,8 +310,8 @@ describe("Imgur .gifv posts", () => {
       provider: "imgur",
       kind: "video",
       mediaUrl: "https://i.imgur.com/ZyXwV9.mp4",
-      proxied: true,
     });
+    expect(slides[0].proxied).toBeUndefined(); // direct play
   });
 });
 
@@ -378,7 +377,7 @@ describe("Streamable posts", () => {
 });
 
 describe("Giphy posts", () => {
-  it("transforms a giphy.com/gifs/<slug-id> watch page to the proxied mp4", () => {
+  it("transforms a giphy.com/gifs/<slug-id> watch page to the direct mp4", () => {
     const slides = slidesFromListing(giphyFixture);
     expect(slides[0]).toMatchObject({
       id: "t3_gp1:0",
@@ -391,7 +390,6 @@ describe("Giphy posts", () => {
       durationMode: "media",
       audioAvailable: false,
       isGif: true,
-      proxied: true,
       mimeType: "video/mp4",
       sourceWidth: 480,
       sourceHeight: 270,

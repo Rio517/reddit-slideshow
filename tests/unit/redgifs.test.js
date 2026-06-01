@@ -105,7 +105,7 @@ describe("createRedgifsResolver", () => {
 });
 
 describe("redgifsVideoSlide", () => {
-  it("upgrades an embed slide to a proxied native-video slide", () => {
+  it("upgrades an embed slide to a direct native-video slide", () => {
     const embed = /** @type {any} */ ({
       id: "t3_x:0",
       provider: "redgifs",
@@ -130,7 +130,7 @@ describe("redgifsVideoSlide", () => {
     expect(video.durationMode).toBe("media");
     expect(video.durationSeconds).toBe(9);
     expect(video.audioAvailable).toBe(true);
-    expect(video.proxied).toBe(true);
+    expect(video.proxied).toBeUndefined(); // direct play (no Referer via the sink)
     // Display context is preserved.
     expect(video.title).toBe("t");
     expect(video.over18).toBe(true);
@@ -161,7 +161,7 @@ describe("resolveRedgifsSlides", () => {
     expect(out[0]).toBe(slides[0]);
     expect(out[1].kind).toBe("video");
     expect(out[1].mediaUrl).toBe("https://media.redgifs.com/abc.mp4");
-    expect(out[1].proxied).toBe(true);
+    expect(out[1].proxied).toBeUndefined(); // direct play
   });
 
   it("keeps the iframe embed when resolution fails", async () => {
