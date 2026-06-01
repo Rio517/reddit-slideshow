@@ -95,7 +95,7 @@ describe("resolveStreamableSlides", () => {
     durationMode: "timer",
   };
 
-  it("upgrades a streamable embed to a proxied native video", async () => {
+  it("upgrades a streamable embed to a direct (non-proxied) native video", async () => {
     const resolve = async () => ({
       mediaUrl: "https://cdn-cf-east.streamable.com/x.mp4",
       durationSeconds: 9,
@@ -106,12 +106,14 @@ describe("resolveStreamableSlides", () => {
     const [slide] = await resolveStreamableSlides([embed], resolve);
     expect(slide).toMatchObject({
       kind: "video",
-      proxied: true,
       mediaUrl: "https://cdn-cf-east.streamable.com/x.mp4",
       durationMode: "media",
       durationSeconds: 9,
       audioAvailable: true,
     });
+    // Direct playback (no blob proxy) so Chrome's ORB can't block the CORS-less
+    // CDN mp4 (ADR 0013).
+    expect(slide.proxied).toBeFalsy();
   });
 
   it("keeps the iframe embed fallback when resolution fails", async () => {

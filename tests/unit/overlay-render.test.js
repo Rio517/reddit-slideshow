@@ -119,6 +119,31 @@ describe("renderSlide", () => {
     ).toBe(true);
   });
 
+  it("allows a direct Streamable CDN video host (varying subdomain), rejects look-alikes", () => {
+    const streamable = (/** @type {string} */ url) =>
+      slide({ provider: "streamable", kind: "video", mediaUrl: url });
+    const el = renderSlide(
+      streamable("https://cdn-cf-east.streamable.com/video/mp4/x.mp4?token=1"),
+    );
+    expect(el.getAttribute("src")).toBe(
+      "https://cdn-cf-east.streamable.com/video/mp4/x.mp4?token=1",
+    );
+    expect(
+      mediaUrlIsSafe(streamable("https://cdn-b-west.streamable.com/x.mp4")),
+    ).toBe(true);
+    // The dot-prefixed suffix can't be spoofed by a look-alike domain, and the
+    // bare domain (no CDN subdomain) is not a real mp4 host.
+    expect(mediaUrlIsSafe(streamable("https://evilstreamable.com/x.mp4"))).toBe(
+      false,
+    );
+    expect(mediaUrlIsSafe(streamable("https://streamable.com/o/x.mp4"))).toBe(
+      false,
+    );
+    expect(
+      mediaUrlIsSafe(streamable("http://cdn-cf-east.streamable.com/x.mp4")),
+    ).toBe(false);
+  });
+
   it("treats an embed as unsafe when its embedUrl is rejected (off-host/empty)", () => {
     const embed = (
       /** @type {Partial<import("../../lib/slides.js").Slide>} */ o,
