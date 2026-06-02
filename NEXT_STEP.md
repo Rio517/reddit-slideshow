@@ -60,9 +60,14 @@ giant commit.
   Real audio needs muxing the DASH audio track (bundled MediaSource/HLS player).
   Browser-only, risks regressing playback.
 - **Redgifs lazy resolution** - push a page before its embeds resolve.
+- **Options-page donation link** - the in-overlay help-panel about line and the
+  repo Sponsor button (`.github/FUNDING.yml`) already point at
+  `github.com/sponsors/Rio517`; add a small Sponsors link to the
+  options-page footer. Keep it a plain external link; mind each store's policy.
 - Download the current media.
 - Highest-resolution inspection indicators.
-
+- switch the order of the bottom left image title elements so the orde rhousld be username, title, popout arrow, loading spinner
+- add resolution and domain on the right side. subtle.
 
 ### Hardening / polish
 
@@ -74,10 +79,6 @@ giant commit.
 - **Small fail-closed test gaps**: `slideshow.fetchMedia` from a non-content-script
   sender; the unparseable-URL catch in `handleHashImage` / `proxyFetch`; the
   redgifs `urls.sd` fallback. Cheap to add to the existing router/redgifs suites.
-- **Options-page donation link** - the in-overlay help-panel about line and the
-  repo Sponsor button (`.github/FUNDING.yml`) already point at
-  `github.com/sponsors/Rio517`; optionally add a small Sponsors link to the
-  options-page footer. Keep it a plain external link; mind each store's policy.
 
 ### Media providers - the pattern
 
