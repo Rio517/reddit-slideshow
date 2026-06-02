@@ -130,7 +130,7 @@ function fakeRequest(pages) {
 }
 
 /**
- * @param {{ pages?: any[], settingsOverrides?: Record<string, unknown>, openUrl?: (url: string) => void, openPopout?: () => void, saveSettings?: (patch: object) => Promise<unknown>, computeImageHash?: (url: string) => Promise<string | null>, createImage?: () => { src: string, decoding?: string }, createVideo?: () => { src: string, preload?: string, muted?: boolean }, resolveMedia?: (url: string) => Promise<string | null> }} [opts]
+ * @param {{ pages?: any[], settingsOverrides?: Record<string, unknown>, openUrl?: (url: string) => void, openPopout?: () => void, saveSettings?: (patch: object) => Promise<unknown>, computeImageHash?: (url: string) => Promise<string | null>, createImage?: () => { src: string, decoding?: string }, createVideo?: () => { src: string, preload?: string, muted?: boolean }, resolveMedia?: (url: string) => Promise<string | null>, downloadMedia?: (url: string, filename: string) => void }} [opts]
  */
 function makeSession({
   pages,
@@ -142,6 +142,7 @@ function makeSession({
   createImage,
   createVideo,
   resolveMedia,
+  downloadMedia,
 } = {}) {
   const request = fakeRequest(
     pages ?? [
@@ -166,6 +167,7 @@ function makeSession({
     createVideo,
     computeImageHash,
     resolveMedia,
+    downloadMedia,
   });
   sessions.push(session);
   return { session, request };
@@ -400,6 +402,21 @@ describe("createSlideshowSession", () => {
     session.handleKeydown(key("ArrowRight")); // -> "b", a perceptual dup of "a"
     await flush(); // "b" hashed → skipped → "c"
     expect(mediaSrc()).toBe("https://i.redd.it/c.jpg");
+  });
+
+  it("downloads the current slide's media via the download control", async () => {
+    /** @type {Array<{ url: string, filename: string }>} */
+    const calls = [];
+    const { session } = makeSession({
+      downloadMedia: (url, filename) => calls.push({ url, filename }),
+    });
+    await session.start();
+    /** @type {HTMLButtonElement | null} */ (
+      q('[aria-label^="Download"]')
+    )?.click();
+    expect(calls).toEqual([
+      { url: "https://i.redd.it/a.jpg", filename: "a.jpg" },
+    ]);
   });
 
   it("filters a perceptual duplicate during preload, before it is shown", async () => {

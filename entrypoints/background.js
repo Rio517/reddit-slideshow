@@ -65,6 +65,11 @@ export default defineBackground(() => {
     hashImage,
     // Redgifs mp4 bytes, played back as a blob to dodge CDN hotlink protection.
     fetchMediaBytes: (url) => fetchCappedBytes(url, MAX_MEDIA_BYTES),
+    // Save the displayed media. The downloads API runs from the background and
+    // fetches the file itself (no reddit Referer), so a hotlink-protected CDN
+    // serves it; the suggested filename comes from the slide's hint.
+    downloadMedia: ({ url, filename }) =>
+      browser.downloads.download({ url, filename, saveAs: false }),
     openOptionsPage: () => browser.runtime.openOptionsPage(),
     // Minimal popup window (no tab strip / toolbar / URL bar) for AirPlay.
     openPopout: (url) =>

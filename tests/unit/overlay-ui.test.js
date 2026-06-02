@@ -89,11 +89,11 @@ describe("createOverlay", () => {
     document.body.inert = false;
   });
 
-  it("builds the chrome with ten controls, hidden by default", () => {
+  it("builds the chrome with eleven controls, hidden by default", () => {
     const overlay = createOverlay(noopHandlers());
     expect(overlay.root.querySelector(".rs-stage")).toBeTruthy();
     expect(overlay.root.querySelector(".rs-timer")).toBeTruthy();
-    expect(overlay.root.querySelectorAll(".rs-btn").length).toBe(10);
+    expect(overlay.root.querySelectorAll(".rs-btn").length).toBe(11);
     expect(overlay.isOpen()).toBe(false);
   });
 
@@ -138,6 +138,46 @@ describe("createOverlay", () => {
     const overlay = createOverlay({ ...noopHandlers(), onPopout });
     clickByLabel(overlay.root, "Open in a window");
     expect(onPopout).toHaveBeenCalledTimes(1);
+  });
+
+  it("wires the download control to onDownload", () => {
+    const onDownload = vi.fn();
+    const overlay = createOverlay({ ...noopHandlers(), onDownload });
+    clickByLabel(overlay.root, "Download");
+    expect(onDownload).toHaveBeenCalledTimes(1);
+  });
+
+  it("enables download for a downloadable image, disables it for an embed", () => {
+    const overlay = createOverlay({ ...noopHandlers(), onDownload() {} });
+    overlay.show();
+    const dl = () =>
+      /** @type {HTMLButtonElement | null} */ (
+        overlay.root.querySelector('[aria-label^="Download"]')
+      );
+    overlay.renderCurrent(imageSlide(), {
+      index: 0,
+      total: 1,
+      exhausted: true,
+      effectiveSeconds: 5,
+      playing: true,
+    });
+    expect(dl()?.disabled).toBe(false);
+    overlay.renderCurrent(
+      imageSlide({
+        kind: "embed",
+        provider: "redgifs",
+        mediaUrl: "https://www.redgifs.com/ifr/x",
+        embedUrl: "https://www.redgifs.com/ifr/x",
+      }),
+      {
+        index: 1,
+        total: 2,
+        exhausted: true,
+        effectiveSeconds: 5,
+        playing: true,
+      },
+    );
+    expect(dl()?.disabled).toBe(true);
   });
 
   it("a backdrop click with the settings panel open closes the panel, not the show", () => {

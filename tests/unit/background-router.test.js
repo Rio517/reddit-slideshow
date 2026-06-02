@@ -407,6 +407,100 @@ describe("createMessageRouter - fetchMedia", () => {
   });
 });
 
+describe("createMessageRouter - download", () => {
+  const dlMsg = (/** @type {any} */ payload) => ({
+    type: "slideshow.download",
+    payload,
+  });
+
+  it("downloads a media file for a content-script request", async () => {
+    /** @type {Array<{ url: string, filename: string }>} */
+    const calls = [];
+    const router = makeRouter({
+      downloadMedia: async (/** @type {any} */ opts) => {
+        calls.push(opts);
+        return 7;
+      },
+    });
+    const result = await router(
+      dlMsg({ url: "https://i.redd.it/a.jpg", filename: "t3_a.jpg" }),
+      OWN,
+    );
+    expect(result).toEqual({ ok: true });
+    expect(calls).toEqual([
+      { url: "https://i.redd.it/a.jpg", filename: "t3_a.jpg" },
+    ]);
+  });
+
+  it("rejects a download from a non-content-script sender (no tab)", async () => {
+    let called = false;
+    const router = makeRouter({
+      downloadMedia: async () => {
+        called = true;
+        return 1;
+      },
+    });
+    const result = await router(
+      dlMsg({ url: "https://i.redd.it/a.jpg", filename: "t3_a.jpg" }),
+      { id: RUNTIME_ID }, // extension page: own id, no tab
+    );
+    expect(result).toEqual({ ok: false });
+    expect(called).toBe(false);
+  });
+
+  it("rejects a non-https download url", async () => {
+    let called = false;
+    const router = makeRouter({
+      downloadMedia: async () => {
+        called = true;
+        return 1;
+      },
+    });
+    const result = await router(
+      dlMsg({ url: "http://i.redd.it/a.jpg", filename: "t3_a.jpg" }),
+      OWN,
+    );
+    expect(result).toEqual({ ok: false });
+    expect(called).toBe(false);
+  });
+
+  it("rejects a missing filename", async () => {
+    const router = makeRouter({ downloadMedia: async () => 1 });
+    expect(
+      await router(dlMsg({ url: "https://i.redd.it/a.jpg" }), OWN),
+    ).toEqual({ ok: false });
+  });
+
+  it("strips any path from the suggested filename", async () => {
+    /** @type {Array<{ url: string, filename: string }>} */
+    const calls = [];
+    const router = makeRouter({
+      downloadMedia: async (/** @type {any} */ opts) => {
+        calls.push(opts);
+        return 1;
+      },
+    });
+    await router(
+      dlMsg({ url: "https://i.redd.it/a.jpg", filename: "../../etc/passwd" }),
+      OWN,
+    );
+    expect(calls[0].filename).toBe("passwd");
+  });
+
+  it("fails closed when the download throws", async () => {
+    const router = makeRouter({
+      downloadMedia: async () => {
+        throw new Error("blocked");
+      },
+    });
+    const result = await router(
+      dlMsg({ url: "https://i.redd.it/a.jpg", filename: "t3_a.jpg" }),
+      OWN,
+    );
+    expect(result).toEqual({ ok: false });
+  });
+});
+
 describe("createMessageRouter - openOptions", () => {
   it("opens the options page for an own-sender request", async () => {
     const openOptionsPage = vi.fn();

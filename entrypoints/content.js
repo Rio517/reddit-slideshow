@@ -79,6 +79,16 @@ export default defineContentScript({
           new Blob([base64ToArrayBuffer(res.b64)], { type: "video/mp4" }),
         );
       },
+      // User-initiated save of the displayed media: the background drives the
+      // downloads API (a content script can't), using the slide's filename hint.
+      downloadMedia: (url, filename) => {
+        browser.runtime
+          .sendMessage({
+            type: "slideshow.download",
+            payload: { url, filename },
+          })
+          .catch((err) => log.warn("download message failed", url, err));
+      },
       createImage: () => new Image(),
       // A detached <video> used only to warm the cache for the next direct clip.
       createVideo: () => document.createElement("video"),
