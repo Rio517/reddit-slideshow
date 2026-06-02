@@ -1,12 +1,14 @@
 # NEXT_STEP - Reddit Slideshow Spectacular!
 
-**Branch:** `main` · **Status:** CI green. Remaining work is polish plus the
-deferred real-browser re-checks in §1. The version bump to 1.0.0 is deliberately
-not done (user's call).
+**Branch:** `main` · **Status:** local green gate (typecheck/lint/format/test +
+both builds + web-ext lint). The backlog is cleared; the only remaining work is
+the browser-only streaming-proxy effort in §1, plus a real-browser confirm of
+the features implemented this session (also §1). The version bump to 1.0.0 is
+deliberately not done (user's call).
 
 > **Hard rule:** work directly on `main`. Do not create branches or worktrees unless the user explicitly asks. See `AGENTS.md`.
 
-This is a Firefox-first (also Chrome) WebExtension that turns the current `old.reddit.com` or `www.reddit.com` feed into a keyboard-driven media slideshow. It reuses the logged-in session (no API keys) and resolves images, galleries, v.redd.it video, Redgifs, Imgur `.gifv`, Imgur albums, Streamable, Giphy, Catbox video, and crossposts via the provider dispatch in `lib/slides.js`. The overlay does a gap-free, decode-gated slide swap with six transitions (none/fade/slide/push/zoom/flip), a top-right close + a backdrop close-confirm with countdown, an idle auto-hide that respects focus, a popout/AirPlay window, a jump-to-post list (title + domain/type, skipped slides dimmed + tagged), a skipped list with a per-item reason, a position counter that pulses on manual nav (with a dim/spinner when the next slide is slow), an end-of-show replay card, and ARIA + a real focus trap. The overlay mounts inside a shadow root (its CSS injected there, isolated from old.reddit/RES page styles) and makes the page `inert` while open. Settings (per-image timer, transition, top-timer-bar mode, load-wait, autoplay, mute, Include-NSFW, dedup, pan & zoom) live in an in-overlay gear panel and a light/dark options page, applied live. A DEV-gated logger (`lib/log.js`) aids debugging; CI runs typecheck/lint/format/test + build (both browsers) + web-ext lint; `npm run screenshots` regenerates the options shots and an offline, deterministic slideshow shot (the real overlay + session over fixture slides in `scripts/slideshow-harness/`). old.reddit.com sets no CSP, so injected cross-origin media loads directly; on www.reddit a blocked direct load falls back to the background blob proxy. The image/video sinks are host/HTTPS-gated (`safeMediaUrl`).
+This is a Firefox-first (also Chrome) WebExtension that turns the current `old.reddit.com` or `www.reddit.com` feed into a keyboard-driven media slideshow. It reuses the logged-in session (no API keys) and resolves images, galleries, v.redd.it video, Redgifs, Imgur `.gifv`, Imgur albums, Streamable, Giphy, Catbox video, and crossposts via the provider dispatch in `lib/slides.js`. The overlay does a gap-free, decode-gated slide swap with six transitions (none/fade/slide/push/zoom/flip), a top-right close + a backdrop close-confirm with countdown, an idle auto-hide that respects focus, a popout/AirPlay window, a jump-to-post list (title + domain/type, auto-skipped slides dimmed and tagged with their reason), a skipped list with a per-item reason, a position counter that pulses on manual nav (with a dim/spinner when the next slide is slow), an end-of-show replay card, and ARIA + a real focus trap. The bottom-left is a bottom-anchored stack: NSFW on top, then the title row (title + open-original + download + loading spinner), then a byline reading `/u/author to /r/subreddit from {domain} at {W}×{H}` (domain + resolution in mono). The ↑/↓ keys upvote/downvote the current post through the session (modhash + `/api/vote`), with a brief toast. Redgifs resolves lazily on approach; v.redd.it audio plays from a companion `<audio>` synced to the silent fallback video. The overlay mounts inside a shadow root (its CSS injected there, isolated from old.reddit/RES page styles) and makes the page `inert` while open. Settings (per-image timer, transition, top-timer-bar mode, load-wait, autoplay, mute, Include-NSFW, dedup, pan & zoom) live in an in-overlay gear panel and a light/dark options page (with a Sponsors link), applied live. A DEV-gated logger (`lib/log.js`) aids debugging; CI runs typecheck/lint/format/test + build (both browsers) + web-ext lint; `npm run screenshots` regenerates the options shots and an offline, deterministic slideshow shot (the real overlay + session over fixture slides in `scripts/slideshow-harness/`). old.reddit.com sets no CSP, so injected cross-origin media loads directly; on www.reddit a blocked direct load falls back to the background blob proxy. The image/video sinks are host/HTTPS-gated (`safeMediaUrl`). Content-dedup hashes the preload window so duplicates are filtered before they show.
 
 ---
 
@@ -42,43 +44,37 @@ giant commit.
   (WXT propagates it to both manifests), then tag + publish `v1.0.0` to trigger
   `release.yml`. Left undone deliberately.
 
-### Core improvements
+### Browser-only (do + verify in a real logged-in Firefox + Chrome session)
 
-- **Dedup: hash the preload window, not the current slide.** Dedup is reactive
-  today - a slide displays, its hash resolves a beat later (background fetch +
-  decode), then a duplicate is skipped, so a dupe flashes briefly before
-  advancing. Hashing upcoming slides during preload (or HEAD/size-gating, or
-  hashing a smaller preview URL) would filter duplicates _before_ they show. See
-  `preloadUpcoming` + `maybeHashCurrent` in `lib/session.js`, ADR 0006.
-- **Streaming on the proxy fallback** - direct playback streams the mp4; the
-  blob-proxy path (Redgifs on Chrome, and the www.reddit CSP fallback) downloads
-  the whole mp4 to a blob before it plays. Streaming it (MediaSource / range
-  requests) is browser-only and risks regressing working blob playback - do it in
-  a focused real-browser effort.
-- **Reddit-video / real audio** - `v.redd.it` serves video and audio as separate
-  streams; we play the silent fallback, so unmuting gives no Reddit-video sound.
-  Real audio needs muxing the DASH audio track (bundled MediaSource/HLS player).
-  Browser-only, risks regressing playback.
-- **Redgifs lazy resolution** - push a page before its embeds resolve.
-- **Options-page donation link** - the in-overlay help-panel about line and the
-  repo Sponsor button (`.github/FUNDING.yml`) already point at
-  `github.com/sponsors/Rio517`; add a small Sponsors link to the
-  options-page footer. Keep it a plain external link; mind each store's policy.
-- Download the current media.
-- Highest-resolution inspection indicators.
-- switch the order of the bottom left image title elements so the orde rhousld be username, title, popout arrow, loading spinner
-- add resolution and domain on the right side. subtle.
+- **Streaming on the proxy fallback** - the blob-proxy path (Redgifs on Chrome,
+  the www.reddit CSP fallback) downloads the whole mp4 to a blob before it plays;
+  streaming it (MediaSource + range requests) would start playback sooner and
+  drop the whole-file buffer. Genuinely browser-only: a MediaSource only fires
+  `sourceopen` once attached to the `<video>` src, so a pre-commit codec failure
+  fires the element's `error` event - which the overlay's handler turns into a
+  skip - **before** any whole-blob fallback can run. A safe fallback therefore
+  can't be guaranteed or tested offline. Do it in a real browser, restructuring
+  the proxied branch in `lib/overlay-ui.js` so the `error`/`loadeddata` listeners
+  attach only after the stream-or-blob strategy commits. Firefox direct play is
+  unaffected (it already streams); this is purely the Chrome-proxied + CSP-fallback
+  case. (The range-fetch background plumbing is the natural starting point.)
 
-### Hardening / polish
+### Implemented this session - needs a real-browser confirm
 
-- **Pin the permalink/author host to reddit** (defense-in-depth): `absolutePermalink`
-  (`lib/slides.js`) resolves a post permalink against the page origin. Downstream
-  sinks are already gated (HTTPS-only "open original"; the byline link only takes
-  the resolved `.origin`), but rejecting a non-`*.reddit.com` resolved host would
-  close the byline sink entirely. Low severity.
-- **Small fail-closed test gaps**: `slideshow.fetchMedia` from a non-content-script
-  sender; the unparseable-URL catch in `handleHashImage` / `proxyFetch`; the
-  redgifs `urls.sd` fallback. Cheap to add to the existing router/redgifs suites.
+Shipped with unit tests, but their live/browser behavior can't be exercised
+offline. Confirm each in a logged-in Firefox + Chrome before trusting it:
+
+- **Redgifs lazy resolution** (ADR 0016) - the page now ships iframe embeds and
+  the session resolves each to native video on approach; confirm the on-approach
+  upgrade plays on both browsers and the iframe fallback still shows on failure.
+- **v.redd.it audio** (ADR 0018) - a companion `<audio>` plays the separate DASH
+  audio track synced to the silent video; confirm sync, the mute-follow (it
+  mirrors the video's `volumechange`), the autoplay-unmute path, and that the
+  manifest's audio BaseURL actually matches.
+- **Download the current media** (ADR 0017) - confirm cross-origin saves (incl.
+  hotlink-protected CDNs, with no reddit Referer) land with the filename hint.
+- **Up/down-key voting** (ADR 0019) - confirm a real cast vote, the toggle/clear,
+  the modhash 403-refresh, and the not-logged-in optimistic revert.
 
 ### Media providers - the pattern
 
@@ -206,7 +202,6 @@ Before calling provider/media work done:
 
 - Do not add all-URLs host permissions (each new provider host is scoped + ADR'd).
 - Do not add analytics.
-- Do not build the downloader yet (it's V2).
 - Do not rely on live Reddit in unit tests.
 - Do not send raw binary over `runtime.sendMessage` (it's dropped) - return a hash or base64.
 - Do not create a branch/worktree unless explicitly asked.
