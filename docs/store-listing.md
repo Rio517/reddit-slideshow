@@ -65,6 +65,7 @@ WHAT IT PLAYS
 - Reddit galleries, expanded into one slide per image
 - Reddit-hosted video (v.redd.it)
 - Redgifs, Imgur (.gifv), Streamable, and Giphy clips, played as native video
+- Imgur albums, expanded into one slide per image
 - Catbox video and image files
 - Crossposts, resolved to the original post's media
 
@@ -161,6 +162,9 @@ Host permissions (install-time):
 - **https://i.imgur.com/\*** - Fetch the .mp4 for an Imgur `.gifv` in the
   background and play it as a looping video (Imgur hotlink-protects against a
   Reddit referrer). Requested without cookies.
+- **https://imgur.com/\*** - Fetch the keyless `imgur.com/ajaxalbums`
+  album-member list (without cookies) to expand an Imgur album into one slide per
+  image. Origin-scoped because MV3 host grants are origin-level.
 - **https://\*.streamable.com/\*** - Resolve a Streamable clip's mp4 via its
   public API and fetch the bytes from the per-video CDN subdomain. Without
   cookies.
@@ -273,11 +277,13 @@ want a third tile.)
 - **old.reddit.com / www.reddit.com** - Read the listing JSON for the page the
   user launched the slideshow from (either Reddit frontend) to build and
   paginate the slide queue.
-- **api.redgifs.com / media.redgifs.com / i.imgur.com / \*.streamable.com /
-  \*.giphy.com** - Resolve and fetch provider clips (Redgifs, Imgur `.gifv`,
-  Streamable, Giphy) in the background so they play as native, correctly-timed
-  video instead of an opaque embed (all requested without cookies). Reddit video
-  (v.redd.it) and Catbox files load directly in the page and need no permission.
+- **api.redgifs.com / media.redgifs.com / i.imgur.com / imgur.com /
+  \*.streamable.com / \*.giphy.com** - Resolve and fetch provider clips (Redgifs,
+  Imgur `.gifv`, Streamable, Giphy) in the background so they play as native,
+  correctly-timed video instead of an opaque embed, and fetch the keyless
+  `imgur.com/ajaxalbums` list to expand an Imgur album into its images (all
+  requested without cookies). Reddit video (v.redd.it) and Catbox files load
+  directly in the page and need no permission.
 - **i.redd.it / preview.redd.it / external-preview.redd.it** - Fetch
   Reddit-hosted images and previews (without cookies) to compute an on-device
   perceptual hash, so the same image re-uploaded under a new link is skipped.

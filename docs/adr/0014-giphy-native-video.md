@@ -10,8 +10,8 @@ Giphy links arrive in two shapes:
 1. **Direct media** - `media.giphy.com/media/<id>/giphy.gif`, `i.giphy.com/<id>.gif`.
    These already render as animated images via the generic image path (ADR 0002).
 2. **Watch pages** - `giphy.com/gifs/<slug>-<id>` (also `/clips/`, `/embed/`,
-   `/stickers/`). These carry no direct media URL, so the image path skips them
-   and the post currently produces no slide.
+   `/stickers/`). These carry no direct media URL, so the generic image path
+   skips them and the post yields no slide without explicit handling.
 
 Giphy exposes a canonical silent-looping mp4 for any id at
 `media.giphy.com/media/<id>/giphy.mp4` - no API needed, just the id. The id is
@@ -39,8 +39,7 @@ is a page subresource and needs none).
 
 Benefits:
 
-- Giphy reaction/clip posts (previously skipped) now play as efficient,
-  correctly-timed looping video instead of nothing.
+- Giphy reaction/clip posts play as efficient, correctly-timed looping video.
 - Reuses the shared direct-with-CSP-fallback path and suffix-matching primitive;
   no new resolver, message type, or queue change.
 

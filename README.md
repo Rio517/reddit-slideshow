@@ -187,9 +187,9 @@ done yet.
 
 No analytics, no tracking, no developer servers - the extension fetches only the
 Reddit feed and the media you are viewing (including clips resolved from Redgifs,
-Imgur, Streamable, and Giphy), plus, for re-upload detection, the image bytes it
-hashes locally on your device. Your Reddit cookies go to Reddit only; every
-provider request is cookie-less. Settings are stored locally. See
+Imgur, Streamable, Giphy, and Catbox), plus, for re-upload detection, the image
+bytes it hashes locally on your device. Your Reddit cookies go to Reddit only;
+every provider request is cookie-less. Settings are stored locally. See
 [PRIVACY.md](PRIVACY.md).
 
 ## License

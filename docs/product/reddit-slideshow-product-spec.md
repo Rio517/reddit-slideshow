@@ -77,14 +77,17 @@ NSFW feeds. It plays as **native `<video>`** (ADR 0016):
 - Parse the id from `redgifs.com/watch/<id>` (or `/ifr/<id>`). The background
   resolves the clip's direct mp4 plus `duration` and `hasAudio` from the Redgifs
   API (`api.redgifs.com`, token cached, concurrency-limited and timed out).
-- The clip plays **directly** from `media.redgifs.com`. That CDN 403s a reddit
-  `Referer`, so the `<video>` carries `referrerpolicy="no-referrer"`. This gives
-  correct timing (advances on the real clip end), global mute/unmute, and no
-  per-clip unmute.
-- On a page whose CSP blocks cross-origin media (`www.reddit`), the direct load
-  fails and the slide falls back to the blob proxy: the background fetches the
-  bytes (no Referer, no cookies, byte-capped) and the content script plays them
-  as a `blob:` URL the CSP allows.
+- On Firefox the clip plays **directly** from `media.redgifs.com`. That CDN 403s
+  a reddit `Referer`, so the `<video>` carries `referrerpolicy="no-referrer"`,
+  which Firefox honors on a media element. On Chrome that attribute is a no-op on
+  media elements, so the Chrome build plays every Redgifs clip through the blob
+  proxy below instead. Either way this gives correct timing (advances on the real
+  clip end), global mute/unmute, and no per-clip unmute.
+- The blob proxy serves all Chrome playback and the `www.reddit` CSP fallback: on
+  a page whose CSP blocks cross-origin media the Firefox direct load fails too,
+  and the slide falls back to the proxy. The background fetches the bytes (no
+  Referer, no cookies, byte-capped) and the content script plays them as a
+  `blob:` URL the CSP allows.
 - If resolution fails (API down, timeout), the slide falls back to the Redgifs
   first-party iframe embed (`<iframe src="…/ifr/<id>">`), which carries the
   Origin/Referer Redgifs whitelists and needs no host permission.

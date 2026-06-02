@@ -12,8 +12,9 @@ Imgur album and gallery links arrive in Reddit listings as a bare page URL with
 - `https://imgur.com/gallery/<slug>-<id>` (or `/gallery/<id>`)
 
 The listing JSON carries only the link - no image list, no thumbnails we can use.
-Until now these posts produced **zero** slides (the generic image path rejects a
-non-image URL), so multi-image Imgur posts silently vanished from the slideshow.
+A bare Imgur album link carries no direct media, so the generic image path (which
+rejects a non-image URL) yields no slides; an album needs explicit member
+expansion to contribute its multiple images.
 
 ### Why not the official API
 
@@ -103,9 +104,9 @@ but as a **1 → N expansion** rather than a 1 → 1 upgrade.
 
 A placeholder whose album resolves to **zero images** (empty array) or whose
 lookup **fails** (network, timeout, malformed JSON) is **dropped** - the post
-contributes no slides, exactly as a bare album link did before this change. We do
-not synthesize a broken slide or a skip entry, because no media load was ever
-attempted; there is nothing the user could act on. The drop is logged.
+contributes no slides. We do not synthesize a broken slide or a skip entry,
+because no media load was ever attempted; there is nothing the user could act on.
+The drop is logged.
 
 ## Consequences
 

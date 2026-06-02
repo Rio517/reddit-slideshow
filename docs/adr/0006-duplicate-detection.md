@@ -65,11 +65,15 @@ matches identical files, so it misses the resized/re-encoded reposts that are
 the whole point. dHash is also cheaper and simpler than DCT/wavelet hashing and
 is sufficient here.
 
-Because of the CORS/canvas constraints above, Layer 2 obtains pixels by having
-the **background** script fetch the image bytes (privileged) and returning an
-`ArrayBuffer`; the content script decodes it with `createImageBitmap` and draws
-to a 9×8 `OffscreenCanvas` to read luminance. That requires host permissions for
-the image hosts (`i.redd.it`, `preview.redd.it`, `external-preview.redd.it`).
+Because of the CORS/canvas constraints above, Layer 2 computes the hash in the
+**background** script: it fetches the image bytes (privileged), decodes them with
+`createImageBitmap`, draws to a 9×8 `OffscreenCanvas` to read luminance, computes
+the 64-bit dHash, and returns only the 16-char hex string. No image bytes cross
+the `runtime.sendMessage` boundary - a raw `ArrayBuffer` is dropped by the
+JSON-serialized message channel, so only the hash travels back. The content
+script matches that hash against the seen hashes within the Hamming threshold.
+This requires host permissions for the image hosts (`i.redd.it`,
+`preview.redd.it`, `external-preview.redd.it`).
 
 Layer 2 is **on by default**, because identity-only dedup misses a common real
 case: the same image posted once as a solo link and again inside a gallery gets
@@ -94,7 +98,7 @@ Benefits:
 
 Costs / risks:
 
-- Layer 2's pixel access depends on background-routed fetching and the
+- Layer 2's hashing depends on background-routed fetching-and-decoding and the
   install-time `i.redd.it` / `preview.redd.it` / `external-preview.redd.it`
   permissions, which widen the install prompt; this is the cost of dedup that
   catches re-uploads without a setup step.

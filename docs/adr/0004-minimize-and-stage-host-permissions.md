@@ -23,15 +23,19 @@ to function:
   needs no permission; this access is only for hashing.
 - `api.redgifs.com`, `media.redgifs.com` - Redgifs is played as native video
   (ADR 0016): the background resolves the clip's direct mp4 from the API, and
-  fetches the bytes only as the `www.reddit` CSP fallback (the CDN hotlink-
-  protects against a reddit `Referer`; direct playback uses
-  `referrerpolicy="no-referrer"` and needs no permission). Both are extension-
-  initiated fetches, so they need the host permission. (The iframe fallback, used
-  only when resolution fails, is a page element and needs no host permission -
-  just the page's `frame-src`.)
+  fetches the bytes for the `www.reddit` CSP fallback **and** for all Redgifs
+  playback on Chrome (the CDN hotlink-protects against a reddit `Referer`; Firefox
+  plays direct via `referrerpolicy="no-referrer"` and needs no permission, but
+  Chrome ignores that attribute on media elements, so it proxies). Both are
+  extension-initiated fetches, so they need the host permission. (The iframe
+  fallback, used only when resolution fails, is a page element and needs no host
+  permission - just the page's `frame-src`.)
 - `i.imgur.com`, `*.streamable.com`, `*.giphy.com` - provider clips played as
   native video; the host permission covers the CSP-fallback byte fetch (ADRs
   0011, 0013, 0014).
+- `imgur.com` - the keyless `imgur.com/ajaxalbums` album-member-list endpoint,
+  fetched without cookies to expand an Imgur album into one slide per member
+  (ADR 0015). Origin-scoped: MV3 host grants are origin-level.
 
 Reddit video (`v.redd.it`) and external image hosts load directly in the page as
 `<img>`/`<video>` and need no host permission. No optional host permissions are
