@@ -53,4 +53,15 @@ export default [
       "no-unsanitized/property": "error",
     },
   },
+  {
+    // Unit tests run on Node (vitest) inside a happy-dom realm, so they see both
+    // Node and extra DOM globals the source files don't reach for.
+    files: ["tests/**/*.js"],
+    languageOptions: {
+      globals: {
+        process: "readonly",
+        DOMParser: "readonly",
+      },
+    },
+  },
 ];

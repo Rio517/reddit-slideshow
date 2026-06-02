@@ -312,6 +312,21 @@
         flex-direction: column;
         gap: 7px;
       }
+
+      .footer {
+        margin-top: 22px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 12.5px;
+        line-height: 1.5;
+      }
+      .footer__link {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      .footer__link:hover {
+        text-decoration: underline;
+      }
     </style>
   </head>
   <body>
@@ -568,6 +583,17 @@
           </div>
         </div>
       </section>
+
+      <footer class="footer">
+        <em>Reddit Slideshow Spectacular!</em> is free and open source.<br />
+        <a
+          class="footer__link"
+          href="https://github.com/sponsors/Rio517"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Sponsor it on GitHub ↗</a
+        >
+      </footer>
     </main>
     <script type="module" src="./main.js"></script>
   </body>
