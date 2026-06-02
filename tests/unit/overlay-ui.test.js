@@ -435,6 +435,76 @@ describe("createOverlay", () => {
     expect(help?.hidden).toBe(true);
   });
 
+  it("moves focus into the help panel on open and back to the trigger on Escape", () => {
+    const overlay = createOverlay(noopHandlers());
+    document.documentElement.append(overlay.host);
+    const shadow = /** @type {ShadowRoot} */ (overlay.host.shadowRoot);
+    try {
+      overlay.show();
+      const helpBtn = /** @type {HTMLElement} */ (
+        overlay.root.querySelector('[aria-label^="Keyboard shortcuts"]')
+      );
+      helpBtn.focus();
+      helpBtn.click(); // open help
+      // Focus moved into the panel - its × close is the first focusable.
+      expect(shadow.activeElement).toBe(
+        overlay.root.querySelector(".rs-help-panel__close"),
+      );
+      // Escape closes it and returns focus to the control that opened it.
+      overlay.dismissTopLayer();
+      expect(shadow.activeElement).toBe(helpBtn);
+    } finally {
+      overlay.host.remove();
+    }
+  });
+
+  it("focuses and traps Tab within the close-confirm modal", () => {
+    const overlay = createOverlay(noopHandlers());
+    document.documentElement.append(overlay.host);
+    const shadow = /** @type {ShadowRoot} */ (overlay.host.shadowRoot);
+    try {
+      overlay.show();
+      // Render deep into the show so a backdrop click guards with the confirm.
+      overlay.renderCurrent(imageSlide(), {
+        index: 25,
+        total: 50,
+        exhausted: false,
+        effectiveSeconds: 5,
+        playing: true,
+      });
+      overlay.root.dispatchEvent(new Event("click", { bubbles: true }));
+      const confirm = /** @type {HTMLElement} */ (
+        overlay.root.querySelector(".rs-confirm")
+      );
+      const keep = /** @type {HTMLElement} */ (
+        overlay.root.querySelector(
+          ".rs-confirm__btn:not(.rs-confirm__btn--danger)",
+        )
+      );
+      const danger = /** @type {HTMLElement} */ (
+        overlay.root.querySelector(".rs-confirm__btn--danger")
+      );
+      expect(confirm.hidden).toBe(false);
+      // Focus lands on "Keep watching".
+      expect(shadow.activeElement).toBe(keep);
+      // Tab cycles between the two buttons, never leaving the modal.
+      const tab = () => {
+        const ev = new Event("keydown", { bubbles: true, cancelable: true });
+        Object.defineProperty(ev, "key", { value: "Tab" });
+        /** @type {HTMLElement} */ (shadow.activeElement).dispatchEvent(ev);
+      };
+      tab();
+      expect(shadow.activeElement).toBe(danger);
+      tab();
+      expect(shadow.activeElement).toBe(keep);
+      // Escape dismisses it.
+      overlay.dismissTopLayer();
+      expect(confirm.hidden).toBe(true);
+    } finally {
+      overlay.host.remove();
+    }
+  });
+
   it("a backdrop click asks before closing once well into the show; media/control clicks do not", () => {
     const onClose = vi.fn();
     const overlay = createOverlay({ ...noopHandlers(), onClose });
