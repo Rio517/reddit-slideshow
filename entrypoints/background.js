@@ -14,6 +14,7 @@ import {
   MAX_IMAGE_BYTES,
   MAX_MEDIA_BYTES,
 } from "@/lib/proxy-fetch.js";
+import { createImageHasher } from "@/lib/image-hash.js";
 import { createLogger } from "@/lib/log.js";
 
 const log = createLogger("background");
@@ -26,6 +27,11 @@ export default defineBackground(() => {
   const redgifs = createRedgifsResolver();
   const streamable = createStreamableResolver();
   const imgur = createImgurAlbumResolver();
+  // Layer 2 dedup: fetch + decode + perceptual-hash entirely in the background,
+  // returning only the hex so no image bytes cross the message boundary.
+  const hashImage = createImageHasher({
+    fetchBytes: (url) => fetchCappedBytes(url, MAX_IMAGE_BYTES),
+  });
 
   /**
    * Build a queue page, then upgrade provider iframe embeds (Redgifs, Streamable)
@@ -50,9 +56,8 @@ export default defineBackground(() => {
   const router = createMessageRouter({
     runtimeId: browser.runtime.id,
     fetchQueuePage: fetchQueuePageWithProviders,
-    // Layer 2 dedup image bytes (hosts the content script's page-CORS fetch
-    // can't reach), capped + timed out.
-    fetchImageBytes: (url) => fetchCappedBytes(url, MAX_IMAGE_BYTES),
+    // Layer 2 dedup: returns the perceptual hash hex (computed background-side).
+    hashImage,
     // Redgifs mp4 bytes, played back as a blob to dodge CDN hotlink protection.
     fetchMediaBytes: (url) => fetchCappedBytes(url, MAX_MEDIA_BYTES),
     openOptionsPage: () => browser.runtime.openOptionsPage(),

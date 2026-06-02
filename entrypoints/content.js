@@ -4,7 +4,6 @@ import overlayCss from "@/assets/overlay.css?inline";
 import { createOverlay } from "@/lib/overlay-ui.js";
 import { getSettings, saveSettings } from "@/lib/settings.js";
 import { createSlideshowSession } from "@/lib/session.js";
-import { differenceHash, luminanceFromImageData } from "@/lib/dedup.js";
 import { createLogger } from "@/lib/log.js";
 
 const log = createLogger("content");
@@ -81,31 +80,18 @@ export default defineContentScript({
       createImage: () => new Image(),
       // A detached <video> used only to warm the cache for the next direct clip.
       createVideo: () => document.createElement("video"),
-      // Layer 2 dedup: the background fetches the bytes (privileged), then we
-      // downscale to 9x8 and difference-hash. Returns null on any failure.
+      // Layer 2 dedup: the background fetches, decodes, and 9x8 difference-hashes
+      // the image, returning only the hex (raw bytes don't survive the message
+      // boundary in Chrome). Returns null on any failure.
       computeImageHash: async (url) => {
-        let res;
         try {
-          res = await browser.runtime.sendMessage({
-            type: "slideshow.fetchImage",
+          const res = await browser.runtime.sendMessage({
+            type: "slideshow.hashImage",
             payload: { url },
           });
+          return res?.ok ? (res.hash ?? null) : null;
         } catch (err) {
-          log.warn("fetchImage message failed", url, err);
-          return null;
-        }
-        if (!res?.ok || !res.bytes) return null;
-        try {
-          const bitmap = await createImageBitmap(new Blob([res.bytes]));
-          const canvas = new OffscreenCanvas(9, 8);
-          const ctx = canvas.getContext("2d");
-          if (!ctx) return null;
-          ctx.drawImage(bitmap, 0, 0, 9, 8);
-          bitmap.close();
-          const imageData = ctx.getImageData(0, 0, 9, 8);
-          return differenceHash(luminanceFromImageData(imageData, 9, 8), 9, 8);
-        } catch (err) {
-          log.warn("image hash failed", url, err);
+          log.warn("hashImage message failed", url, err);
           return null;
         }
       },

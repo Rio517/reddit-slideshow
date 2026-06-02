@@ -14,7 +14,7 @@ function makeRouter(overrides = {}) {
       postsScanned: 50,
       exhausted: false,
     }),
-    fetchImageBytes: async () => new ArrayBuffer(8),
+    hashImage: async () => "0011223344556677",
     ...overrides,
   });
 }
@@ -132,42 +132,52 @@ describe("createMessageRouter - requestPage", () => {
   });
 });
 
-describe("createMessageRouter - fetchImage", () => {
-  it("returns bytes for a valid url", async () => {
+describe("createMessageRouter - hashImage", () => {
+  it("returns the hash for a valid url", async () => {
     const router = makeRouter();
     const result = await router(
       {
-        type: "slideshow.fetchImage",
+        type: "slideshow.hashImage",
         payload: { url: "https://i.redd.it/a.jpg" },
       },
       OWN,
     );
-    expect(result.ok).toBe(true);
-    expect(result.bytes).toBeInstanceOf(ArrayBuffer);
+    expect(result).toEqual({ ok: true, hash: "0011223344556677" });
   });
 
-  it("returns bytes for an i.imgur.com image (Imgur dedup, ADR 0015)", async () => {
+  it("hashes an i.imgur.com image (Imgur dedup, ADR 0015)", async () => {
     const router = makeRouter();
     const result = await router(
       {
-        type: "slideshow.fetchImage",
+        type: "slideshow.hashImage",
         payload: { url: "https://i.imgur.com/XV5chUH.jpg" },
       },
       OWN,
     );
-    expect(result.ok).toBe(true);
-    expect(result.bytes).toBeInstanceOf(ArrayBuffer);
+    expect(result).toEqual({ ok: true, hash: "0011223344556677" });
   });
 
-  it("fails closed when the fetch rejects", async () => {
+  it("passes a null hash through (undecodable image)", async () => {
+    const router = makeRouter({ hashImage: async () => null });
+    const result = await router(
+      {
+        type: "slideshow.hashImage",
+        payload: { url: "https://i.redd.it/a.jpg" },
+      },
+      OWN,
+    );
+    expect(result).toEqual({ ok: true, hash: null });
+  });
+
+  it("fails closed when hashing rejects", async () => {
     const router = makeRouter({
-      fetchImageBytes: async () => {
+      hashImage: async () => {
         throw new Error("blocked");
       },
     });
     const result = await router(
       {
-        type: "slideshow.fetchImage",
+        type: "slideshow.hashImage",
         payload: { url: "https://i.redd.it/a.jpg" },
       },
       OWN,
@@ -175,17 +185,17 @@ describe("createMessageRouter - fetchImage", () => {
     expect(result).toEqual({ ok: false });
   });
 
-  it("rejects a non-Reddit-image host without fetching", async () => {
+  it("rejects a non-Reddit-image host without hashing", async () => {
     let called = false;
     const router = makeRouter({
-      fetchImageBytes: async () => {
+      hashImage: async () => {
         called = true;
-        return new ArrayBuffer(8);
+        return "deadbeefdeadbeef";
       },
     });
     const result = await router(
       {
-        type: "slideshow.fetchImage",
+        type: "slideshow.hashImage",
         payload: { url: "https://evil.example/x.jpg" },
       },
       OWN,
@@ -197,14 +207,14 @@ describe("createMessageRouter - fetchImage", () => {
   it("rejects a cleartext http URL on an allowlisted host", async () => {
     let called = false;
     const router = makeRouter({
-      fetchImageBytes: async () => {
+      hashImage: async () => {
         called = true;
-        return new ArrayBuffer(8);
+        return "deadbeefdeadbeef";
       },
     });
     const result = await router(
       {
-        type: "slideshow.fetchImage",
+        type: "slideshow.hashImage",
         payload: { url: "http://i.redd.it/a.jpg" },
       },
       OWN,
@@ -216,15 +226,15 @@ describe("createMessageRouter - fetchImage", () => {
   it("rejects a missing url", async () => {
     const router = makeRouter();
     expect(
-      await router({ type: "slideshow.fetchImage", payload: {} }, OWN),
+      await router({ type: "slideshow.hashImage", payload: {} }, OWN),
     ).toEqual({ ok: false });
   });
 
-  it("rejects a privileged fetch from a non-content-script sender (no tab)", async () => {
+  it("rejects a privileged hash from a non-content-script sender (no tab)", async () => {
     const router = makeRouter();
     const result = await router(
       {
-        type: "slideshow.fetchImage",
+        type: "slideshow.hashImage",
         payload: { url: "https://i.redd.it/a.jpg" },
       },
       { id: RUNTIME_ID }, // an extension page: own id, but no tab
