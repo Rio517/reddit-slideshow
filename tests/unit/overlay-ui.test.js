@@ -748,12 +748,17 @@ describe("createOverlay", () => {
     ).toBe("Duplicate image");
   });
 
-  it("dims and tags auto-skipped slides in the jump list", () => {
+  it("shows domain + type columns and flags auto-skipped slides in the jump list", () => {
     const overlay = createOverlay(noopHandlers());
     overlay.setJumpList(
       [
-        imageSlide({ title: "kept" }),
-        imageSlide({ title: "gone", skipReason: "Unavailable" }),
+        imageSlide({ sourceUrl: "https://i.redd.it/a.jpg" }),
+        imageSlide({ kind: "video", sourceUrl: "https://v.redd.it/b" }),
+        imageSlide({ isGif: true, sourceUrl: "https://i.imgur.com/c.gif" }),
+        imageSlide({
+          skipReason: "Unavailable",
+          sourceUrl: "https://www.redgifs.com/watch/d",
+        }),
       ],
       0,
       1,
@@ -761,16 +766,30 @@ describe("createOverlay", () => {
     /** @type {HTMLElement} */ (
       overlay.root.querySelector(".rs-meta__counter")
     ).dispatchEvent(new Event("click", { bubbles: true }));
+    // The click bubbles to the backdrop handler; the counter's cluster must be on
+    // its allowlist or the panel would be dismissed the instant it opened.
+    expect(
+      /** @type {HTMLElement | null} */ (
+        overlay.root.querySelector(".rs-jump-panel")
+      )?.hidden,
+    ).toBe(false);
     const items = overlay.root.querySelectorAll(".rs-jump-panel__item");
-    expect(items[0].classList.contains("rs-jump-panel__item--skipped")).toBe(
-      false,
-    );
-    expect(items[1].classList.contains("rs-jump-panel__item--skipped")).toBe(
+    const domain = (/** @type {number} */ i) =>
+      items[i].querySelector(".rs-jump-panel__domain")?.textContent;
+    const type = (/** @type {number} */ i) =>
+      items[i].querySelector(".rs-jump-panel__type")?.textContent;
+    // Domain column = source host (www. stripped); type column = asset kind.
+    expect(domain(0)).toBe("i.redd.it");
+    expect(type(0)).toBe("image");
+    expect(type(1)).toBe("video");
+    expect(domain(2)).toBe("i.imgur.com");
+    expect(type(2)).toBe("gif");
+    // An auto-skipped slide stays listed, dimmed, with the type column flagging it.
+    expect(domain(3)).toBe("redgifs.com");
+    expect(items[3].classList.contains("rs-jump-panel__item--skipped")).toBe(
       true,
     );
-    expect(items[1].querySelector(".rs-jump-panel__tag")?.textContent).toBe(
-      "(skipped)",
-    );
+    expect(type(3)).toBe("skipped");
   });
 
   it("scrolls to the current post once the jump panel is shown, not while hidden", () => {

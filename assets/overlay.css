@@ -517,7 +517,8 @@ iframe.reddit-slideshow-media {
 
 #reddit-slideshow-root.rs-idle .rs-controls,
 #reddit-slideshow-root.rs-idle .rs-close-top,
-#reddit-slideshow-root.rs-idle .rs-meta {
+#reddit-slideshow-root.rs-idle .rs-meta,
+#reddit-slideshow-root.rs-idle .rs-topleft {
   opacity: 0;
   pointer-events: none;
 }
@@ -526,15 +527,11 @@ iframe.reddit-slideshow-media {
   transform: translateY(-50%) translateX(12px);
 }
 
-/* "Always show count, title & skips": the meta bar survives the idle fade. It
-   stays non-interactive while idle (the cursor is hidden); a mousemove wakes it. */
-#reddit-slideshow-root.rs-pin-meta.rs-idle .rs-meta {
-  opacity: 1;
-}
-
-/* The skipped badge is part of that pinned context: keep it through the fade too,
-   so a jump in the position count always has its visible explanation. */
-#reddit-slideshow-root.rs-pin-meta.rs-idle .rs-skipped {
+/* "Always show count, title & skips": the bottom meta bar and the top-left
+   cluster (counter + skipped badge) survive the idle fade. They stay
+   non-interactive while idle (the cursor is hidden); a mousemove wakes them. */
+#reddit-slideshow-root.rs-pin-meta.rs-idle .rs-meta,
+#reddit-slideshow-root.rs-pin-meta.rs-idle .rs-topleft {
   opacity: 1;
 }
 
@@ -876,12 +873,21 @@ iframe.reddit-slideshow-media {
   }
 }
 
-/* Skipped (failed media) badge + list */
-.rs-skipped {
+/* Top-left cluster: position counter + skipped badge, side by side. */
+.rs-topleft {
   position: absolute;
   top: 22px;
   left: 26px;
   z-index: 7;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: opacity 0.35s ease;
+}
+
+/* Skipped (failed media) badge + list */
+.rs-skipped {
+  flex: none;
   font-family:
     ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
   font-size: 11px;
@@ -892,9 +898,7 @@ iframe.reddit-slideshow-media {
   border-radius: 6px;
   padding: 4px 9px;
   cursor: pointer;
-  transition:
-    opacity 0.35s ease,
-    background 0.2s ease;
+  transition: background 0.2s ease;
 }
 
 .rs-skipped[hidden] {
@@ -905,13 +909,9 @@ iframe.reddit-slideshow-media {
   background: rgba(255, 107, 107, 0.18);
 }
 
-#reddit-slideshow-root.rs-idle .rs-skipped {
-  opacity: 0;
-}
-
 .rs-skipped-panel {
   position: absolute;
-  top: 52px;
+  top: 58px;
   left: 26px;
   z-index: 7;
   width: min(360px, 60vw);
@@ -1189,7 +1189,16 @@ iframe.reddit-slideshow-media {
   -webkit-appearance: none;
   transition:
     background 0.2s ease,
-    color 0.2s ease;
+    color 0.2s ease,
+    opacity 200ms ease;
+}
+
+/* Until the first slide sets the position text the counter has no content - keep
+   it hidden (so it isn't a stray empty pill while loading), then fade it in over
+   200ms once it gets its "n / m". */
+.rs-meta__counter:empty {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .rs-meta__counter:hover {
@@ -1235,7 +1244,7 @@ iframe.reddit-slideshow-media {
 .rs-jump-panel {
   position: absolute;
   left: 26px;
-  bottom: 72px;
+  top: 58px;
   z-index: 8;
   width: min(340px, 72vw);
   max-height: 60vh;
@@ -1266,7 +1275,7 @@ iframe.reddit-slideshow-media {
 
 .rs-jump-panel__item {
   display: grid;
-  grid-template-columns: 32px 1fr auto;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 10px;
   text-align: left;
@@ -1285,12 +1294,6 @@ iframe.reddit-slideshow-media {
   opacity: 0.55;
 }
 
-.rs-jump-panel__tag {
-  font-size: 11px;
-  color: var(--rs-muted);
-  white-space: nowrap;
-}
-
 .rs-jump-panel__item:hover {
   background: rgba(255, 255, 255, 0.08);
 }
@@ -1307,13 +1310,26 @@ iframe.reddit-slideshow-media {
   text-align: right;
 }
 
-.rs-jump-panel__text {
+/* The domain column: where the media is from. Truncates; min-width:0 lets the
+   1fr grid cell shrink so the ellipsis actually kicks in. */
+.rs-jump-panel__domain {
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.rs-jump-panel__item--current .rs-jump-panel__text {
+/* The type column: the asset kind (image / gif / video / embed), or "skipped". */
+.rs-jump-panel__type {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rs-muted);
+  white-space: nowrap;
+}
+
+.rs-jump-panel__item--current .rs-jump-panel__domain {
   color: var(--rs-accent);
 }
 
