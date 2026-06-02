@@ -57,6 +57,44 @@ describe("slidesFromListing", () => {
     );
   });
 
+  /**
+   * @param {string} permalink
+   * @returns {import("../../lib/slides.js").Slide}
+   */
+  function permalinkSlide(permalink) {
+    const slides = slidesFromListing({
+      data: {
+        children: [
+          {
+            kind: "t3",
+            data: {
+              name: "t3_pl",
+              title: "Permalink post",
+              permalink,
+              url: "https://i.redd.it/ok.png",
+              post_hint: "image",
+            },
+          },
+        ],
+      },
+    });
+    return slides[0];
+  }
+
+  it("drops a permalink that resolves off reddit (defense-in-depth)", () => {
+    // An absolute, non-reddit permalink would otherwise feed "open original"
+    // and the byline author link; pin both sinks to reddit by dropping it.
+    expect(
+      permalinkSlide("https://evil.example/phish").permalink,
+    ).toBeUndefined();
+  });
+
+  it("keeps a permalink on a reddit subdomain", () => {
+    expect(
+      permalinkSlide("https://np.reddit.com/r/x/comments/abc/").permalink,
+    ).toBe("https://np.reddit.com/r/x/comments/abc/");
+  });
+
   it("does not throw on a post with no title", () => {
     const listing = {
       data: {
