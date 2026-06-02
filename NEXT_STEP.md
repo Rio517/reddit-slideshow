@@ -1,6 +1,6 @@
 # NEXT_STEP - Reddit Slideshow Spectacular!
 
-**Doc updated:** 2026-06-02 · **Branch:** `main` · **Status:** shipped-ready on `old.reddit.com` + `www.reddit.com`; CI green; store-listing copy drafted. Current capabilities are described just below; open work is in §1 and the pending real-Firefox passes in §5.
+**Doc updated:** 2026-06-02 · **Branch:** `main` · **Status:** CI green and a full 1.0 audit done this session (blockers + should-fix addressed), BUT real-browser testing surfaced **active functional bugs** - see §1 "Active bugs" first. Not 1.0-shippable until those are resolved. The version bump to 1.0.0 is deliberately not done (user's call).
 
 > **Hard rule:** work directly on `main`. Do not create branches or worktrees unless the user explicitly asks. See `AGENTS.md`.
 
@@ -33,6 +33,71 @@ Key decisions already made:
 
 Near-term items, roughly in priority; most have a real blocker noted. Keep small
 commits - do not batch multiple slices into one giant commit.
+
+### Active bugs (reported from real-browser testing, 2026-06-02)
+
+These came back from the user testing the rebuilt extension and are the **top
+priority**. All three are real-browser behaviors the offline gate can't catch, so
+they need a logged-in profile + devtools to diagnose. Get the specifics noted
+below before changing code.
+
+- **FF: Imgur album not shown.** The album list comes from a background fetch of
+  `imgur.com/ajaxalbums/getimages/<id>/hit.json` (`entrypoints/background.js` →
+  `createImgurAlbumResolver` → `lib/imgur.js`; expanded by `resolveImgurAlbumSlides`).
+  **Prime suspect:** this session narrowed the host permission from
+  `https://imgur.com/*` to `https://imgur.com/ajaxalbums/*` (`wxt.config.ts`,
+  commit "refactor: correct now-stale proxy comments, narrow imgur permission").
+  Firefox may not grant a **path-scoped** host permission for a background
+  cross-origin fetch the way it grants an origin-scoped one - if so the fetch is
+  CORS-blocked, the album resolve throws, and the post is dropped (fail-soft →
+  "not shown"). **First thing to try: revert the narrowing back to
+  `https://imgur.com/*`, rebuild, re-test.** If that fixes it, keep the broad
+  permission (and note why in the manifest comment). Confirm via the FF background
+  console: a network error / CORS rejection on the ajaxalbums URL.
+- **Chrome: Redgifs doesn't work.** Direct path is
+  `<video src="https://media.redgifs.com/<X>.mp4" referrerpolicy="no-referrer">`
+  (`lib/overlay-render.js`, scoped to the Redgifs host). `referrerpolicy` on a
+  `<video>` is **unverified in real Chrome**. Need from devtools (Network tab, on
+  `old.reddit.com`): (a) does `api.redgifs.com` resolve succeed? (b) on the
+  `media.redgifs.com` request, is a `Referer` still being sent, and what's the
+  response status? If Chrome still sends a referer (→403) or blocks for another
+  reason, the direct load fails; on old.reddit there's no CSP-fallback trigger
+  unless the `<video>` fires an `error` event (which then flips to `proxied`, but
+  Chrome's SW can't read the CORS-less bytes → skip). Possible fixes depending on
+  findings: a `referrerpolicy` that the CDN accepts, or a different no-referer
+  mechanism, or accept the proxy path and make it work in Chrome.
+- **Dedup doesn't work.** Clarify which: Layer 1 (exact-URL, always on) or Layer 2
+  (perceptual hash, `dedupe && contentDedup`, default on). Layer 2 needs the
+  background `fetchImage` bytes from `i.redd.it` / `preview.redd.it` /
+  `external-preview.redd.it` / `i.imgur.com`. The dedup-pause guard added this
+  session (`lib/session.js` `maybeHashCurrent`) only suppresses the advance when
+  `autoplay && paused`; normal playing/manual dedup still advances (unit-tested),
+  so that change shouldn't have broken it - but verify. Get: which feed, is
+  `contentDedup` on, any console error from the hash fetch, and whether the dupes
+  are exact-URL or perceptual.
+
+### Regression to fix (introduced this session)
+
+- **Jump list dropped the post title.** The counter→jump list was reworked this
+  session into two columns (domain + asset type), which **removed the truncated
+  post title** the user did not ask to drop. Restore the title alongside the new
+  columns - e.g. title as the primary (CSS-ellipsized) line with `domain · type`
+  as a muted subline. Touch `renderJumpPanel` + the `.rs-jump-panel__*` rules
+  (`lib/overlay-ui.js`, `assets/overlay.css`) and the jump-list test in
+  `tests/unit/overlay-ui.test.js`. (Domain helper `slideDomain`, type helper
+  `slideAssetType` already exist.)
+
+### Requested, not yet done
+
+- **Run the `code-simplifier` skill over the codebase** (user asked). Focus on
+  recently-touched files (the overlay/session work this session); behavior-
+  preserving only, and mind the "prefer restraint on refactors" guidance - lead
+  with whether a simplification is worth it.
+- **Version bump to 1.0.0** when the user gives the go: only `package.json:3`
+  (WXT propagates it to both manifests), then tag + publish `v1.0.0` to trigger
+  `release.yml`. Left undone deliberately.
+
+### Backlog
 
 - **Options-page donation link** - the in-overlay help-panel about line and the
   repo Sponsor button (`.github/FUNDING.yml`) already point at
@@ -71,13 +136,11 @@ slideshow fit).
   Confirm in a logged-in profile what headless can't: CSS isolation against real
   RES/old.reddit, the `inert` focus trap (Tab can't escape the overlay),
   backdrop/control clicks, and `f` fullscreen from inside the shadow.
-- **Real-Firefox/Chrome re-check (providers):** confirm direct playback of Imgur
-  `.gifv`, Giphy, Redgifs, Catbox, Streamable, and Imgur-album members (images +
-  `.mp4` videos) in a logged-in profile (detection + resolvers are unit-tested),
-  and that a CSP-blocked direct load on `www.reddit` falls back to the blob proxy.
-  Streamable direct video is confirmed in **both Firefox and Chrome** (the Chrome
-  ORB fix works); the newly-direct Redgifs/Imgur/Giphy path wants a live look in
-  both - especially Redgifs' `referrerpolicy="no-referrer"` and the proxy fallback.
+- **Real-Firefox/Chrome re-check (providers):** Chrome-Redgifs and FF-Imgur-album
+  are now **confirmed failing** - see §1 "Active bugs". Still want a live look at
+  Giphy, Catbox, Imgur `.gifv`, Imgur-album members (images + `.mp4`), and the
+  `www.reddit` CSP blob-proxy fallback. Streamable direct video is confirmed in
+  **both Firefox and Chrome** (the Chrome ORB fix works).
 - **Real-Firefox re-check:** the dropped iframe `allow-same-origin` (security M1).
   Confirm Redgifs `/ifr/` playback still works while logged in; revert that one
   line if it regresses.
