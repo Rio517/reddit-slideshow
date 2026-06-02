@@ -24,11 +24,14 @@ export default defineConfig({
       "https://api.redgifs.com/*",
       "https://media.redgifs.com/*",
       // Imgur: album/gallery member lists come from the keyless
-      // imgur.com/ajaxalbums endpoint (ADR 0015) - the only imgur.com path we
-      // fetch, so scope the permission to it. Member files and .gifv → .mp4
-      // clips hotlink directly from i.imgur.com (the blob proxy is the CSP
-      // fallback, ADR 0011); i.imgur.com bytes are also hashed for dedup.
-      "https://imgur.com/ajaxalbums/*",
+      // imgur.com/ajaxalbums endpoint (ADR 0015); the background fetch needs the
+      // host-permission CORS bypass because imgur returns a restrictive ACAO.
+      // Origin-scoped rather than path-scoped to /ajaxalbums/*: we only ever
+      // fetch that one path, and origin scope is the conventional grant form.
+      // Member files and .gifv → .mp4 clips hotlink directly from i.imgur.com
+      // (the blob proxy is the CSP fallback, ADR 0011); i.imgur.com bytes are
+      // also hashed for dedup.
+      "https://imgur.com/*",
       "https://i.imgur.com/*",
       // Streamable: resolve the mp4 via the public API (api.) and fetch the bytes
       // from the per-video CDN subdomain (cdn-*.). One wildcard covers both,
