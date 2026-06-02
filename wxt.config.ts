@@ -23,11 +23,12 @@ export default defineConfig({
       // background, so the clip plays as a native, correctly-timed video.
       "https://api.redgifs.com/*",
       "https://media.redgifs.com/*",
-      // Imgur: .gifv → .mp4 is background-fetched and played as a blob because
-      // Imgur hotlink-protects the binary against a reddit Referer (ADR 0011);
-      // album image lists come from the keyless imgur.com/ajaxalbums endpoint
-      // (ADR 0015). Album image files (i.imgur.com) hotlink directly, no proxy.
-      "https://imgur.com/*",
+      // Imgur: album/gallery member lists come from the keyless
+      // imgur.com/ajaxalbums endpoint (ADR 0015) - the only imgur.com path we
+      // fetch, so scope the permission to it. Member files and .gifv → .mp4
+      // clips hotlink directly from i.imgur.com (the blob proxy is the CSP
+      // fallback, ADR 0011); i.imgur.com bytes are also hashed for dedup.
+      "https://imgur.com/ajaxalbums/*",
       "https://i.imgur.com/*",
       // Streamable: resolve the mp4 via the public API (api.) and fetch the bytes
       // from the per-video CDN subdomain (cdn-*.). One wildcard covers both,
