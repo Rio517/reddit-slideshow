@@ -4,6 +4,7 @@ import overlayCss from "@/assets/overlay.css?inline";
 import { createOverlay } from "@/lib/overlay-ui.js";
 import { getSettings, saveSettings } from "@/lib/settings.js";
 import { createSlideshowSession } from "@/lib/session.js";
+import { base64ToArrayBuffer } from "@/lib/bytes-base64.js";
 import { createLogger } from "@/lib/log.js";
 
 const log = createLogger("content");
@@ -59,8 +60,9 @@ export default defineContentScript({
           .catch(() => {});
       },
       // Proxied media (Redgifs): the background fetches the mp4 bytes (no reddit
-      // Referer, so the CDN serves them); we wrap them in a blob: URL the page
-      // CSP allows. Returns null on any failure so the overlay shows a fallback.
+      // Referer, so the CDN serves them) and returns them base64-encoded (raw
+      // bytes don't survive the message boundary in Chrome); we decode and wrap
+      // them in a blob: URL the page CSP allows. Null on any failure.
       resolveMedia: async (url) => {
         let res;
         try {
@@ -72,9 +74,9 @@ export default defineContentScript({
           log.warn("fetchMedia message failed", url, err);
           return null;
         }
-        if (!res?.ok || !res.bytes) return null;
+        if (!res?.ok || !res.b64) return null;
         return URL.createObjectURL(
-          new Blob([res.bytes], { type: "video/mp4" }),
+          new Blob([base64ToArrayBuffer(res.b64)], { type: "video/mp4" }),
         );
       },
       createImage: () => new Image(),

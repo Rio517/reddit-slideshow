@@ -244,9 +244,9 @@ describe("createMessageRouter - hashImage", () => {
 });
 
 describe("createMessageRouter - fetchMedia", () => {
-  it("returns bytes for a Redgifs media url", async () => {
+  it("returns base64 bytes for a Redgifs media url", async () => {
     const router = makeRouter({
-      fetchMediaBytes: async () => new ArrayBuffer(16),
+      fetchMediaBytes: async () => new Uint8Array([1, 2, 3]).buffer,
     });
     const result = await router(
       {
@@ -255,11 +255,11 @@ describe("createMessageRouter - fetchMedia", () => {
       },
       OWN,
     );
-    expect(result.ok).toBe(true);
-    expect(result.bytes).toBeInstanceOf(ArrayBuffer);
+    // Base64, not a raw ArrayBuffer (which Chrome drops over the message bound.).
+    expect(result).toEqual({ ok: true, b64: "AQID" });
   });
 
-  it("returns bytes for an Imgur .mp4 media url", async () => {
+  it("returns base64 bytes for an Imgur .mp4 media url", async () => {
     const router = makeRouter({
       fetchMediaBytes: async () => new ArrayBuffer(16),
     });
@@ -271,7 +271,7 @@ describe("createMessageRouter - fetchMedia", () => {
       OWN,
     );
     expect(result.ok).toBe(true);
-    expect(result.bytes).toBeInstanceOf(ArrayBuffer);
+    expect(typeof result.b64).toBe("string");
   });
 
   it("returns bytes for a Streamable per-video CDN subdomain", async () => {

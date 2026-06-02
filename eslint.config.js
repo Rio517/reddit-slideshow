@@ -35,6 +35,8 @@ export default [
         HTMLSelectElement: "readonly",
         AbortController: "readonly",
         Blob: "readonly",
+        atob: "readonly",
+        btoa: "readonly",
         OffscreenCanvas: "readonly",
         createImageBitmap: "readonly",
         setTimeout: "readonly",
