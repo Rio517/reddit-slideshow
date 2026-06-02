@@ -619,6 +619,68 @@ describe("createMessageRouter - download", () => {
   });
 });
 
+describe("createMessageRouter - vote", () => {
+  const voteMsg = (/** @type {any} */ id, /** @type {any} */ dir) => ({
+    type: "slideshow.vote",
+    payload: { id, dir },
+  });
+
+  it("votes on a post for a content-script request", async () => {
+    /** @type {Array<[string, number]>} */
+    const calls = [];
+    const router = makeRouter({
+      vote: async (/** @type {string} */ id, /** @type {number} */ dir) => {
+        calls.push([id, dir]);
+        return true;
+      },
+    });
+    expect(await router(voteMsg("t3_abc", 1), OWN)).toEqual({ ok: true });
+    expect(calls).toEqual([["t3_abc", 1]]);
+  });
+
+  it("rejects a vote from a non-content-script sender (no tab)", async () => {
+    let called = false;
+    const router = makeRouter({
+      vote: async () => {
+        called = true;
+        return true;
+      },
+    });
+    expect(await router(voteMsg("t3_abc", 1), { id: RUNTIME_ID })).toEqual({
+      ok: false,
+    });
+    expect(called).toBe(false);
+  });
+
+  it("rejects an id that isn't a post fullname", async () => {
+    let called = false;
+    const router = makeRouter({
+      vote: async () => {
+        called = true;
+        return true;
+      },
+    });
+    expect(await router(voteMsg("evil", 1), OWN)).toEqual({ ok: false });
+    expect(await router(voteMsg("t1_abc", 1), OWN)).toEqual({ ok: false });
+    expect(called).toBe(false);
+  });
+
+  it("rejects an out-of-range direction", async () => {
+    const router = makeRouter({ vote: async () => true });
+    expect(await router(voteMsg("t3_abc", 2), OWN)).toEqual({ ok: false });
+    expect(await router(voteMsg("t3_abc", "up"), OWN)).toEqual({ ok: false });
+  });
+
+  it("fails closed when the vote throws", async () => {
+    const router = makeRouter({
+      vote: async () => {
+        throw new Error("not logged in");
+      },
+    });
+    expect(await router(voteMsg("t3_abc", -1), OWN)).toEqual({ ok: false });
+  });
+});
+
 describe("createMessageRouter - openOptions", () => {
   it("opens the options page for an own-sender request", async () => {
     const openOptionsPage = vi.fn();

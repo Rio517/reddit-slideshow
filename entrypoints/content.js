@@ -118,6 +118,19 @@ export default defineContentScript({
           return null;
         }
       },
+      // Up/down-key voting on the current post through the session (the
+      // background holds the modhash and POSTs with the session cookie).
+      vote: async (id, dir) => {
+        try {
+          return await browser.runtime.sendMessage({
+            type: "slideshow.vote",
+            payload: { id, dir },
+          });
+        } catch (err) {
+          log.warn("vote message failed", err);
+          return { ok: false };
+        }
+      },
       // User-initiated save of the displayed media: the background drives the
       // downloads API (a content script can't), using the slide's filename hint.
       downloadMedia: (url, filename) => {

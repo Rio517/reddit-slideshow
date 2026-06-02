@@ -923,6 +923,73 @@ iframe.reddit-slideshow-media {
   }
 }
 
+/* Vote feedback toast (the up/down keys); a brief top-center flash. */
+.rs-vote-flash {
+  position: absolute;
+  top: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(10, 12, 18, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--rs-fg);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.rs-vote-flash[hidden] {
+  display: none;
+}
+
+.rs-vote-flash--on {
+  animation: rs-vote-flash 1.2s ease forwards;
+}
+
+.rs-vote-flash--up {
+  color: var(--rs-accent);
+}
+
+.rs-vote-flash--down {
+  color: #6aa3ff;
+}
+
+.rs-vote-flash--error {
+  color: var(--rs-danger);
+}
+
+@keyframes rs-vote-flash {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px);
+  }
+  12% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rs-vote-flash--on {
+    animation: none;
+    opacity: 1;
+  }
+}
+
 /* Top-left cluster: position counter + skipped badge, side by side. */
 .rs-topleft {
   position: absolute;

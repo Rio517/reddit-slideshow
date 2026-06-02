@@ -147,6 +147,23 @@ describe("createOverlay", () => {
     expect(onDownload).toHaveBeenCalledTimes(1);
   });
 
+  it("flashes vote feedback for up, down, cleared, and error", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    overlay.flashVote(1);
+    const flash = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-vote-flash")
+    );
+    expect(flash?.hidden).toBe(false);
+    expect(flash?.textContent).toContain("Upvoted");
+    overlay.flashVote(-1);
+    expect(flash?.textContent).toContain("Downvoted");
+    overlay.flashVote(0);
+    expect(flash?.textContent).toContain("removed");
+    overlay.flashVote("error");
+    expect(flash?.textContent).toContain("Couldn't");
+  });
+
   it("enables download for a downloadable image, disables it for an embed", () => {
     const overlay = createOverlay({ ...noopHandlers(), onDownload() {} });
     overlay.show();

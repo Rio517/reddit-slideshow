@@ -130,7 +130,7 @@ function fakeRequest(pages) {
 }
 
 /**
- * @param {{ pages?: any[], settingsOverrides?: Record<string, unknown>, openUrl?: (url: string) => void, openPopout?: () => void, saveSettings?: (patch: object) => Promise<unknown>, computeImageHash?: (url: string) => Promise<string | null>, createImage?: () => { src: string, decoding?: string }, createVideo?: () => { src: string, preload?: string, muted?: boolean }, resolveMedia?: (url: string) => Promise<string | null>, downloadMedia?: (url: string, filename: string) => void, resolveRedgifs?: (slide: any) => Promise<any>, resolveRedditAudio?: (slide: any) => Promise<string | null> }} [opts]
+ * @param {{ pages?: any[], settingsOverrides?: Record<string, unknown>, openUrl?: (url: string) => void, openPopout?: () => void, saveSettings?: (patch: object) => Promise<unknown>, computeImageHash?: (url: string) => Promise<string | null>, createImage?: () => { src: string, decoding?: string }, createVideo?: () => { src: string, preload?: string, muted?: boolean }, resolveMedia?: (url: string) => Promise<string | null>, downloadMedia?: (url: string, filename: string) => void, resolveRedgifs?: (slide: any) => Promise<any>, resolveRedditAudio?: (slide: any) => Promise<string | null>, vote?: (id: string, dir: number) => Promise<any> }} [opts]
  */
 function makeSession({
   pages,
@@ -145,6 +145,7 @@ function makeSession({
   downloadMedia,
   resolveRedgifs,
   resolveRedditAudio,
+  vote,
 } = {}) {
   const request = fakeRequest(
     pages ?? [
@@ -172,6 +173,7 @@ function makeSession({
     downloadMedia,
     resolveRedgifs,
     resolveRedditAudio,
+    vote,
   });
   sessions.push(session);
   return { session, request };
@@ -476,6 +478,81 @@ describe("createSlideshowSession", () => {
     await flush();
     const video = shadow()?.querySelector("video.reddit-slideshow-media");
     expect(video?.getAttribute("src")).toBe("https://media.redgifs.com/X.mp4");
+  });
+
+  it("upvotes the current post with ArrowUp and toggles it off on a second press", async () => {
+    /** @type {Array<[string, number]>} */
+    const votes = [];
+    const { session } = makeSession({
+      vote: async (id, dir) => {
+        votes.push([id, dir]);
+        return { ok: true };
+      },
+      pages: [
+        {
+          slides: [imageSlide("t3_a")],
+          after: null,
+          exhausted: true,
+          postsScanned: 1,
+        },
+      ],
+    });
+    await session.start();
+    session.handleKeydown(key("ArrowUp"));
+    await flush();
+    expect(votes).toEqual([["t3_a", 1]]);
+    session.handleKeydown(key("ArrowUp")); // same direction again clears it
+    await flush();
+    expect(votes).toEqual([
+      ["t3_a", 1],
+      ["t3_a", 0],
+    ]);
+  });
+
+  it("downvotes the current post with ArrowDown", async () => {
+    /** @type {Array<[string, number]>} */
+    const votes = [];
+    const { session } = makeSession({
+      vote: async (id, dir) => {
+        votes.push([id, dir]);
+        return { ok: true };
+      },
+      pages: [
+        {
+          slides: [imageSlide("t3_a")],
+          after: null,
+          exhausted: true,
+          postsScanned: 1,
+        },
+      ],
+    });
+    await session.start();
+    session.handleKeydown(key("ArrowDown"));
+    await flush();
+    expect(votes).toEqual([["t3_a", -1]]);
+  });
+
+  it("seeds the vote toggle from the post's existing vote state", async () => {
+    /** @type {Array<[string, number]>} */
+    const votes = [];
+    const { session } = makeSession({
+      vote: async (id, dir) => {
+        votes.push([id, dir]);
+        return { ok: true };
+      },
+      pages: [
+        {
+          slides: [imageSlide("t3_a", { likes: true })], // already upvoted
+          after: null,
+          exhausted: true,
+          postsScanned: 1,
+        },
+      ],
+    });
+    await session.start();
+    session.handleKeydown(key("ArrowUp")); // pressing up on an upvoted post clears it
+    await flush();
+    expect(votes).toEqual([["t3_a", 0]]);
   });
 
   it("downloads the current slide's media via the download control", async () => {
