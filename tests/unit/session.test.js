@@ -569,6 +569,18 @@ describe("createSlideshowSession", () => {
     expect(stopped).toBe(1);
   });
 
+  it("toggles the help panel on the ? key", async () => {
+    const { session } = makeSession();
+    await session.start();
+    const help = () =>
+      /** @type {HTMLElement | null} */ (q(".rs-help-panel"))?.hidden;
+    expect(help()).toBe(true);
+    session.handleKeydown(key("?"));
+    expect(help()).toBe(false);
+    session.handleKeydown(key("?")); // toggles back off
+    expect(help()).toBe(true);
+  });
+
   it("applies a changed image timer to the running slideshow without reload", async () => {
     const { session } = makeSession();
     await session.start();

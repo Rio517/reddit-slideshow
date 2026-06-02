@@ -371,6 +371,70 @@ describe("createOverlay", () => {
     expect(video?.getAttribute("src")).toBe("blob:fake-123");
   });
 
+  it("shows a video's first frame without playing it while paused/manual", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.renderCurrent(
+      imageSlide({
+        kind: "video",
+        durationMode: "media",
+        mediaUrl: "https://v.redd.it/x/CMAF_720.mp4",
+      }),
+      {
+        index: 0,
+        total: 1,
+        exhausted: true,
+        effectiveSeconds: 5,
+        playing: false,
+      },
+    );
+    const video = /** @type {HTMLVideoElement} */ (
+      overlay.root.querySelector("video.reddit-slideshow-media")
+    );
+    // The element must not auto-start on its own either.
+    expect(video.autoplay).toBe(false);
+    const play = vi.fn(() => Promise.resolve());
+    video.play = play;
+    video.dispatchEvent(new Event("loadeddata"));
+    expect(play).not.toHaveBeenCalled();
+  });
+
+  it("starts a direct video on load when the show is playing", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.renderCurrent(
+      imageSlide({
+        kind: "video",
+        durationMode: "media",
+        mediaUrl: "https://v.redd.it/x/CMAF_720.mp4",
+      }),
+      {
+        index: 0,
+        total: 1,
+        exhausted: true,
+        effectiveSeconds: 5,
+        playing: true,
+      },
+    );
+    const video = /** @type {HTMLVideoElement} */ (
+      overlay.root.querySelector("video.reddit-slideshow-media")
+    );
+    const play = vi.fn(() => Promise.resolve());
+    video.play = play;
+    video.dispatchEvent(new Event("loadeddata"));
+    expect(play).toHaveBeenCalledTimes(1);
+  });
+
+  it("toggles the help panel via the exposed toggleHelp (the ? key path)", () => {
+    const overlay = createOverlay(noopHandlers());
+    const help = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-help-panel")
+    );
+    expect(help?.hidden).toBe(true);
+    overlay.toggleHelp();
+    expect(help?.hidden).toBe(false);
+    overlay.toggleHelp();
+    expect(help?.hidden).toBe(true);
+  });
+
   it("a backdrop click asks before closing once well into the show; media/control clicks do not", () => {
     const onClose = vi.fn();
     const overlay = createOverlay({ ...noopHandlers(), onClose });

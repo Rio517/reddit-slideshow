@@ -68,7 +68,7 @@ describe("renderSlide", () => {
     );
   });
 
-  it("renders Reddit video muted and autoplaying, not looping", () => {
+  it("renders Reddit video muted, not auto-starting or looping", () => {
     const el = /** @type {HTMLVideoElement} */ (
       renderSlide(
         slide({
@@ -81,7 +81,9 @@ describe("renderSlide", () => {
     );
     expect(el.tagName).toBe("VIDEO");
     expect(el.muted).toBe(true);
-    expect(el.autoplay).toBe(true);
+    // The overlay starts playback (only when the show is playing), so the element
+    // must not auto-start on its own.
+    expect(el.autoplay).toBe(false);
     expect(el.loop).toBe(false);
     // No native control bar - videos follow the slideshow's own mute state.
     expect(el.controls).toBe(false);
