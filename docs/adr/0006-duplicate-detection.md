@@ -75,6 +75,14 @@ script matches that hash against the seen hashes within the Hamming threshold.
 This requires host permissions for the image hosts (`i.redd.it`,
 `preview.redd.it`, `external-preview.redd.it`).
 
+Hashing covers the **preload window** - the current slide plus the next couple -
+drained by a single serial worker in queue order. Recording each new hash before
+checking later slides keeps the first copy ahead of its duplicates, and marking
+an upcoming duplicate with a skip reason lets the queue step over it before it is
+ever shown (instead of flashing it, then skipping). A duplicate whose hash lags
+past the window still reaches the screen and falls back to skip-and-advance (and,
+for a paused autoplaying viewer, stays put).
+
 Layer 2 is **on by default**, because identity-only dedup misses a common real
 case: the same image posted once as a solo link and again inside a gallery gets
 two different Reddit upload ids, so only a content hash catches it - without
@@ -126,4 +134,3 @@ Costs / risks:
 - Confirm `preview.redd.it`/`i.redd.it` allow background fetches and that
   `createImageBitmap` → `OffscreenCanvas` reads succeed under Firefox MV3.
 - Tune the default Hamming threshold against real reposts.
-- Consider hashing during preload so a duplicate is skipped before it is shown.

@@ -402,7 +402,7 @@ describe("createSlideshowSession", () => {
     expect(mediaSrc()).toBe("https://i.redd.it/c.jpg");
   });
 
-  it("doesn't advance past a duplicate when an autoplaying show is paused", async () => {
+  it("filters a perceptual duplicate during preload, before it is shown", async () => {
     /** @type {Record<string, string>} */
     const hashes = {
       "https://i.redd.it/a.jpg": "ffffffffffffffff",
@@ -410,7 +410,7 @@ describe("createSlideshowSession", () => {
       "https://i.redd.it/c.jpg": "0000000000000000",
     };
     const { session } = makeSession({
-      settingsOverrides: { contentDedup: true, autoplay: true },
+      settingsOverrides: { contentDedup: true },
       computeImageHash: async (url) => hashes[url] ?? null,
       pages: [
         {
@@ -422,12 +422,55 @@ describe("createSlideshowSession", () => {
       ],
     });
     await session.start();
-    await flush(); // "a" hashed and recorded
+    await flush();
+    expect(mediaSrc()).toBe("https://i.redd.it/a.jpg");
+    // "b" is hashed in "a"'s preload window and marked skipped before it is ever
+    // shown - no flash of the duplicate on advance.
+    expect(text(".rs-skipped")).toBe("1 skipped");
+    session.handleKeydown(key("ArrowRight")); // steps over the pre-marked "b"
+    await flush();
+    expect(mediaSrc()).toBe("https://i.redd.it/c.jpg");
+  });
+
+  it("doesn't yank a paused autoplaying viewer off a late-resolving duplicate", async () => {
+    /** @type {Record<string, string>} */
+    const hashes = {
+      "https://i.redd.it/a.jpg": "ffffffffffffffff",
+      "https://i.redd.it/b.jpg": "ffffffffffffffff", // same as a → duplicate
+      "https://i.redd.it/c.jpg": "0000000000000000",
+    };
+    // Defer "b"'s hash so it becomes current before it's known to be a dup -
+    // the fallback path where pre-filtering didn't get there in time.
+    /** @type {(value?: unknown) => void} */
+    let releaseB = () => {};
+    const bHashed = new Promise((resolve) => {
+      releaseB = resolve;
+    });
+    const { session } = makeSession({
+      settingsOverrides: { contentDedup: true, autoplay: true },
+      computeImageHash: async (url) => {
+        if (url === "https://i.redd.it/b.jpg") await bHashed;
+        return hashes[url] ?? null;
+      },
+      pages: [
+        {
+          slides: [imageSlide("a"), imageSlide("b"), imageSlide("c")],
+          after: null,
+          exhausted: true,
+          postsScanned: 3,
+        },
+      ],
+    });
+    await session.start();
+    await flush(); // "a" hashed; the worker then blocks on "b"
     session.handleKeydown(key(" ")); // pause the playing show
-    session.handleKeydown(key("ArrowRight")); // -> "b" (a dup), while paused
-    await flush(); // "b" hashed → duplicate
+    session.handleKeydown(key("ArrowRight")); // -> "b" (its hash still pending)
+    await flush();
+    expect(mediaSrc()).toBe("https://i.redd.it/b.jpg");
+    releaseB(); // "b"'s hash resolves now, while "b" is current and paused
+    await flush();
     // Paused autoplay: record the skip but leave the viewer on the duplicate;
-    // don't yank them to "c". (Manual mode still auto-skips - see the test above.)
+    // don't yank them to "c". (Manual mode still auto-skips.)
     expect(mediaSrc()).toBe("https://i.redd.it/b.jpg");
     expect(text(".rs-skipped")).toBe("1 skipped");
   });
