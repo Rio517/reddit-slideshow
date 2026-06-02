@@ -171,6 +171,28 @@ describe("slidesFromListing", () => {
   it("treats a [deleted] author as no byline", () => {
     expect(singleAuthorSlide("[deleted]").author).toBeUndefined();
   });
+
+  it("attaches the post's subreddit and vote state to its slides", () => {
+    const slide = slidesFromListing({
+      data: {
+        children: [
+          {
+            kind: "t3",
+            data: {
+              name: "t3_sr",
+              title: "Sub post",
+              subreddit: "aww",
+              likes: true,
+              url: "https://i.redd.it/x.jpg",
+              post_hint: "image",
+            },
+          },
+        ],
+      },
+    })[0];
+    expect(slide.subreddit).toBe("aww");
+    expect(slide.likes).toBe(true);
+  });
 });
 
 describe("gallery posts", () => {

@@ -369,10 +369,10 @@ describe("createOverlay", () => {
     expect(author?.href).toBe("https://old.reddit.com/user/alice");
   });
 
-  it("orders the meta bar as username, title, popout arrow, spinner", () => {
+  it("stacks the bottom-left meta as nsfw, title row, byline (bottom)", () => {
     const overlay = createOverlay(noopHandlers());
     overlay.show();
-    overlay.renderCurrent(imageSlide({ author: "alice" }), {
+    overlay.renderCurrent(imageSlide({ over18: true }), {
       index: 0,
       total: 1,
       exhausted: true,
@@ -382,25 +382,52 @@ describe("createOverlay", () => {
     const meta = /** @type {HTMLElement} */ (
       overlay.root.querySelector(".rs-meta")
     );
-    // querySelectorAll yields document order, so this is the on-screen order.
+    // DOM top→bottom; the column lays the last child at the bottom, anchored.
+    const order = [...meta.children].map((c) => c.className.split(" ")[0]);
+    expect(order).toEqual([
+      "rs-meta__nsfw",
+      "rs-meta__title",
+      "rs-meta__byline",
+    ]);
+  });
+
+  it("orders the title row as title text, open, download, then spinner", () => {
+    const overlay = createOverlay({ ...noopHandlers(), onDownload() {} });
+    overlay.show();
+    overlay.renderCurrent(imageSlide(), {
+      index: 0,
+      total: 1,
+      exhausted: true,
+      effectiveSeconds: 5,
+      playing: true,
+    });
+    const row = /** @type {HTMLElement} */ (
+      overlay.root.querySelector(".rs-meta__title")
+    );
     const order = [
-      ...meta.querySelectorAll(
-        ".rs-meta__author, .rs-meta__title-text, .rs-meta__open, .rs-meta__spinner",
+      ...row.querySelectorAll(
+        ".rs-meta__title-text, .rs-meta__open, .rs-meta__download, .rs-meta__spinner",
       ),
     ].map((el) => [...el.classList].find((c) => c.startsWith("rs-meta__")));
     expect(order).toEqual([
-      "rs-meta__author",
       "rs-meta__title-text",
       "rs-meta__open",
+      "rs-meta__download",
       "rs-meta__spinner",
     ]);
   });
 
-  it("shows a subtle resolution + domain readout on the right", () => {
+  it("renders the byline as author, subreddit, domain, and resolution", () => {
     const overlay = createOverlay(noopHandlers());
     overlay.show();
     overlay.renderCurrent(
-      imageSlide({ sourceWidth: 1920, sourceHeight: 1080 }),
+      imageSlide({
+        author: "alice",
+        subreddit: "aww",
+        sourceWidth: 1920,
+        sourceHeight: 1080,
+        sourceUrl: "https://i.redd.it/x.jpg",
+      }),
       {
         index: 0,
         total: 1,
@@ -409,17 +436,26 @@ describe("createOverlay", () => {
         playing: true,
       },
     );
-    const res = /** @type {HTMLElement | null} */ (
-      overlay.root.querySelector(".rs-info__res")
+    const byline = /** @type {HTMLElement} */ (
+      overlay.root.querySelector(".rs-meta__byline")
     );
-    expect(res?.textContent).toBe("1920 × 1080");
-    expect(res?.hidden).toBe(false);
-    expect(overlay.root.querySelector(".rs-info__domain")?.textContent).toBe(
+    expect(byline.querySelector(".rs-meta__author")?.textContent).toBe(
+      "/u/alice",
+    );
+    const sub = /** @type {HTMLAnchorElement | null} */ (
+      byline.querySelector(".rs-meta__subreddit")
+    );
+    expect(sub?.textContent).toBe("/r/aww");
+    expect(sub?.href).toBe("https://old.reddit.com/r/aww");
+    expect(byline.querySelector(".rs-meta__domain")?.textContent).toBe(
       "i.redd.it",
+    );
+    expect(byline.querySelector(".rs-meta__res")?.textContent).toBe(
+      "1920×1080",
     );
   });
 
-  it("hides the resolution readout when the slide has no dimensions", () => {
+  it("hides the resolution in the byline when the slide has no dimensions", () => {
     const overlay = createOverlay(noopHandlers());
     overlay.show();
     overlay.renderCurrent(
@@ -433,11 +469,11 @@ describe("createOverlay", () => {
       },
     );
     const res = /** @type {HTMLElement | null} */ (
-      overlay.root.querySelector(".rs-info__res")
+      overlay.root.querySelector(".rs-meta__res")
     );
     expect(res?.hidden).toBe(true);
     // The domain still shows.
-    expect(overlay.root.querySelector(".rs-info__domain")?.textContent).toBe(
+    expect(overlay.root.querySelector(".rs-meta__domain")?.textContent).toBe(
       "i.redd.it",
     );
   });

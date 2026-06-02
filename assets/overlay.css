@@ -388,15 +388,17 @@ iframe.reddit-slideshow-media {
   border-radius: 6px;
 }
 
-/* Bottom-left metadata */
+/* Bottom-left metadata: a stack anchored at the bottom and growing up - NSFW on
+   top, the title row, then the byline at the bottom. */
 .rs-meta {
   position: absolute;
   left: 26px;
   bottom: 30px;
   z-index: 6;
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
   max-width: 64vw;
   transition:
     opacity 0.35s ease,
@@ -432,11 +434,13 @@ iframe.reddit-slideshow-media {
   display: none;
 }
 
+/* Title row: the title text (ellipsized), then the open-original + download
+   controls and the loading spinner. */
 .rs-meta__title {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-width: 0;
+  max-width: 64vw;
   /* Lighter than --rs-muted so the title reads clearly over busy media. */
   color: #c1c8d3;
   font-size: 14px;
@@ -446,9 +450,7 @@ iframe.reddit-slideshow-media {
   text-shadow: 0 0 0.2rem #000;
 }
 
-/* Only the title text ellipsizes; the author byline sits beside it as a
-   flex:none sibling so it's never clipped (and no stray "…" on short titles,
-   which the old container-level ellipsis produced). */
+/* Only the title text ellipsizes; the controls beside it are flex:none. */
 .rs-meta__title-text {
   flex: 0 1 auto;
   min-width: 0;
@@ -457,19 +459,60 @@ iframe.reddit-slideshow-media {
   text-overflow: ellipsis;
 }
 
-.rs-meta__author {
+/* Byline: /u/author to /r/subreddit from {domain} at {W}×{H}, on one line. */
+.rs-meta__byline {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  max-width: 64vw;
+  font-size: 12px;
+  color: var(--rs-muted);
+  text-shadow: 0 0 0.2rem #000;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.rs-meta__author,
+.rs-meta__subreddit {
   flex: none;
   color: var(--rs-accent);
   text-decoration: none;
 }
 
 .rs-meta__author:hover,
-.rs-meta__author:focus-visible {
+.rs-meta__author:focus-visible,
+.rs-meta__subreddit:hover,
+.rs-meta__subreddit:focus-visible {
   text-decoration: underline;
 }
 
-.rs-meta__author[hidden] {
+.rs-meta__author[hidden],
+.rs-meta__subreddit[hidden],
+.rs-meta__sep[hidden],
+.rs-meta__domain[hidden],
+.rs-meta__res[hidden] {
   display: none;
+}
+
+.rs-meta__sep {
+  flex: none;
+}
+
+/* The domain and resolution numbers render in a mono font; the domain truncates
+   first if the byline overflows. */
+.rs-meta__domain,
+.rs-meta__res {
+  flex: none;
+  font-family:
+    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.rs-meta__domain {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Inline "loading next media" ring. Appears instantly when shown, then fades out
@@ -491,45 +534,6 @@ iframe.reddit-slideshow-media {
 .rs-meta__spinner--on {
   opacity: 1;
   transition: none;
-}
-
-/* Bottom-right readout: source resolution + domain. Subtle, mirrors the
-   bottom-left meta bar; fades on idle and pins with "always show meta". */
-.rs-info {
-  position: absolute;
-  right: 26px;
-  bottom: 30px;
-  z-index: 6;
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  max-width: 40vw;
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  color: var(--rs-muted);
-  text-shadow: 0 0 0.2rem #000;
-  transition:
-    opacity 0.35s ease,
-    transform 0.35s ease;
-}
-
-.rs-info__res {
-  flex: none;
-  font-family:
-    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
-  font-variant-numeric: tabular-nums;
-}
-
-.rs-info__res[hidden] {
-  display: none;
-}
-
-.rs-info__domain {
-  flex: 0 1 auto;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 /* Control bar */
@@ -557,7 +561,6 @@ iframe.reddit-slideshow-media {
 #reddit-slideshow-root.rs-idle .rs-controls,
 #reddit-slideshow-root.rs-idle .rs-close-top,
 #reddit-slideshow-root.rs-idle .rs-meta,
-#reddit-slideshow-root.rs-idle .rs-info,
 #reddit-slideshow-root.rs-idle .rs-topleft {
   opacity: 0;
   pointer-events: none;
@@ -571,7 +574,6 @@ iframe.reddit-slideshow-media {
    cluster (counter + skipped badge) survive the idle fade. They stay
    non-interactive while idle (the cursor is hidden); a mousemove wakes them. */
 #reddit-slideshow-root.rs-pin-meta.rs-idle .rs-meta,
-#reddit-slideshow-root.rs-pin-meta.rs-idle .rs-info,
 #reddit-slideshow-root.rs-pin-meta.rs-idle .rs-topleft {
   opacity: 1;
 }
@@ -858,9 +860,7 @@ iframe.reddit-slideshow-media {
 .rs-buffering {
   position: absolute;
   right: 24px;
-  /* Above the resolution/domain readout (bottom: 30px) so the two never overlap
-     while a page is loading. */
-  bottom: 58px;
+  bottom: 34px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1275,17 +1275,21 @@ iframe.reddit-slideshow-media {
   animation: rs-counter-pulse 0.4s var(--rs-tx-ease);
 }
 
-/* Open-original lives in the meta bar now; size it down from the rail buttons. */
-.rs-meta__open {
+/* Open-original and download live in the title row; size them down from the
+   rail buttons. */
+.rs-meta__open,
+.rs-meta__download {
   width: 30px;
   height: 30px;
 }
 
-.rs-meta__open:hover {
+.rs-meta__open:hover,
+.rs-meta__download:hover {
   background: rgba(255, 255, 255, 0.12);
 }
 
-.rs-meta__open .rs-icon {
+.rs-meta__open .rs-icon,
+.rs-meta__download .rs-icon {
   width: 18px;
   height: 18px;
 }
