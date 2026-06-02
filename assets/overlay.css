@@ -1306,17 +1306,14 @@ iframe.reddit-slideshow-media {
   text-overflow: ellipsis;
 }
 
-/* Subline: domain · type, muted and smaller than the title. */
+/* Subline: domain · type, muted and smaller than the title. The "·" separator
+   inherits this color and size. */
 .rs-jump-panel__sub {
   display: flex;
   align-items: center;
   gap: 6px;
   min-width: 0;
   font-size: 11px;
-  color: var(--rs-muted);
-}
-
-.rs-jump-panel__sep {
   color: var(--rs-muted);
 }
 
