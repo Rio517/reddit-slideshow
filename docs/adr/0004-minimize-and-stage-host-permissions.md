@@ -22,13 +22,16 @@ to function:
   detection, which is on by default (ADR 0006 Layer 2). Display of these images
   needs no permission; this access is only for hashing.
 - `api.redgifs.com`, `media.redgifs.com` - Redgifs is played as native video
-  (ADR 0010): the background resolves the clip's direct mp4 from the API and
-  fetches the bytes, because the CDN hotlink-protects against a reddit `Referer`.
-  That is an extension-initiated fetch, so it needs the host permission. (The
-  iframe fallback, used only when resolution fails, is a page element and needs
-  no host permission - just the page's `frame-src`.)
-- `i.imgur.com`, `*.streamable.com`, `*.giphy.com` - background-fetch provider
-  clips played as native video (ADRs 0011, 0013, 0014).
+  (ADR 0016): the background resolves the clip's direct mp4 from the API, and
+  fetches the bytes only as the `www.reddit` CSP fallback (the CDN hotlink-
+  protects against a reddit `Referer`; direct playback uses
+  `referrerpolicy="no-referrer"` and needs no permission). Both are extension-
+  initiated fetches, so they need the host permission. (The iframe fallback, used
+  only when resolution fails, is a page element and needs no host permission -
+  just the page's `frame-src`.)
+- `i.imgur.com`, `*.streamable.com`, `*.giphy.com` - provider clips played as
+  native video; the host permission covers the CSP-fallback byte fetch (ADRs
+  0011, 0013, 0014).
 
 Reddit video (`v.redd.it`) and external image hosts load directly in the page as
 `<img>`/`<video>` and need no host permission. No optional host permissions are

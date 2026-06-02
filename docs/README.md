@@ -21,6 +21,12 @@ This directory holds planning material for a Firefox-first browser extension tha
 - [ADR 0008](adr/0008-support-new-reddit.md): support new Reddit (www.reddit.com) with a self-contained data path.
 - [ADR 0009](adr/0009-build-for-chrome.md): build a Chrome MV3 target from the same source.
 - [ADR 0010](adr/0010-pan-and-zoom-images.md): Ken Burns pan & zoom for image slides (resolution-independent; dwell = sum of phases).
+- [ADR 0011](adr/0011-imgur-gifv-native-video.md): play Imgur `.gifv` as a looping native video (direct, blob proxy as the CSP fallback).
+- [ADR 0012](adr/0012-catbox-direct-video.md): play Catbox direct files as native video.
+- [ADR 0013](adr/0013-streamable-native-video.md): resolve Streamable to native video via its API, with an iframe fallback.
+- [ADR 0014](adr/0014-giphy-native-video.md): play Giphy watch pages as a looping native video (direct, blob proxy as the CSP fallback).
+- [ADR 0015](adr/0015-imgur-albums.md): expand Imgur albums 1→N via the keyless `ajaxalbums` endpoint (`.mp4` members play as direct video).
+- [ADR 0016](adr/0016-redgifs-native-video.md): play Redgifs as native video — API resolve, direct playback (`referrerpolicy=no-referrer`), blob proxy + iframe fallbacks.
 - [Foundation plan](superpowers/plans/2026-05-29-foundation-wxt-mv3.md): task-by-task plan for the WXT/MV3 scaffold, shared core, and offline fixtures.
 
 ## Status

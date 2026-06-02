@@ -72,16 +72,19 @@ v.redd.it is DASH/HLS with separated tracks. The listing's `secure_media.reddit_
 ### Redgifs
 
 Redgifs is a first-class provider - the single most common media domain on real
-NSFW feeds. It plays as **native `<video>`** (ADR 0010):
+NSFW feeds. It plays as **native `<video>`** (ADR 0016):
 
 - Parse the id from `redgifs.com/watch/<id>` (or `/ifr/<id>`). The background
   resolves the clip's direct mp4 plus `duration` and `hasAudio` from the Redgifs
   API (`api.redgifs.com`, token cached, concurrency-limited and timed out).
-- The CDN (`media.redgifs.com`) hotlink-protects against a reddit `Referer`, so
-  the background fetches the bytes (no Referer, no cookies, with a byte cap) and
-  the content script plays them as a `blob:` URL - which also satisfies the
-  www-Reddit CSP. This gives correct timing (advances on the real clip end),
-  global mute/unmute, and no per-clip unmute.
+- The clip plays **directly** from `media.redgifs.com`. That CDN 403s a reddit
+  `Referer`, so the `<video>` carries `referrerpolicy="no-referrer"`. This gives
+  correct timing (advances on the real clip end), global mute/unmute, and no
+  per-clip unmute.
+- On a page whose CSP blocks cross-origin media (`www.reddit`), the direct load
+  fails and the slide falls back to the blob proxy: the background fetches the
+  bytes (no Referer, no cookies, byte-capped) and the content script plays them
+  as a `blob:` URL the CSP allows.
 - If resolution fails (API down, timeout), the slide falls back to the Redgifs
   first-party iframe embed (`<iframe src="…/ifr/<id>">`), which carries the
   Origin/Referer Redgifs whitelists and needs no host permission.
@@ -109,8 +112,8 @@ fetches from (see ADR 0004):
 - `https://old.reddit.com/*`, `https://www.reddit.com/*` - listing JSON for both
   frontends (ADR 0008).
 - `https://i.redd.it/*`, `https://v.redd.it/*` - Reddit image and video media.
-- `https://api.redgifs.com/*`, `https://media.redgifs.com/*` - resolve and fetch
-  native Redgifs video (ADR 0010).
+- `https://api.redgifs.com/*`, `https://media.redgifs.com/*` - resolve native
+  Redgifs video and fetch its bytes for the CSP fallback (ADR 0016).
 
 Plus the `storage` API permission for settings.
 

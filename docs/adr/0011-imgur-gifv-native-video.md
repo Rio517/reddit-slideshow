@@ -11,36 +11,35 @@ Imgur serves the same clip as an `.mp4` at the same id (`/<id>.mp4`). Direct
 `i.imgur.com` images already play via the generic image path (ADR 0002); only
 `.gifv` needs handling.
 
-Two ways to play the `.mp4`:
-
-1. **Direct** - set it as a `<video src>` on the Reddit page. Imgur hotlink-
-   protects against a non-Imgur `Referer` (it serves a placeholder for hotlinked
-   media), so a clip embedded from a reddit page is unreliable.
-2. **Proxied** - the background fetches the bytes (no reddit `Referer`) and the
-   content script plays them as a `blob:` URL. This mirrors the Redgifs native-
-   video path (ADR 0010) and is robust against the hotlink protection.
-
 ## Decision
 
 Detect `*.imgur.com/<id>.gifv` posts in the `lib/slides.js` provider dispatch and
-emit a single **proxied, looping video** slide whose `mediaUrl` is the
-transformed `https://i.imgur.com/<id>.mp4`. The transform is a pure URL rewrite -
-no network resolve, so no provider resolver module is needed (unlike Redgifs).
+emit a single **looping native-video** slide whose `mediaUrl` is the transformed
+`https://i.imgur.com/<id>.mp4`. The transform is a pure URL rewrite - no network
+resolve, so no provider resolver module is needed (unlike Redgifs, ADR 0016).
 
-The slide is `kind: "video"`, `proxied: true`, `isGif: true` (silent loop), and
+The slide is `kind: "video"`, `isGif: true` (silent loop), and
 `durationMode: "media"` - so it advances on the controller's media safety-net
 timer (`imageTimerSeconds + 2s`) while looping, matching reddit-hosted GIFs.
 
-Add `https://i.imgur.com/*` to install-time `host_permissions` (the background
-fetch needs it) and to `PROXY_MEDIA_HOSTS` in the background router, so the
-privileged blob fetch is host-gated to Imgur, independent of granted permissions.
+It plays **directly**: the mp4 is set as a `<video src>` on the Reddit page
+(`i.imgur.com` is a `DIRECT_VIDEO_HOST`), which serves it to a reddit referer. On
+a page whose CSP blocks cross-origin media (`www.reddit`), the direct load fails
+and the slide falls back to `proxied` - the background fetches the bytes (no
+`Referer`) and the content script plays them as a `blob:` URL the CSP allows
+(the direct-with-CSP-fallback pattern shared with Redgifs/Streamable/Giphy).
+
+Add `https://i.imgur.com/*` to install-time `host_permissions` (the proxy-
+fallback fetch needs it; direct `<video>` playback is a page subresource and does
+not) and to `PROXY_MEDIA_HOSTS` in the background router, so that fallback fetch
+is host-gated to Imgur independent of granted permissions.
 
 ## Consequences
 
 Benefits:
 
 - Imgur `.gifv` clips play inline as correctly-timed, looping video.
-- Reuses the existing proxied-blob playback path; no new message types.
+- Reuses the shared direct-with-CSP-fallback playback path; no new message types.
 
 Costs:
 

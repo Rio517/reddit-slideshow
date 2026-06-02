@@ -23,14 +23,17 @@ hyphens). Giphy's media is served from rotating CDN subdomains
 
 Detect **only** `giphy.com` watch-page posts (not the `media.`/`i.` CDN
 subdomains, to avoid converting already-working gif images) with an extractable
-id, and emit a single **proxied, looping video** slide whose `mediaUrl` is the
+id, and emit a single **looping native-video** slide whose `mediaUrl` is the
 transformed `media.giphy.com/media/<id>/giphy.mp4`. A pure URL rewrite - no
 resolver - mirroring the Imgur `.gifv` path (ADR 0011): `kind: "video"`,
-`proxied: true`, `isGif: true`, `durationMode: "media"`.
+`isGif: true`, `durationMode: "media"`.
 
-Play it proxied (background-fetched blob), reusing the proxy allowlist's
-domain-**suffix** rule with `.giphy.com` (ADR 0013), since the media subdomain
-varies. Add a single `https://*.giphy.com/*` install-time host permission.
+Play it **directly** from Giphy's media CDN (a `DIRECT_VIDEO_HOST` suffix). On a
+CSP-blocked page (`www.reddit`) the direct load falls back to a background-fetched
+`blob:`, reusing the proxy allowlist's domain-**suffix** rule with `.giphy.com`
+(ADR 0013) since the media subdomain varies. Add a single `https://*.giphy.com/*`
+install-time host permission (needed for that CSP-fallback fetch; direct playback
+is a page subresource and needs none).
 
 ## Consequences
 
@@ -38,8 +41,8 @@ Benefits:
 
 - Giphy reaction/clip posts (previously skipped) now play as efficient,
   correctly-timed looping video instead of nothing.
-- Reuses the existing proxied-blob path and suffix-matching primitive; no new
-  resolver, message type, or queue change.
+- Reuses the shared direct-with-CSP-fallback path and suffix-matching primitive;
+  no new resolver, message type, or queue change.
 
 Costs:
 
