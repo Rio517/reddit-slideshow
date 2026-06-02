@@ -446,9 +446,9 @@ iframe.reddit-slideshow-media {
   text-shadow: 0 0 0.2rem #000;
 }
 
-/* Only the title text ellipsizes; the byline and spinner sit beside it as
-   flex:none siblings so they're never clipped (and no stray "…" on short
-   titles, which the old container-level ellipsis produced). */
+/* Only the title text ellipsizes; the author byline sits beside it as a
+   flex:none sibling so it's never clipped (and no stray "…" on short titles,
+   which the old container-level ellipsis produced). */
 .rs-meta__title-text {
   flex: 0 1 auto;
   min-width: 0;
@@ -493,6 +493,45 @@ iframe.reddit-slideshow-media {
   transition: none;
 }
 
+/* Bottom-right readout: source resolution + domain. Subtle, mirrors the
+   bottom-left meta bar; fades on idle and pins with "always show meta". */
+.rs-info {
+  position: absolute;
+  right: 26px;
+  bottom: 30px;
+  z-index: 6;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  max-width: 40vw;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--rs-muted);
+  text-shadow: 0 0 0.2rem #000;
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+.rs-info__res {
+  flex: none;
+  font-family:
+    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.rs-info__res[hidden] {
+  display: none;
+}
+
+.rs-info__domain {
+  flex: 0 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Control bar */
 .rs-controls {
   position: absolute;
@@ -518,6 +557,7 @@ iframe.reddit-slideshow-media {
 #reddit-slideshow-root.rs-idle .rs-controls,
 #reddit-slideshow-root.rs-idle .rs-close-top,
 #reddit-slideshow-root.rs-idle .rs-meta,
+#reddit-slideshow-root.rs-idle .rs-info,
 #reddit-slideshow-root.rs-idle .rs-topleft {
   opacity: 0;
   pointer-events: none;
@@ -531,6 +571,7 @@ iframe.reddit-slideshow-media {
    cluster (counter + skipped badge) survive the idle fade. They stay
    non-interactive while idle (the cursor is hidden); a mousemove wakes them. */
 #reddit-slideshow-root.rs-pin-meta.rs-idle .rs-meta,
+#reddit-slideshow-root.rs-pin-meta.rs-idle .rs-info,
 #reddit-slideshow-root.rs-pin-meta.rs-idle .rs-topleft {
   opacity: 1;
 }
@@ -810,7 +851,9 @@ iframe.reddit-slideshow-media {
 .rs-buffering {
   position: absolute;
   right: 24px;
-  bottom: 34px;
+  /* Above the resolution/domain readout (bottom: 30px) so the two never overlap
+     while a page is loading. */
+  bottom: 58px;
   display: flex;
   align-items: center;
   gap: 8px;

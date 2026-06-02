@@ -264,6 +264,79 @@ describe("createOverlay", () => {
     expect(author?.href).toBe("https://old.reddit.com/user/alice");
   });
 
+  it("orders the meta bar as username, title, popout arrow, spinner", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    overlay.renderCurrent(imageSlide({ author: "alice" }), {
+      index: 0,
+      total: 1,
+      exhausted: true,
+      effectiveSeconds: 5,
+      playing: true,
+    });
+    const meta = /** @type {HTMLElement} */ (
+      overlay.root.querySelector(".rs-meta")
+    );
+    // querySelectorAll yields document order, so this is the on-screen order.
+    const order = [
+      ...meta.querySelectorAll(
+        ".rs-meta__author, .rs-meta__title-text, .rs-meta__open, .rs-meta__spinner",
+      ),
+    ].map((el) => [...el.classList].find((c) => c.startsWith("rs-meta__")));
+    expect(order).toEqual([
+      "rs-meta__author",
+      "rs-meta__title-text",
+      "rs-meta__open",
+      "rs-meta__spinner",
+    ]);
+  });
+
+  it("shows a subtle resolution + domain readout on the right", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    overlay.renderCurrent(
+      imageSlide({ sourceWidth: 1920, sourceHeight: 1080 }),
+      {
+        index: 0,
+        total: 1,
+        exhausted: true,
+        effectiveSeconds: 5,
+        playing: true,
+      },
+    );
+    const res = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-info__res")
+    );
+    expect(res?.textContent).toBe("1920 × 1080");
+    expect(res?.hidden).toBe(false);
+    expect(overlay.root.querySelector(".rs-info__domain")?.textContent).toBe(
+      "i.redd.it",
+    );
+  });
+
+  it("hides the resolution readout when the slide has no dimensions", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    overlay.renderCurrent(
+      imageSlide({ sourceWidth: undefined, sourceHeight: undefined }),
+      {
+        index: 0,
+        total: 1,
+        exhausted: true,
+        effectiveSeconds: 5,
+        playing: true,
+      },
+    );
+    const res = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-info__res")
+    );
+    expect(res?.hidden).toBe(true);
+    // The domain still shows.
+    expect(overlay.root.querySelector(".rs-info__domain")?.textContent).toBe(
+      "i.redd.it",
+    );
+  });
+
   it("hides the author byline when the slide has no author", () => {
     const overlay = createOverlay(noopHandlers());
     overlay.show();
