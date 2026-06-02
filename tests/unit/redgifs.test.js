@@ -74,6 +74,24 @@ describe("createRedgifsResolver", () => {
     expect(gifCalls).toBe(2);
   });
 
+  it("falls back to the sd mp4 when no hd url is present", async () => {
+    const fetchImpl = vi.fn(async (/** @type {any} */ url) =>
+      String(url).includes("/auth/temporary")
+        ? jsonResponse({ token: "T" })
+        : jsonResponse({
+            gif: {
+              urls: { sd: "https://media.redgifs.com/X-sd.mp4" },
+              hasAudio: false,
+            },
+          }),
+    );
+    const { resolve } = createRedgifsResolver({
+      fetchImpl: /** @type {any} */ (fetchImpl),
+    });
+    const r = await resolve("abc");
+    expect(r.mediaUrl).toBe("https://media.redgifs.com/X-sd.mp4");
+  });
+
   it("rejects an mp4 url from an unexpected host", async () => {
     const fetchImpl = vi.fn(async (/** @type {any} */ url) =>
       String(url).includes("/auth/temporary")

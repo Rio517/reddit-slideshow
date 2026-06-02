@@ -230,6 +230,22 @@ describe("createMessageRouter - hashImage", () => {
     ).toEqual({ ok: false });
   });
 
+  it("rejects an unparseable hash url without hashing", async () => {
+    let called = false;
+    const router = makeRouter({
+      hashImage: async () => {
+        called = true;
+        return "deadbeefdeadbeef";
+      },
+    });
+    const result = await router(
+      { type: "slideshow.hashImage", payload: { url: "http://[" } },
+      OWN,
+    );
+    expect(result).toEqual({ ok: false });
+    expect(called).toBe(false);
+  });
+
   it("rejects a privileged hash from a non-content-script sender (no tab)", async () => {
     const router = makeRouter();
     const result = await router(
@@ -352,6 +368,42 @@ describe("createMessageRouter - fetchMedia", () => {
       OWN,
     );
     expect(result).toEqual({ ok: false });
+  });
+
+  it("rejects an unparseable media url without fetching", async () => {
+    let called = false;
+    const router = makeRouter({
+      fetchMediaBytes: async () => {
+        called = true;
+        return new ArrayBuffer(8);
+      },
+    });
+    const result = await router(
+      { type: "slideshow.fetchMedia", payload: { url: "http://[" } },
+      OWN,
+    );
+    expect(result).toEqual({ ok: false });
+    expect(called).toBe(false);
+  });
+
+  it("rejects a media fetch from a non-content-script sender (no tab)", async () => {
+    let called = false;
+    const router = makeRouter({
+      fetchMediaBytes: async () => {
+        called = true;
+        return new ArrayBuffer(8);
+      },
+    });
+    const result = await router(
+      {
+        type: "slideshow.fetchMedia",
+        payload: { url: "https://media.redgifs.com/X.mp4" },
+      },
+      { id: RUNTIME_ID }, // an extension page: own id, but no tab
+    );
+    expect(result).toEqual({ ok: false });
+    // The privileged fetch must never run for an untrusted caller.
+    expect(called).toBe(false);
   });
 });
 
