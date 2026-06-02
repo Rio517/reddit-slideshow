@@ -456,6 +456,75 @@ describe("createMessageRouter - resolveRedgifs", () => {
   });
 });
 
+describe("createMessageRouter - resolveRedditAudio", () => {
+  const dashMsg = (/** @type {any} */ dashUrl) => ({
+    type: "slideshow.resolveRedditAudio",
+    payload: { dashUrl },
+  });
+  const DASH = "https://v.redd.it/abc/DASHPlaylist.mpd?a=1";
+  const AUDIO = "https://v.redd.it/abc/DASH_AUDIO_128.mp4";
+
+  it("returns the resolved audio url for a v.redd.it manifest", async () => {
+    const router = makeRouter({ resolveRedditAudio: async () => AUDIO });
+    expect(await router(dashMsg(DASH), OWN)).toEqual({
+      ok: true,
+      audioUrl: AUDIO,
+    });
+  });
+
+  it("passes a null audio url through for a silent clip", async () => {
+    const router = makeRouter({ resolveRedditAudio: async () => null });
+    expect(await router(dashMsg(DASH), OWN)).toEqual({
+      ok: true,
+      audioUrl: null,
+    });
+  });
+
+  it("rejects a resolve from a non-content-script sender (no tab)", async () => {
+    let called = false;
+    const router = makeRouter({
+      resolveRedditAudio: async () => {
+        called = true;
+        return AUDIO;
+      },
+    });
+    expect(await router(dashMsg(DASH), { id: RUNTIME_ID })).toEqual({
+      ok: false,
+    });
+    expect(called).toBe(false);
+  });
+
+  it("rejects a non-v.redd.it manifest host without fetching", async () => {
+    let called = false;
+    const router = makeRouter({
+      resolveRedditAudio: async () => {
+        called = true;
+        return AUDIO;
+      },
+    });
+    expect(await router(dashMsg("https://evil.example/x.mpd"), OWN)).toEqual({
+      ok: false,
+    });
+    expect(called).toBe(false);
+  });
+
+  it("rejects a cleartext manifest url", async () => {
+    const router = makeRouter({ resolveRedditAudio: async () => AUDIO });
+    expect(
+      await router(dashMsg("http://v.redd.it/abc/DASHPlaylist.mpd"), OWN),
+    ).toEqual({ ok: false });
+  });
+
+  it("fails closed when resolution throws", async () => {
+    const router = makeRouter({
+      resolveRedditAudio: async () => {
+        throw new Error("boom");
+      },
+    });
+    expect(await router(dashMsg(DASH), OWN)).toEqual({ ok: false });
+  });
+});
+
 describe("createMessageRouter - download", () => {
   const dlMsg = (/** @type {any} */ payload) => ({
     type: "slideshow.download",

@@ -35,6 +35,7 @@ export default [
         HTMLSelectElement: "readonly",
         AbortController: "readonly",
         Blob: "readonly",
+        TextDecoder: "readonly",
         atob: "readonly",
         btoa: "readonly",
         OffscreenCanvas: "readonly",

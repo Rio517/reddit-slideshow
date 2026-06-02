@@ -130,7 +130,7 @@ function fakeRequest(pages) {
 }
 
 /**
- * @param {{ pages?: any[], settingsOverrides?: Record<string, unknown>, openUrl?: (url: string) => void, openPopout?: () => void, saveSettings?: (patch: object) => Promise<unknown>, computeImageHash?: (url: string) => Promise<string | null>, createImage?: () => { src: string, decoding?: string }, createVideo?: () => { src: string, preload?: string, muted?: boolean }, resolveMedia?: (url: string) => Promise<string | null>, downloadMedia?: (url: string, filename: string) => void, resolveRedgifs?: (slide: any) => Promise<any> }} [opts]
+ * @param {{ pages?: any[], settingsOverrides?: Record<string, unknown>, openUrl?: (url: string) => void, openPopout?: () => void, saveSettings?: (patch: object) => Promise<unknown>, computeImageHash?: (url: string) => Promise<string | null>, createImage?: () => { src: string, decoding?: string }, createVideo?: () => { src: string, preload?: string, muted?: boolean }, resolveMedia?: (url: string) => Promise<string | null>, downloadMedia?: (url: string, filename: string) => void, resolveRedgifs?: (slide: any) => Promise<any>, resolveRedditAudio?: (slide: any) => Promise<string | null> }} [opts]
  */
 function makeSession({
   pages,
@@ -144,6 +144,7 @@ function makeSession({
   resolveMedia,
   downloadMedia,
   resolveRedgifs,
+  resolveRedditAudio,
 } = {}) {
   const request = fakeRequest(
     pages ?? [
@@ -170,6 +171,7 @@ function makeSession({
     resolveMedia,
     downloadMedia,
     resolveRedgifs,
+    resolveRedditAudio,
   });
   sessions.push(session);
   return { session, request };
@@ -404,6 +406,34 @@ describe("createSlideshowSession", () => {
     session.handleKeydown(key("ArrowRight")); // -> "b", a perceptual dup of "a"
     await flush(); // "b" hashed → skipped → "c"
     expect(mediaSrc()).toBe("https://i.redd.it/c.jpg");
+  });
+
+  it("resolves v.redd.it audio for an upcoming video and plays it from a companion element", async () => {
+    const audioTrack = "https://v.redd.it/b/DASH_AUDIO_128.mp4";
+    const { session } = makeSession({
+      resolveRedditAudio: async (/** @type {any} */ slide) =>
+        slide.dashUrl ? audioTrack : null,
+      pages: [
+        {
+          slides: [
+            imageSlide("a"),
+            videoSlide("b", {
+              audioAvailable: true,
+              dashUrl: "https://v.redd.it/b/DASHPlaylist.mpd",
+            }),
+          ],
+          after: null,
+          exhausted: true,
+          postsScanned: 2,
+        },
+      ],
+    });
+    await session.start();
+    await flush(); // "a" shown; "b"'s audio resolved during the preload window
+    session.handleKeydown(key("ArrowRight")); // -> "b"
+    await flush();
+    const audio = shadow()?.querySelector("audio");
+    expect(audio?.getAttribute("src")).toBe(audioTrack);
   });
 
   it("upgrades an upcoming redgifs embed to native video before it is shown", async () => {

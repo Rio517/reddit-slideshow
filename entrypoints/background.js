@@ -13,7 +13,9 @@ import {
   fetchCappedBytes,
   MAX_IMAGE_BYTES,
   MAX_MEDIA_BYTES,
+  MAX_MANIFEST_BYTES,
 } from "@/lib/proxy-fetch.js";
+import { audioUrlFromDash } from "@/lib/reddit-audio.js";
 import { createImageHasher } from "@/lib/image-hash.js";
 import { createLogger } from "@/lib/log.js";
 
@@ -62,6 +64,12 @@ export default defineBackground(() => {
     fetchMediaBytes: (url) => fetchCappedBytes(url, MAX_MEDIA_BYTES),
     // Lazy redgifs: resolve one embed's native mp4 (+ duration/audio) on demand.
     resolveRedgifsId: (id) => redgifs.resolve(id),
+    // v.redd.it audio: fetch the DASH manifest and read its separate audio
+    // track URL (null for a silent clip), to play alongside the silent video.
+    resolveRedditAudio: async (dashUrl) => {
+      const bytes = await fetchCappedBytes(dashUrl, MAX_MANIFEST_BYTES);
+      return audioUrlFromDash(new TextDecoder().decode(bytes), dashUrl);
+    },
     // Save the displayed media. The downloads API runs from the background and
     // fetches the file itself (no reddit Referer), so a hotlink-protected CDN
     // serves it; the suggested filename comes from the slide's hint.

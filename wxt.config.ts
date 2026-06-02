@@ -21,6 +21,10 @@ export default defineConfig({
       "https://i.redd.it/*",
       "https://preview.redd.it/*",
       "https://external-preview.redd.it/*",
+      // v.redd.it: background-fetch the DASH manifest to read a hosted video's
+      // separate audio track URL (ADR 0018). The video itself loads as a page
+      // subresource (no permission); this access is only for the manifest.
+      "https://v.redd.it/*",
       // Redgifs: resolve the direct mp4 (api) and fetch its bytes (media) in the
       // background, so the clip plays as a native, correctly-timed video.
       "https://api.redgifs.com/*",

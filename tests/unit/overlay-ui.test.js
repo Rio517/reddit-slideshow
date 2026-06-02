@@ -180,6 +180,71 @@ describe("createOverlay", () => {
     expect(dl()?.disabled).toBe(true);
   });
 
+  it("attaches a synced companion audio for a video slide with an audio track", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    overlay.renderCurrent(
+      imageSlide({
+        kind: "video",
+        durationMode: "media",
+        mediaUrl: "https://v.redd.it/b/CMAF_720.mp4",
+        audioUrl: "https://v.redd.it/b/DASH_AUDIO_128.mp4",
+      }),
+      {
+        index: 0,
+        total: 1,
+        exhausted: true,
+        effectiveSeconds: 5,
+        playing: true,
+      },
+    );
+    const audio = overlay.root.querySelector("audio");
+    expect(audio?.getAttribute("src")).toBe(
+      "https://v.redd.it/b/DASH_AUDIO_128.mp4",
+    );
+  });
+
+  it("attaches no companion audio for a video without an audio track", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    overlay.renderCurrent(
+      imageSlide({
+        kind: "video",
+        durationMode: "media",
+        mediaUrl: "https://v.redd.it/b/CMAF_720.mp4",
+      }),
+      {
+        index: 0,
+        total: 1,
+        exhausted: true,
+        effectiveSeconds: 5,
+        playing: true,
+      },
+    );
+    expect(overlay.root.querySelector("audio")).toBeNull();
+  });
+
+  it("ignores a companion audio url that isn't on a reddit host", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    overlay.renderCurrent(
+      imageSlide({
+        kind: "video",
+        durationMode: "media",
+        mediaUrl: "https://v.redd.it/b/CMAF_720.mp4",
+        audioUrl: "https://evil.example/track.mp4",
+      }),
+      {
+        index: 0,
+        total: 1,
+        exhausted: true,
+        effectiveSeconds: 5,
+        playing: true,
+      },
+    );
+    expect(overlay.root.querySelector("audio")).toBeNull();
+  });
+
   it("a backdrop click with the settings panel open closes the panel, not the show", () => {
     const onClose = vi.fn();
     const overlay = createOverlay({ ...noopHandlers(), onClose });

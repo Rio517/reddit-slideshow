@@ -102,6 +102,22 @@ export default defineContentScript({
           proxied: import.meta.env.CHROME,
         });
       },
+      // v.redd.it audio: ask the background to read the separate audio track
+      // URL from the DASH manifest. Null keeps the clip silent (today's
+      // behavior).
+      resolveRedditAudio: async (slide) => {
+        if (!slide.dashUrl) return null;
+        try {
+          const res = await browser.runtime.sendMessage({
+            type: "slideshow.resolveRedditAudio",
+            payload: { dashUrl: slide.dashUrl },
+          });
+          return res?.ok ? (res.audioUrl ?? null) : null;
+        } catch (err) {
+          log.warn("resolveRedditAudio message failed", err);
+          return null;
+        }
+      },
       // User-initiated save of the displayed media: the background drives the
       // downloads API (a content script can't), using the slide's filename hint.
       downloadMedia: (url, filename) => {
