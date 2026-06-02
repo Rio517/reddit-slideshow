@@ -402,6 +402,36 @@ describe("createSlideshowSession", () => {
     expect(mediaSrc()).toBe("https://i.redd.it/c.jpg");
   });
 
+  it("doesn't advance past a duplicate when an autoplaying show is paused", async () => {
+    /** @type {Record<string, string>} */
+    const hashes = {
+      "https://i.redd.it/a.jpg": "ffffffffffffffff",
+      "https://i.redd.it/b.jpg": "ffffffffffffffff", // same as a → duplicate
+      "https://i.redd.it/c.jpg": "0000000000000000",
+    };
+    const { session } = makeSession({
+      settingsOverrides: { contentDedup: true, autoplay: true },
+      computeImageHash: async (url) => hashes[url] ?? null,
+      pages: [
+        {
+          slides: [imageSlide("a"), imageSlide("b"), imageSlide("c")],
+          after: null,
+          exhausted: true,
+          postsScanned: 3,
+        },
+      ],
+    });
+    await session.start();
+    await flush(); // "a" hashed and recorded
+    session.handleKeydown(key(" ")); // pause the playing show
+    session.handleKeydown(key("ArrowRight")); // -> "b" (a dup), while paused
+    await flush(); // "b" hashed → duplicate
+    // Paused autoplay: record the skip but leave the viewer on the duplicate;
+    // don't yank them to "c". (Manual mode still auto-skips - see the test above.)
+    expect(mediaSrc()).toBe("https://i.redd.it/b.jpg");
+    expect(text(".rs-skipped")).toBe("1 skipped");
+  });
+
   it("records a slide's hash even if the show advances before it resolves", async () => {
     /** @type {Record<string, string>} */
     const hashes = {
