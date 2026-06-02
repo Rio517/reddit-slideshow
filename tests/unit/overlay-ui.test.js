@@ -967,12 +967,18 @@ describe("createOverlay", () => {
     expect(type(1)).toBe("video");
     expect(domain(2)).toBe("i.imgur.com");
     expect(type(2)).toBe("gif");
-    // An auto-skipped slide stays listed, dimmed, with the type column flagging it.
+    // An auto-skipped slide stays listed, dimmed, with the type column showing
+    // the specific skip reason in place of the asset kind.
     expect(domain(3)).toBe("redgifs.com");
     expect(items[3].classList.contains("rs-jump-panel__item--skipped")).toBe(
       true,
     );
-    expect(type(3)).toBe("skipped");
+    expect(type(3)).toBe("Unavailable");
+    expect(
+      items[3]
+        .querySelector(".rs-jump-panel__type")
+        ?.classList.contains("rs-jump-panel__type--reason"),
+    ).toBe(true);
   });
 
   it("shows each post's title as the primary line, with domain + type as a subline", () => {

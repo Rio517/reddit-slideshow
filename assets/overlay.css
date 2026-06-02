@@ -1369,7 +1369,7 @@ iframe.reddit-slideshow-media {
 
 /* Auto-skipped slides stay listed but read as muted. */
 .rs-jump-panel__item--skipped {
-  opacity: 0.55;
+  opacity: 0.7;
 }
 
 .rs-jump-panel__item:hover {
@@ -1398,7 +1398,7 @@ iframe.reddit-slideshow-media {
 }
 
 /* The type part of the subline: the asset kind (image / gif / video / embed),
-   or "skipped". */
+   or the skip reason for an auto-skipped row. */
 .rs-jump-panel__type {
   flex: none;
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
@@ -1406,6 +1406,14 @@ iframe.reddit-slideshow-media {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   white-space: nowrap;
+}
+
+/* Skip-reason variant: reasons are sentences, so drop the asset-kind uppercase
+   styling and tint them so they read as a status, not a media type. */
+.rs-jump-panel__type--reason {
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--rs-muted);
 }
 
 .rs-jump-panel__item--current .rs-jump-panel__name {
