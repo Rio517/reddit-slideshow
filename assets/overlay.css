@@ -1275,7 +1275,7 @@ iframe.reddit-slideshow-media {
 
 .rs-jump-panel__item {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr;
   align-items: center;
   gap: 10px;
   text-align: left;
@@ -1287,6 +1287,37 @@ iframe.reddit-slideshow-media {
   border-radius: 7px;
   padding: 8px;
   cursor: pointer;
+}
+
+/* The text column: title on top, domain · type beneath. min-width:0 lets the
+   1fr grid cell shrink so the title's ellipsis actually kicks in. */
+.rs-jump-panel__body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Primary line: the post title. Truncates; full text stays on the title attr. */
+.rs-jump-panel__name {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Subline: domain · type, muted and smaller than the title. */
+.rs-jump-panel__sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 11px;
+  color: var(--rs-muted);
+}
+
+.rs-jump-panel__sep {
+  color: var(--rs-muted);
 }
 
 /* Auto-skipped slides stay listed but read as muted. */
@@ -1310,8 +1341,8 @@ iframe.reddit-slideshow-media {
   text-align: right;
 }
 
-/* The domain column: where the media is from. Truncates; min-width:0 lets the
-   1fr grid cell shrink so the ellipsis actually kicks in. */
+/* The domain part of the subline: where the media is from. Truncates;
+   min-width:0 lets it shrink within the flex subline so the ellipsis kicks in. */
 .rs-jump-panel__domain {
   min-width: 0;
   white-space: nowrap;
@@ -1319,17 +1350,18 @@ iframe.reddit-slideshow-media {
   text-overflow: ellipsis;
 }
 
-/* The type column: the asset kind (image / gif / video / embed), or "skipped". */
+/* The type part of the subline: the asset kind (image / gif / video / embed),
+   or "skipped". */
 .rs-jump-panel__type {
+  flex: none;
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--rs-muted);
   white-space: nowrap;
 }
 
-.rs-jump-panel__item--current .rs-jump-panel__domain {
+.rs-jump-panel__item--current .rs-jump-panel__name {
   color: var(--rs-accent);
 }
 

@@ -862,6 +862,43 @@ describe("createOverlay", () => {
     expect(type(3)).toBe("skipped");
   });
 
+  it("shows each post's title as the primary line, with domain + type as a subline", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.setJumpList(
+      [
+        imageSlide({
+          title: "First post",
+          sourceUrl: "https://i.redd.it/a.jpg",
+        }),
+        imageSlide({
+          title: "Second post",
+          isGif: true,
+          sourceUrl: "https://i.imgur.com/c.gif",
+        }),
+      ],
+      0,
+      1,
+    );
+    /** @type {HTMLElement} */ (
+      overlay.root.querySelector(".rs-meta__counter")
+    ).dispatchEvent(new Event("click", { bubbles: true }));
+    const items = overlay.root.querySelectorAll(".rs-jump-panel__item");
+    const name = (/** @type {number} */ i) =>
+      items[i].querySelector(".rs-jump-panel__name");
+    // The post title is the primary line; full text stays in the DOM (CSS
+    // ellipsizes it) and on the title attribute for hover.
+    expect(name(0)?.textContent).toBe("First post");
+    expect(name(0)?.getAttribute("title")).toBe("First post");
+    expect(name(1)?.textContent).toBe("Second post");
+    // The domain + type still render alongside it as the muted subline.
+    expect(items[0].querySelector(".rs-jump-panel__domain")?.textContent).toBe(
+      "i.redd.it",
+    );
+    expect(items[1].querySelector(".rs-jump-panel__type")?.textContent).toBe(
+      "gif",
+    );
+  });
+
   it("scrolls to the current post once the jump panel is shown, not while hidden", () => {
     const overlay = createOverlay(noopHandlers());
     overlay.setJumpList(
