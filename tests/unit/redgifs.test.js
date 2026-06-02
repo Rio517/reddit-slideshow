@@ -164,6 +164,24 @@ describe("resolveRedgifsSlides", () => {
     expect(out[1].proxied).toBeUndefined(); // direct play
   });
 
+  it("marks redgifs slides proxied when asked (Chrome: referrerpolicy is a no-op)", async () => {
+    const slides = /** @type {any[]} */ ([
+      {
+        provider: "redgifs",
+        kind: "embed",
+        sourceUrl: "https://www.redgifs.com/watch/abc",
+        embedUrl: "https://www.redgifs.com/ifr/abc",
+      },
+    ]);
+    const resolve = async (/** @type {string} */ id) => ({
+      mediaUrl: `https://media.redgifs.com/${id}.mp4`,
+      hasAudio: false,
+    });
+    const out = await resolveRedgifsSlides(slides, resolve, { proxied: true });
+    expect(out[0].kind).toBe("video");
+    expect(out[0].proxied).toBe(true); // blob proxy path (background, no Referer)
+  });
+
   it("keeps the iframe embed when resolution fails", async () => {
     const slides = /** @type {any[]} */ ([
       {

@@ -44,7 +44,12 @@ export default defineBackground(() => {
    */
   const fetchQueuePageWithProviders = async (pageUrl, options) => {
     const page = await fetchQueuePage(pageUrl, options);
-    page.slides = await resolveRedgifsSlides(page.slides, redgifs.resolve);
+    // Chrome can't play the redgifs mp4 directly (referrerpolicy is a no-op on
+    // <video> there, so the CDN 403s the reddit Referer); proxy it from the
+    // start. Firefox honors the attribute and plays direct.
+    page.slides = await resolveRedgifsSlides(page.slides, redgifs.resolve, {
+      proxied: import.meta.env.CHROME,
+    });
     page.slides = await resolveStreamableSlides(
       page.slides,
       streamable.resolve,
