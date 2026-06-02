@@ -32,15 +32,18 @@ operated by the developer (there is none):
   the post links - Reddit's own hosts (`i.redd.it`, `v.redd.it`), Catbox
   (`files.catbox.moe`), and other image hosts - the same way they would load on
   Reddit itself.
-- **Provider clips.** Some providers don't expose a directly-playable URL, so the
-  extension's background plays their clips as native video: it fetches the video
-  bytes from the provider's media host (`media.redgifs.com`, `i.imgur.com`,
-  `*.streamable.com`, `*.giphy.com`) and, for Redgifs and Streamable, first
-  resolves the direct URL from the provider's API (`api.redgifs.com`,
-  `api.streamable.com`). These requests are made **without cookies**
-  (`credentials: "omit"`) and with no referrer; each provider receives only what
-  any request to load that clip would (e.g. your IP address and standard request
-  data), subject to that provider's own privacy policy (e.g.
+- **Provider clips.** For some providers the extension first resolves a directly-
+  playable video URL - from the provider's API (`api.redgifs.com`,
+  `api.streamable.com`) or by rewriting the link (Imgur, Giphy). Your browser then
+  plays the clip **directly** as native video from the provider's media host
+  (`media.redgifs.com`, `i.imgur.com`, `*.streamable.com`, `*.giphy.com`), the same
+  way it loads any media. On new Reddit (`www.reddit.com`), whose page security
+  policy blocks some cross-origin video, the extension's background instead fetches
+  that clip's bytes from the same media host and plays them locally as a fallback.
+  All of these requests - the API resolves and any byte fallback - are made
+  **without cookies** (`credentials: "omit"`) and with no referrer; each provider
+  receives only what any request to load that clip would (e.g. your IP address and
+  standard request data), subject to that provider's own privacy policy (e.g.
   [Redgifs'](https://www.redgifs.com/privacy)). The extension sends no account
   information or tracking of its own. (If Redgifs or Streamable can't be reached,
   the clip falls back to the provider's standard `<iframe>` embed, loaded by your

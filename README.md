@@ -23,7 +23,7 @@ AirPlay or Chromecast that window to your TV for a hands-off, lean-back feed.
 ## Features
 
 - Launch from any `old.reddit.com` or `www.reddit.com` feed via the toolbar icon
-  or **Alt+Shift+S** - it starts at the post nearest your scroll position.
+  or **Alt+Shift+S** - it starts at the top of the current feed (its own sort).
 - Auto-advance on a timer or arrow through manually; videos advance when they end.
 - Pages forever - follows Reddit's pagination so the show keeps going.
 - Per-kind rendering: `<img>` for images/galleries and native `<video>` for
@@ -185,9 +185,12 @@ done yet.
 
 ## Privacy
 
-No analytics, no tracking, no developer servers - the extension only fetches the
-media you are viewing (Reddit, and Redgifs for Redgifs links) and stores your
-settings locally. See [PRIVACY.md](PRIVACY.md).
+No analytics, no tracking, no developer servers - the extension fetches only the
+Reddit feed and the media you are viewing (including clips resolved from Redgifs,
+Imgur, Streamable, and Giphy), plus, for re-upload detection, the image bytes it
+hashes locally on your device. Your Reddit cookies go to Reddit only; every
+provider request is cookie-less. Settings are stored locally. See
+[PRIVACY.md](PRIVACY.md).
 
 ## License
 
