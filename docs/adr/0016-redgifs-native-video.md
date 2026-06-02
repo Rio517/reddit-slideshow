@@ -23,14 +23,23 @@ established here.
 
 ## Decision
 
-Resolve every Redgifs embed to a native `<video>` slide in the background before
-the content script sees the queue.
+Resolve each Redgifs embed to a native `<video>` slide **lazily**, as the
+slideshow approaches it - the queue page is delivered with iframe embeds and each
+is upgraded on demand. This keeps the first page from blocking on Redgifs API
+calls; a clip not yet resolved when reached simply shows as its iframe embed
+until (or unless) its resolve lands.
 
 - **Resolve (`lib/redgifs.js`).** A background resolver parses the id, fetches an
   anonymous token from `api.redgifs.com` (cached, refreshed once on a 401), and
   reads the direct mp4 URL + `duration` + `hasAudio`. The returned host is
   re-validated to be exactly `media.redgifs.com` before it is trusted.
-  Concurrency-limited and timed out via `lib/async-pool.js`.
+- **Lazy upgrade (`lib/session.js`).** The session resolves the embeds in its
+  preload window (`slideshow.resolveRedgifs { id }` to the background) and
+  upgrades each slide in place to native video before it is shown; the on-screen
+  slide is re-rendered if it upgrades while current. Each embed is resolved at
+  most once per run. (Streamable and Imgur albums still resolve eagerly in the
+  page build - their `resolveNativeSlides` batch is concurrency-limited and timed
+  out via `lib/async-pool.js`.)
 - **Play (per-browser).** Firefox plays the clip directly as a native `<video>`
   whose `src` is the `media.redgifs.com` mp4: the element carries
   `referrerpolicy="no-referrer"` (set as an attribute), which Firefox honors on a

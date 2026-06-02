@@ -130,7 +130,7 @@ function fakeRequest(pages) {
 }
 
 /**
- * @param {{ pages?: any[], settingsOverrides?: Record<string, unknown>, openUrl?: (url: string) => void, openPopout?: () => void, saveSettings?: (patch: object) => Promise<unknown>, computeImageHash?: (url: string) => Promise<string | null>, createImage?: () => { src: string, decoding?: string }, createVideo?: () => { src: string, preload?: string, muted?: boolean }, resolveMedia?: (url: string) => Promise<string | null>, downloadMedia?: (url: string, filename: string) => void }} [opts]
+ * @param {{ pages?: any[], settingsOverrides?: Record<string, unknown>, openUrl?: (url: string) => void, openPopout?: () => void, saveSettings?: (patch: object) => Promise<unknown>, computeImageHash?: (url: string) => Promise<string | null>, createImage?: () => { src: string, decoding?: string }, createVideo?: () => { src: string, preload?: string, muted?: boolean }, resolveMedia?: (url: string) => Promise<string | null>, downloadMedia?: (url: string, filename: string) => void, resolveRedgifs?: (slide: any) => Promise<any> }} [opts]
  */
 function makeSession({
   pages,
@@ -143,6 +143,7 @@ function makeSession({
   createVideo,
   resolveMedia,
   downloadMedia,
+  resolveRedgifs,
 } = {}) {
   const request = fakeRequest(
     pages ?? [
@@ -168,6 +169,7 @@ function makeSession({
     computeImageHash,
     resolveMedia,
     downloadMedia,
+    resolveRedgifs,
   });
   sessions.push(session);
   return { session, request };
@@ -402,6 +404,48 @@ describe("createSlideshowSession", () => {
     session.handleKeydown(key("ArrowRight")); // -> "b", a perceptual dup of "a"
     await flush(); // "b" hashed → skipped → "c"
     expect(mediaSrc()).toBe("https://i.redd.it/c.jpg");
+  });
+
+  it("upgrades an upcoming redgifs embed to native video before it is shown", async () => {
+    /** @param {string} id */
+    const redgifsEmbed = (id) =>
+      imageSlide(id, {
+        provider: "redgifs",
+        kind: "embed",
+        mediaUrl: `https://www.redgifs.com/ifr/${id}`,
+        embedUrl: `https://www.redgifs.com/ifr/${id}`,
+        sourceUrl: `https://www.redgifs.com/watch/${id}`,
+      });
+    /** @type {string[]} */
+    const resolved = [];
+    const { session } = makeSession({
+      resolveRedgifs: async (/** @type {any} */ slide) => {
+        resolved.push(slide.id);
+        return {
+          ...slide,
+          kind: "video",
+          durationMode: "media",
+          mediaUrl: "https://media.redgifs.com/X.mp4",
+          audioAvailable: true,
+          mimeType: "video/mp4",
+        };
+      },
+      pages: [
+        {
+          slides: [imageSlide("a"), redgifsEmbed("b")],
+          after: null,
+          exhausted: true,
+          postsScanned: 2,
+        },
+      ],
+    });
+    await session.start();
+    await flush(); // "a" shown; "b" resolved during the preload window
+    expect(resolved).toContain("b");
+    session.handleKeydown(key("ArrowRight")); // -> "b", now native video
+    await flush();
+    const video = shadow()?.querySelector("video.reddit-slideshow-media");
+    expect(video?.getAttribute("src")).toBe("https://media.redgifs.com/X.mp4");
   });
 
   it("downloads the current slide's media via the download control", async () => {

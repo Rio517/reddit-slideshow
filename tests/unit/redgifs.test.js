@@ -1,9 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import {
-  createRedgifsResolver,
-  redgifsVideoSlide,
-  resolveRedgifsSlides,
-} from "../../lib/redgifs.js";
+import { createRedgifsResolver, redgifsVideoSlide } from "../../lib/redgifs.js";
 
 /** @param {any} body @param {{ status?: number }} [opts] */
 function jsonResponse(body, { status = 200 } = {}) {
@@ -153,65 +149,20 @@ describe("redgifsVideoSlide", () => {
     expect(video.title).toBe("t");
     expect(video.over18).toBe(true);
   });
-});
 
-describe("resolveRedgifsSlides", () => {
-  it("upgrades redgifs embeds and leaves other slides untouched", async () => {
-    const slides = /** @type {any[]} */ ([
-      {
-        provider: "reddit-image",
-        kind: "image",
-        mediaUrl: "https://i.redd.it/a.jpg",
-      },
-      {
-        provider: "redgifs",
-        kind: "embed",
-        sourceUrl: "https://www.redgifs.com/watch/abc",
-        embedUrl: "https://www.redgifs.com/ifr/abc",
-      },
-    ]);
-    const resolve = async (/** @type {string} */ id) => ({
-      mediaUrl: `https://media.redgifs.com/${id}.mp4`,
-      durationSeconds: 5,
-      hasAudio: false,
+  it("marks the slide proxied when asked (Chrome: referrerpolicy is a no-op)", () => {
+    const embed = /** @type {any} */ ({
+      provider: "redgifs",
+      kind: "embed",
+      sourceUrl: "https://www.redgifs.com/watch/abc",
+      embedUrl: "https://www.redgifs.com/ifr/abc",
     });
-    const out = await resolveRedgifsSlides(slides, resolve);
-    expect(out[0]).toBe(slides[0]);
-    expect(out[1].kind).toBe("video");
-    expect(out[1].mediaUrl).toBe("https://media.redgifs.com/abc.mp4");
-    expect(out[1].proxied).toBeUndefined(); // direct play
-  });
-
-  it("marks redgifs slides proxied when asked (Chrome: referrerpolicy is a no-op)", async () => {
-    const slides = /** @type {any[]} */ ([
-      {
-        provider: "redgifs",
-        kind: "embed",
-        sourceUrl: "https://www.redgifs.com/watch/abc",
-        embedUrl: "https://www.redgifs.com/ifr/abc",
-      },
-    ]);
-    const resolve = async (/** @type {string} */ id) => ({
-      mediaUrl: `https://media.redgifs.com/${id}.mp4`,
-      hasAudio: false,
-    });
-    const out = await resolveRedgifsSlides(slides, resolve, { proxied: true });
-    expect(out[0].kind).toBe("video");
-    expect(out[0].proxied).toBe(true); // blob proxy path (background, no Referer)
-  });
-
-  it("keeps the iframe embed when resolution fails", async () => {
-    const slides = /** @type {any[]} */ ([
-      {
-        provider: "redgifs",
-        kind: "embed",
-        sourceUrl: "https://www.redgifs.com/watch/abc",
-      },
-    ]);
-    const resolve = async () => {
-      throw new Error("redgifs down");
-    };
-    const out = await resolveRedgifsSlides(slides, resolve);
-    expect(out[0]).toBe(slides[0]);
+    const video = redgifsVideoSlide(
+      embed,
+      { mediaUrl: "https://media.redgifs.com/Abc.mp4", hasAudio: false },
+      { proxied: true },
+    );
+    expect(video.kind).toBe("video");
+    expect(video.proxied).toBe(true); // blob proxy path (background, no Referer)
   });
 });

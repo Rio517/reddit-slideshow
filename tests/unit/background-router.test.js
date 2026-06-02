@@ -407,6 +407,55 @@ describe("createMessageRouter - fetchMedia", () => {
   });
 });
 
+describe("createMessageRouter - resolveRedgifs", () => {
+  const rgMsg = (/** @type {any} */ id) => ({
+    type: "slideshow.resolveRedgifs",
+    payload: { id },
+  });
+  const MEDIA = { mediaUrl: "https://media.redgifs.com/X.mp4", hasAudio: true };
+
+  it("resolves a redgifs id to media for a content-script request", async () => {
+    /** @type {string[]} */
+    const ids = [];
+    const router = makeRouter({
+      resolveRedgifsId: async (/** @type {string} */ id) => {
+        ids.push(id);
+        return MEDIA;
+      },
+    });
+    const result = await router(rgMsg("abc"), OWN);
+    expect(result).toEqual({ ok: true, media: MEDIA });
+    expect(ids).toEqual(["abc"]);
+  });
+
+  it("rejects a resolve from a non-content-script sender (no tab)", async () => {
+    let called = false;
+    const router = makeRouter({
+      resolveRedgifsId: async () => {
+        called = true;
+        return MEDIA;
+      },
+    });
+    const result = await router(rgMsg("abc"), { id: RUNTIME_ID });
+    expect(result).toEqual({ ok: false });
+    expect(called).toBe(false);
+  });
+
+  it("rejects a missing id", async () => {
+    const router = makeRouter({ resolveRedgifsId: async () => MEDIA });
+    expect(await router(rgMsg(undefined), OWN)).toEqual({ ok: false });
+  });
+
+  it("fails closed when resolution throws", async () => {
+    const router = makeRouter({
+      resolveRedgifsId: async () => {
+        throw new Error("redgifs down");
+      },
+    });
+    expect(await router(rgMsg("abc"), OWN)).toEqual({ ok: false });
+  });
+});
+
 describe("createMessageRouter - download", () => {
   const dlMsg = (/** @type {any} */ payload) => ({
     type: "slideshow.download",

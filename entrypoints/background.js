@@ -1,6 +1,6 @@
 import { fetchQueuePage } from "@/lib/queue.js";
 import { createMessageRouter } from "@/lib/background-router.js";
-import { createRedgifsResolver, resolveRedgifsSlides } from "@/lib/redgifs.js";
+import { createRedgifsResolver } from "@/lib/redgifs.js";
 import {
   createStreamableResolver,
   resolveStreamableSlides,
@@ -34,22 +34,17 @@ export default defineBackground(() => {
   });
 
   /**
-   * Build a queue page, then upgrade provider iframe embeds (Redgifs, Streamable)
-   * to native (proxied) video slides so they time and unmute correctly, and
-   * expand Imgur album placeholders 1→N into their member image slides. Each
-   * resolver leaves the iframe fallback in place when its lookup fails; a failed
-   * album expansion drops to no slides.
+   * Build a queue page, then upgrade Streamable iframe embeds to native video
+   * and expand Imgur album placeholders 1→N into their member image slides.
+   * Redgifs is resolved lazily instead (slideshow.resolveRedgifs, on approach),
+   * so the page ships immediately with redgifs iframe embeds. Each resolver
+   * leaves the iframe fallback in place when its lookup fails; a failed album
+   * expansion drops to no slides.
    * @param {string} pageUrl
    * @param {{ after?: string }} options
    */
   const fetchQueuePageWithProviders = async (pageUrl, options) => {
     const page = await fetchQueuePage(pageUrl, options);
-    // Chrome can't play the redgifs mp4 directly (referrerpolicy is a no-op on
-    // <video> there, so the CDN 403s the reddit Referer); proxy it from the
-    // start. Firefox honors the attribute and plays direct.
-    page.slides = await resolveRedgifsSlides(page.slides, redgifs.resolve, {
-      proxied: import.meta.env.CHROME,
-    });
     page.slides = await resolveStreamableSlides(
       page.slides,
       streamable.resolve,
@@ -65,6 +60,8 @@ export default defineBackground(() => {
     hashImage,
     // Redgifs mp4 bytes, played back as a blob to dodge CDN hotlink protection.
     fetchMediaBytes: (url) => fetchCappedBytes(url, MAX_MEDIA_BYTES),
+    // Lazy redgifs: resolve one embed's native mp4 (+ duration/audio) on demand.
+    resolveRedgifsId: (id) => redgifs.resolve(id),
     // Save the displayed media. The downloads API runs from the background and
     // fetches the file itself (no reddit Referer), so a hotlink-protected CDN
     // serves it; the suggested filename comes from the slide's hint.

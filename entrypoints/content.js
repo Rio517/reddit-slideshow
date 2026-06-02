@@ -5,6 +5,8 @@ import { createOverlay } from "@/lib/overlay-ui.js";
 import { getSettings, saveSettings } from "@/lib/settings.js";
 import { createSlideshowSession } from "@/lib/session.js";
 import { base64ToArrayBuffer } from "@/lib/bytes-base64.js";
+import { redgifsVideoSlide } from "@/lib/redgifs.js";
+import { redgifsId } from "@/lib/slides.js";
 import { createLogger } from "@/lib/log.js";
 
 const log = createLogger("content");
@@ -78,6 +80,27 @@ export default defineContentScript({
         return URL.createObjectURL(
           new Blob([base64ToArrayBuffer(res.b64)], { type: "video/mp4" }),
         );
+      },
+      // Lazy redgifs: resolve one embed's native mp4 on approach and return the
+      // upgraded video slide (proxied on Chrome, where referrerpolicy is a no-op
+      // on <video>). Null keeps the iframe embed.
+      resolveRedgifs: async (slide) => {
+        const id = redgifsId(slide.sourceUrl ?? slide.embedUrl);
+        if (!id) return null;
+        let res;
+        try {
+          res = await browser.runtime.sendMessage({
+            type: "slideshow.resolveRedgifs",
+            payload: { id },
+          });
+        } catch (err) {
+          log.warn("resolveRedgifs message failed", id, err);
+          return null;
+        }
+        if (!res?.ok || !res.media) return null;
+        return redgifsVideoSlide(slide, res.media, {
+          proxied: import.meta.env.CHROME,
+        });
       },
       // User-initiated save of the displayed media: the background drives the
       // downloads API (a content script can't), using the slide's filename hint.
