@@ -38,3 +38,20 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run webext:lint
+
+  e2e:
+    name: e2e (loaded extension, Chromium)
+    runs-on: ubuntu-latest
+    # This job DOES need the browser, unlike the others.
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "0"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # Drives a real Chromium with the built extension loaded (--headless=new).
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:prod

@@ -55,13 +55,15 @@ export default [
     },
   },
   {
-    // Unit tests run on Node (vitest) inside a happy-dom realm, so they see both
-    // Node and extra DOM globals the source files don't reach for.
-    files: ["tests/**/*.js"],
+    // Tests run on Node (vitest, or the Playwright e2e runner), so they see both
+    // Node and extra DOM/extension globals the source files don't reach for. The
+    // e2e .mjs also runs callbacks in the browser/extension (chrome.*).
+    files: ["tests/**/*.{js,mjs}"],
     languageOptions: {
       globals: {
         process: "readonly",
         DOMParser: "readonly",
+        chrome: "readonly",
       },
     },
   },

@@ -112,7 +112,8 @@ npm run build:chrome # Chrome MV3 only
 npm run zip          # packaged zip (Firefox / AMO)
 npm run zip:chrome   # packaged zip (Chrome Web Store)
 npm run icons        # regenerate PNG icons from public/icon.svg (Bash + librsvg/rsvg-convert; macOS/Linux)
-npm test             # Vitest unit tests
+npm test             # Vitest unit tests (fast; offline)
+npm run test:prod    # e2e: build Chrome + drive the loaded extension in Chromium
 npm run typecheck    # tsc --noEmit over JSDoc-typed JS
 npm run lint         # ESLint (incl. unsafe-DOM checks)
 npm run format       # Prettier check
@@ -121,6 +122,13 @@ npm run webext:lint  # Mozilla addons-linter on the built (Firefox) output
 
 The same source builds both browsers; WXT emits a Chrome `service_worker`
 background and a Firefox event page from one `defineBackground`.
+
+`npm test` is the fast offline unit suite. `npm run test:prod` is the slow e2e
+batch (kept out of `npm test`): it loads the built Chrome extension into a real
+Chromium (Playwright, `--headless=new`) and drives the actual slideshow over a
+mocked listing, so it exercises content-script injection, background messaging,
+and the overlay render that the unit tests can't. It needs the Chromium binary
+(`npx playwright install chromium`); CI runs it as its own job.
 
 The PNG icons in `public/icon/` are committed and are the source of truth for
 the manifest (ADR 0009), so a normal build needs no extra tooling. `npm run
@@ -168,7 +176,8 @@ lib/              framework-free core: slides, queue, controller, overlay,
                   dedup, settings, session orchestration
 assets/           overlay.css
 public/           extension icon
-tests/            Vitest unit/integration tests + offline fixtures
+tests/            Vitest unit tests + offline fixtures; e2e/ drives the
+                  loaded extension in Chromium (npm run test:prod)
 docs/             product spec, research, and ADRs
 ```
 
