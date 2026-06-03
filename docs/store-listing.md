@@ -253,10 +253,11 @@ copy of it.
 Two screenshots ship in the repo. Both stores accept PNGs; upload these (or
 regenerate the options shots with `npm run screenshots`).
 
-**docs/slideshow-demo.png** - the slideshow running full-screen over r/aww: a
-sleeping cat fills the stage, with the position counter and "Open original" at
-the bottom-left and the vertical control rail (prev / play / next, mute,
-fullscreen, open-in-window, settings, and the close X) down the right edge.
+**docs/slideshow-demo.png** - the slideshow running full-screen over r/aww: an
+image fills the stage, with the position counter top-left, a bottom-left byline
+(`/u/author to /r/aww from i.redd.it at 1600×1067`) plus the open-original and
+download buttons, and the vertical control rail (prev / play / next, mute,
+fullscreen, open-in-window, help, and settings) down the right edge.
 
 > Suggested caption: "Full-screen slideshow over your current feed -
 > keyboard-driven, with a position counter and a minimal control rail."

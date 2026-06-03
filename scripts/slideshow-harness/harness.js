@@ -15,6 +15,16 @@ import overlayCss from "../../assets/overlay.css";
 
 const ORIGIN = "https://old.reddit.com";
 
+// Fictional authors so the byline (/u/author to /r/subreddit …) reads like a
+// real feed in the demo shot.
+const AUTHORS = [
+  "highwayrescue",
+  "naptime_nina",
+  "snowpaws",
+  "two_tabbies",
+  "sunbeam_sam",
+];
+
 /**
  * @param {number} n
  * @param {string} title
@@ -33,6 +43,8 @@ function imageSlide(n, title, width, height) {
     sourceUrl: url,
     permalink: `${ORIGIN}/r/aww/comments/fix${n}/`,
     title,
+    author: AUTHORS[n - 1] ?? "redditor",
+    subreddit: "aww",
     over18: false,
     durationMode: "timer",
     audioAvailable: false,
