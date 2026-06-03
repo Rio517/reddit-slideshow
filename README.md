@@ -92,7 +92,10 @@ startup that you can dismiss).
 
 ## Use
 
-- Open an `old.reddit.com` or `www.reddit.com` feed, then click the toolbar
+- New here? Open **[r/slideshowspectacular](https://old.reddit.com/r/slideshowspectacular)** -
+  a small demo feed (and where new releases are announced) - and launch the
+  slideshow to see it run.
+- Open any `old.reddit.com` or `www.reddit.com` feed, then click the toolbar
   icon or press **Alt+Shift+S**.
 - Keys: **←/→** previous/next, **Space** play/pause, **M** mute, **Esc** close.
   You can also click the dark backdrop to close.

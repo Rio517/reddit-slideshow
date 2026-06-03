@@ -1,10 +1,10 @@
 # NEXT_STEP - Reddit Slideshow Spectacular!
 
 **Branch:** `main` · **Status:** local green gate (typecheck/lint/format/test +
-both builds + web-ext lint). The backlog is cleared; the only remaining work is
-the browser-only streaming-proxy effort in §1, plus a real-browser confirm of
-the features implemented this session (also §1). The version bump to 1.0.0 is
-deliberately not done (user's call).
+both builds + web-ext lint). The backlog is cleared; what remains is a
+real-browser confirm of the features implemented this session (§1). Streaming
+the proxy fallback was investigated and parked (see the §1 note). The version
+bump to 1.0.0 is deliberately not done (user's call).
 
 > **Hard rule:** work directly on `main`. Do not create branches or worktrees unless the user explicitly asks. See `AGENTS.md`.
 
@@ -44,26 +44,10 @@ giant commit.
   (WXT propagates it to both manifests), then tag + publish `v1.0.0` to trigger
   `release.yml`. Left undone deliberately.
 
-### Browser-only (do + verify in a real logged-in Firefox + Chrome session)
-
-- **Streaming on the proxy fallback** - the blob-proxy path (Redgifs on Chrome,
-  the www.reddit CSP fallback) downloads the whole mp4 to a blob before it plays;
-  streaming it (MediaSource + range requests) would start playback sooner and
-  drop the whole-file buffer. **Bigger than it sounds, and Chrome-only:** a
-  Playwright/Chromium probe (ffmpeg-built clips) confirmed MediaSource accepts
-  only _fragmented_ mp4 (`appended-ok`) and rejects _progressive_ mp4
-  (`sourcebuffer-error`). The proxied CDN clips (redgifs/imgur/giphy) are
-  progressive, so range-fetch + `appendBuffer` can't play them - it needs an
-  in-browser **remuxer** (mp4box.js / mux.js, a few hundred KB) to convert
-  progressive→fragmented on the fly. It also needs a careful proxied-branch
-  restructure in `lib/overlay-ui.js`: a MediaSource only fires `sourceopen` once
-  attached to the `<video>` src, so the `error`/`loadeddata` listeners must
-  attach only _after_ the stream-or-blob strategy commits, or a codec failure
-  skips the clip before the whole-blob fallback runs. The win is Chrome-proxied +
-  CSP-fallback only - Firefox already streams directly. **Verdict:** not worth
-  bundling a heavy remuxer for that narrow win; left as a scoped task. If
-  revisited, validate end to end in Chromium via Playwright (it can drive a real
-  MediaSource).
+> **Not planned:** streaming the proxy fallback (MediaSource) was investigated
+> and parked - it needs a few-hundred-KB in-browser remuxer for a narrow
+> Chrome-only win. The full reasoning + the Playwright evidence are in
+> `docs/research/proxy-streaming-mediasource.md`.
 
 ### Implemented this session - needs a real-browser confirm
 
