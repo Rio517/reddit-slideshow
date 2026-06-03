@@ -1,5 +1,7 @@
 # Reddit Slideshow Spectacular!
 
+**[Visit the site →](https://rio517.github.io/reddit-slideshow-spectacular/)**
+
 A full-screen, keyboard-driven slideshow of the images and videos in **your own
 Reddit** - the feed you're already looking at. Open your Home feed, a community
 you've joined, one of your Custom Feeds (multireddits), any subreddit, your saved
