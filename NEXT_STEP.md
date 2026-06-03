@@ -49,15 +49,21 @@ giant commit.
 - **Streaming on the proxy fallback** - the blob-proxy path (Redgifs on Chrome,
   the www.reddit CSP fallback) downloads the whole mp4 to a blob before it plays;
   streaming it (MediaSource + range requests) would start playback sooner and
-  drop the whole-file buffer. Genuinely browser-only: a MediaSource only fires
-  `sourceopen` once attached to the `<video>` src, so a pre-commit codec failure
-  fires the element's `error` event - which the overlay's handler turns into a
-  skip - **before** any whole-blob fallback can run. A safe fallback therefore
-  can't be guaranteed or tested offline. Do it in a real browser, restructuring
-  the proxied branch in `lib/overlay-ui.js` so the `error`/`loadeddata` listeners
-  attach only after the stream-or-blob strategy commits. Firefox direct play is
-  unaffected (it already streams); this is purely the Chrome-proxied + CSP-fallback
-  case. (The range-fetch background plumbing is the natural starting point.)
+  drop the whole-file buffer. **Bigger than it sounds, and Chrome-only:** a
+  Playwright/Chromium probe (ffmpeg-built clips) confirmed MediaSource accepts
+  only _fragmented_ mp4 (`appended-ok`) and rejects _progressive_ mp4
+  (`sourcebuffer-error`). The proxied CDN clips (redgifs/imgur/giphy) are
+  progressive, so range-fetch + `appendBuffer` can't play them - it needs an
+  in-browser **remuxer** (mp4box.js / mux.js, a few hundred KB) to convert
+  progressive→fragmented on the fly. It also needs a careful proxied-branch
+  restructure in `lib/overlay-ui.js`: a MediaSource only fires `sourceopen` once
+  attached to the `<video>` src, so the `error`/`loadeddata` listeners must
+  attach only _after_ the stream-or-blob strategy commits, or a codec failure
+  skips the clip before the whole-blob fallback runs. The win is Chrome-proxied +
+  CSP-fallback only - Firefox already streams directly. **Verdict:** not worth
+  bundling a heavy remuxer for that narrow win; left as a scoped task. If
+  revisited, validate end to end in Chromium via Playwright (it can drive a real
+  MediaSource).
 
 ### Implemented this session - needs a real-browser confirm
 
