@@ -17,7 +17,7 @@ AirPlay or Chromecast that window to your TV for a hands-off, lean-back feed.
 
 <a href="docs/slideshow-demo.png">
   <img src="docs/slideshow-demo.png" width="820"
-    alt="A full-screen slideshow over r/aww: the position counter top-left, the control rail (prev/play/next, mute, fullscreen, open-in-window, help, settings) down the right, and a bottom-left byline reading /u/author to /r/aww from i.redd.it at 1600×1067 with open-original and download buttons">
+    alt="A full-screen slideshow over r/SlideShowSpectacular showing a golden-retriever puppy bounding through a sunlit meadow: the position counter top-left, the control rail (prev/play/next, mute, fullscreen, open-in-window, help, settings) down the right, and a bottom-left byline reading /u/rio517 to /r/SlideShowSpectacular from i.redd.it at 1122×1482 with open-original and download buttons">
 </a>
 
 ## Features
