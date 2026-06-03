@@ -603,6 +603,12 @@ describe("createMessageRouter - download", () => {
       OWN,
     );
     expect(calls[0].filename).toBe("passwd");
+    // Windows backslash separators are stripped too.
+    await router(
+      dlMsg({ url: "https://i.redd.it/a.jpg", filename: "..\\..\\evil.exe" }),
+      OWN,
+    );
+    expect(calls[1].filename).toBe("evil.exe");
   });
 
   it("fails closed when the download throws", async () => {

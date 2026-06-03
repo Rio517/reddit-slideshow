@@ -532,6 +532,34 @@ describe("createSlideshowSession", () => {
     expect(votes).toEqual([["t3_a", -1]]);
   });
 
+  it("doesn't vote when an arrow key is pressed inside an open panel", async () => {
+    /** @type {Array<[string, number]>} */
+    const votes = [];
+    const { session } = makeSession({
+      vote: async (id, dir) => {
+        votes.push([id, dir]);
+        return { ok: true };
+      },
+    });
+    await session.start();
+    // A key event targeting a control inside the settings panel (e.g. a focused
+    // slider) must reach the panel, not fire a vote.
+    const panel = document.createElement("div");
+    panel.className = "rs-settings-panel";
+    const slider = document.createElement("input");
+    panel.append(slider);
+    session.handleKeydown(
+      /** @type {any} */ ({
+        key: "ArrowUp",
+        target: slider,
+        preventDefault() {},
+        stopImmediatePropagation() {},
+      }),
+    );
+    await flush();
+    expect(votes).toEqual([]);
+  });
+
   it("seeds the vote toggle from the post's existing vote state", async () => {
     /** @type {Array<[string, number]>} */
     const votes = [];

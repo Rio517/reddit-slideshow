@@ -33,13 +33,21 @@ describe("audioUrlFromDash", () => {
     expect(audioUrlFromDash(MPD_SILENT, MANIFEST)).toBeNull();
   });
 
-  it("keeps an absolute audio BaseURL as-is", () => {
+  it("keeps a same-host absolute audio BaseURL", () => {
     const mpd = `<MPD><Period><AdaptationSet contentType="audio">
-      <Representation><BaseURL>https://cdn.example/DASH_AUDIO_128.mp4</BaseURL></Representation>
+      <Representation><BaseURL>https://v.redd.it/abc/DASH_AUDIO_128.mp4</BaseURL></Representation>
     </AdaptationSet></Period></MPD>`;
     expect(audioUrlFromDash(mpd, MANIFEST)).toBe(
-      "https://cdn.example/DASH_AUDIO_128.mp4",
+      "https://v.redd.it/abc/DASH_AUDIO_128.mp4",
     );
+  });
+
+  it("rejects an audio BaseURL that resolves to another host", () => {
+    // The manifest is third-party content; don't follow an off-host absolute URL.
+    const mpd = `<MPD><Period><AdaptationSet contentType="audio">
+      <Representation><BaseURL>https://evil.example/DASH_AUDIO_128.mp4</BaseURL></Representation>
+    </AdaptationSet></Period></MPD>`;
+    expect(audioUrlFromDash(mpd, MANIFEST)).toBeNull();
   });
 
   it("returns null for an unusable manifest", () => {
