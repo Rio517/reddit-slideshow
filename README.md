@@ -9,7 +9,7 @@ or keyboard shortcut, and that exact view becomes the slideshow.
 **Private, and built on your existing setup.** It reuses your logged-in Reddit
 session - no API keys, no separate account, nothing to re-subscribe to - and runs
 entirely in your browser. No analytics, no tracking, no developer servers (there
-are none); your settings stay on your device. It plays direct images, galleries,
+are none); your settings stay on your computer. It plays direct images, galleries,
 Reddit-hosted video, Redgifs, Imgur, Streamable, Giphy, Catbox, and crossposts.
 
 **Made for the big screen.** Pop the slideshow out into its own window, then
@@ -207,7 +207,7 @@ done yet.
 No analytics, no tracking, no developer servers - the extension fetches only the
 Reddit feed and the media you are viewing (including clips resolved from Redgifs,
 Imgur, Streamable, Giphy, and Catbox), plus, for re-upload detection, the image
-bytes it hashes locally on your device. The one action that writes to your Reddit
+bytes it hashes locally on your computer. The one action that writes to your Reddit
 account is voting, and only when you press **↑/↓**. Your Reddit cookies go to
 Reddit only; every provider request is cookie-less. Settings are stored locally.
 See [PRIVACY.md](PRIVACY.md).

@@ -116,7 +116,7 @@ No analytics, no tracking, no ads, no accounts, and no developer servers (there
 are none). The extension only fetches the media you're viewing: the feed and
 its media from Reddit, and provider clips from Imgur, Redgifs, Streamable, Giphy,
 and Catbox. The one thing that writes to your Reddit account is voting, and only
-when you press the up/down keys. Your settings are stored locally on your device,
+when you press the up/down keys. Your settings are stored locally on your computer,
 and it ships no remote code. Full policy: see the privacy policy link.
 
 Built as a Manifest V3 WebExtension for Firefox and Chromium browsers (Chrome,
@@ -149,9 +149,9 @@ justification per host; Chrome asks per-host too (see section 8).
 API permissions:
 
 - **storage** - Save the user's settings (timer, transitions, mute/autoplay,
-  NSFW and dedup toggles, etc.) locally on the device. Nothing is synced or
+  NSFW and dedup toggles, etc.) locally on the computer. Nothing is synced or
   uploaded.
-- **downloads** - Save the media the user is currently viewing to their device,
+- **downloads** - Save the media the user is currently viewing to their computer,
   with a sensible filename, when they use the in-overlay download control.
 
 Host permissions (install-time):
@@ -185,7 +185,7 @@ Catbox files (`files.catbox.moe`) load directly in the page as `<video>` and
 need no host permission.
 
 Host permissions for the on-by-default re-upload detection (fetch Reddit images
-to compute a local perceptual hash; the hash never leaves the device):
+to compute a local perceptual hash; the hash never leaves the computer):
 
 - **https://i.redd.it/\*** - Fetch the displayed Reddit-hosted image to hash.
   (Display itself needs no permission; this access is only for hashing.)
@@ -299,10 +299,10 @@ want a third tile.)
   its separate audio track, so the clip can play with sound; the video itself
   loads directly in the page.
 - **i.redd.it / preview.redd.it / external-preview.redd.it** - Fetch
-  Reddit-hosted images and previews (without cookies) to compute an on-device
-  perceptual hash, so the same image re-uploaded under a new link is skipped.
-  This duplicate detection is on by default; the hash never leaves the device.
-- **downloads** - Save the displayed media to the user's device, on request, via
+  Reddit-hosted images and previews (without cookies) to compute a perceptual
+  hash locally, so the same image re-uploaded under a new link is skipped.
+  This duplicate detection is on by default; the hash never leaves the computer.
+- **downloads** - Save the displayed media to the user's computer, on request, via
   the in-overlay download control.
 
 ---

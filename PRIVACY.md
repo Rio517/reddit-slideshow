@@ -12,7 +12,7 @@ already viewing into a full-screen media slideshow.
 Only your own settings - the per-image timer, autoplay, start-muted,
 Include-NSFW, the two de-duplication toggles, and the max-load-wait. These are
 saved with the browser's local extension storage (`storage.local`) **on your
-device**. They are not synced, uploaded, or shared, and contain no personal
+computer**. They are not synced, uploaded, or shared, and contain no personal
 information. Removing the extension removes them.
 
 ## Network requests the extension makes
@@ -42,7 +42,7 @@ operated by the developer (there is none):
   `/api/me.json`, for the required CSRF token). This is the **only** action the
   extension takes that writes to your Reddit account, and it happens **only** when
   you press the key. Nothing is sent anywhere but Reddit.
-- **Download.** The download control saves the current media to your device with
+- **Download.** The download control saves the current media to your computer with
   the browser's downloads API; the file is fetched from its host (without cookies)
   and saved locally - nothing is uploaded.
 - **Provider clips.** For some providers the extension first resolves a directly-
@@ -66,7 +66,7 @@ operated by the developer (there is none):
   image and its previews from `i.redd.it` / `preview.redd.it` /
   `external-preview.redd.it` to compute a local perceptual hash. These fetches
   are made **without cookies** (`credentials: "omit"`), the hashing happens
-  entirely in your browser, and no image or hash leaves your device. You can turn
+  entirely in your browser, and no image or hash leaves your computer. You can turn
   this off with the "Also skip re-uploaded images" setting.
 
 ## Permissions and why they are needed
@@ -78,7 +78,7 @@ operated by the developer (there is none):
 - **Host access to `i.redd.it`, `preview.redd.it`, `external-preview.redd.it`** -
   so the background can fetch Reddit-hosted images and previews to compute the
   local perceptual hash used for on-by-default re-upload detection. These fetches
-  are made without cookies; nothing leaves your device.
+  are made without cookies; nothing leaves your computer.
 - **Host access to `v.redd.it`** - so the background can fetch a Reddit video's
   DASH manifest (without cookies) to find its separate audio track. The video and
   audio themselves load directly in the page and need no permission.
@@ -87,7 +87,7 @@ operated by the developer (there is none):
   provider clips (Redgifs, Imgur, Streamable, Giphy) and play them as native
   video. These fetches are made without cookies.
 - **`downloads`** - so the download control can save the media you are viewing to
-  your device, with a sensible filename.
+  your computer, with a sensible filename.
 
 The extension requests no other permissions: no browsing history, no bookmarks,
 no access to other sites, and no remote code.
