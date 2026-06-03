@@ -63,7 +63,7 @@ WHAT IT PLAYS
 
 - Direct Reddit images (full-resolution i.redd.it where available)
 - Reddit galleries, expanded into one slide per image
-- Reddit-hosted video (v.redd.it)
+- Reddit-hosted video (v.redd.it), with its sound (the separate audio track)
 - Redgifs, Imgur (.gifv), Streamable, and Giphy clips, played as native video
 - Imgur albums, expanded into one slide per image
 - Catbox video and image files
@@ -75,10 +75,12 @@ is skipped too - so the slideshow never lands on a dead slide.
 
 CONTROLS
 
-- Keyboard: Left/Right to move, Space to play/pause, M to mute, F for
-  fullscreen, Esc to close
+- Keyboard: Left/Right to move, Up/Down to upvote/downvote the post, Space to
+  play/pause, M to mute, F for fullscreen, Esc to close
 - An on-screen control rail: previous, play/pause, next, mute, fullscreen, open
   in a window, and settings
+- Under each slide: a byline (who posted it, to which subreddit, the source and
+  resolution), with buttons to open the original post or download the media
 - Click the position counter to jump straight to any post in the loaded queue
 - Click the dark backdrop to close
 - Images advance on a timer you set; the timer keeps running even after you
@@ -113,8 +115,9 @@ PRIVACY
 No analytics, no tracking, no ads, no accounts, and no developer servers (there
 are none). The extension only fetches the media you're viewing: the feed and
 its media from Reddit, and provider clips from Imgur, Redgifs, Streamable, Giphy,
-and Catbox. Your settings are stored locally on your device, and it ships no
-remote code. Full policy: see the privacy policy link.
+and Catbox. The one thing that writes to your Reddit account is voting, and only
+when you press the up/down keys. Your settings are stored locally on your device,
+and it ships no remote code. Full policy: see the privacy policy link.
 
 Built as a Manifest V3 WebExtension for Firefox and Chromium browsers (Chrome,
 Edge, Brave). Open source, MIT licensed.
@@ -143,18 +146,22 @@ tool.)
 These mirror `wxt.config.ts` and `PRIVACY.md`. AMO in particular asks for a
 justification per host; Chrome asks per-host too (see section 8).
 
-API permission:
+API permissions:
 
 - **storage** - Save the user's settings (timer, transitions, mute/autoplay,
   NSFW and dedup toggles, etc.) locally on the device. Nothing is synced or
   uploaded.
+- **downloads** - Save the media the user is currently viewing to their device,
+  with a sensible filename, when they use the in-overlay download control.
 
 Host permissions (install-time):
 
 - **https://old.reddit.com/\*** - Fetch the listing JSON for the old-Reddit page
-  the user is viewing, so the slideshow knows which media to show.
-- **https://www.reddit.com/\*** - Same, for new Reddit; the slideshow can be
-  launched from either frontend.
+  the user is viewing, so the slideshow knows which media to show; also, when the
+  user presses the up/down keys, cast their vote on the current post (`/api/vote`
+  with the session cookie + modhash).
+- **https://www.reddit.com/\*** - Same listing fetch, for new Reddit; the
+  slideshow can be launched from either frontend.
 - **https://api.redgifs.com/\* , https://media.redgifs.com/\*** - Resolve a
   Redgifs link to its direct video URL and fetch the bytes in the background (the
   CDN hotlink-protects against a Reddit referrer), so the clip plays as native,
@@ -170,9 +177,12 @@ Host permissions (install-time):
   cookies.
 - **https://\*.giphy.com/\*** - Fetch a Giphy clip's mp4 from its media CDN and
   play it as a looping video. Without cookies.
+- **https://v.redd.it/\*** - Fetch a Reddit video's DASH manifest (without
+  cookies) to find its separate audio track, played alongside the silent video.
+  The video and audio themselves load directly in the page.
 
-Reddit video (`v.redd.it`) and Catbox files (`files.catbox.moe`) load directly
-in the page as `<img>`/`<video>` and need no host permission.
+Catbox files (`files.catbox.moe`) load directly in the page as `<video>` and
+need no host permission.
 
 Host permissions for the on-by-default re-upload detection (fetch Reddit images
 to compute a local perceptual hash; the hash never leaves the device):
@@ -276,18 +286,24 @@ want a third tile.)
 
 - **old.reddit.com / www.reddit.com** - Read the listing JSON for the page the
   user launched the slideshow from (either Reddit frontend) to build and
-  paginate the slide queue.
+  paginate the slide queue; and, on the up/down keys, cast the user's vote on the
+  current post via `/api/vote`.
 - **api.redgifs.com / media.redgifs.com / i.imgur.com / imgur.com /
   \*.streamable.com / \*.giphy.com** - Resolve and fetch provider clips (Redgifs,
   Imgur `.gifv`, Streamable, Giphy) in the background so they play as native,
   correctly-timed video instead of an opaque embed, and fetch the keyless
   `imgur.com/ajaxalbums` list to expand an Imgur album into its images (all
-  requested without cookies). Reddit video (v.redd.it) and Catbox files load
-  directly in the page and need no permission.
+  requested without cookies). Catbox files load directly in the page and need no
+  permission.
+- **v.redd.it** - Fetch a Reddit video's DASH manifest (without cookies) to find
+  its separate audio track, so the clip can play with sound; the video itself
+  loads directly in the page.
 - **i.redd.it / preview.redd.it / external-preview.redd.it** - Fetch
   Reddit-hosted images and previews (without cookies) to compute an on-device
   perceptual hash, so the same image re-uploaded under a new link is skipped.
   This duplicate detection is on by default; the hash never leaves the device.
+- **downloads** - Save the displayed media to the user's device, on request, via
+  the in-overlay download control.
 
 ---
 

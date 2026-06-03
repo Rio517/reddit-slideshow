@@ -30,9 +30,8 @@ A Firefox user who browses `old.reddit.com`, uses Reddit Enhancement Suite, and 
 - Replacing or modifying RES itself.
 - Supporting every external media host.
 - Requiring Reddit API app credentials.
-- Rebuilding Reddit browsing, voting, commenting, or moderation workflows.
-- Downloading/saving media from the slideshow.
-- Advanced image inspection controls such as pan and zoom.
+- Rebuilding Reddit's browsing, commenting, or moderation workflows (a single
+  up/down-vote shortcut on the current post aside).
 - Syncing settings across browsers unless it comes nearly free through WebExtension storage.
 
 ## Core Experience
@@ -67,7 +66,7 @@ Gallery posts should resolve through Reddit listing data, using gallery item ord
 
 Reddit-hosted videos should use playable video URLs from listing media metadata when available. Playback completion should advance the slideshow.
 
-v.redd.it is DASH/HLS with separated tracks. The listing's `secure_media.reddit_video` carries `fallback_url` (a plain `.mp4`), `dash_url`, `hls_url`, `duration`, dimensions, `is_gif`, and `has_audio`. The resolver reports `audioAvailable` from `has_audio` (false for `is_gif` clips), so the slide knows whether audio exists. v1 still plays the `fallback_url` in a plain `<video>`, which is silent; actually hearing the audio requires a DASH/HLS player (`dash_url`/`hls_url`). The mute/unmute setting is therefore meaningful only once that audio-capable path exists.
+v.redd.it is DASH/HLS with separated tracks. The listing's `secure_media.reddit_video` carries `fallback_url` (a plain `.mp4`), `dash_url`, `hls_url`, `duration`, dimensions, `is_gif`, and `has_audio`. The resolver reports `audioAvailable` from `has_audio` (false for `is_gif` clips). The `fallback_url` plays in a plain `<video>` and is video-only; the separate audio track is recovered from the DASH manifest and played from a companion `<audio>` synced to the silent video, so the mute/unmute control governs real Reddit-video sound (ADR 0018).
 
 ### Redgifs
 
@@ -102,7 +101,7 @@ Other external hosts are out of v1 unless they are simple direct media links. Th
 ## Settings
 
 - Image timer: any value from 1 to 60 seconds via a slider (default 5).
-- Start muted: on/off (inert until an audio-capable playback path exists).
+- Start muted: on/off (governs Reddit-video audio and provider clips with sound).
 - Autoplay slideshow: on/off (off starts the slideshow paused).
 - Include NSFW: follow Reddit / always hide. **Default: follow Reddit** - show over-18 content only insofar as the signed-in session already exposes it. This is the least-surprising default and avoids the extension becoming an NSFW-unlocking tool.
 - Provider permissions: Redgifs should be requested only if needed or clearly disclosed.
@@ -135,59 +134,36 @@ requested.
 
 ## Accessibility And Controls
 
-- Left arrow: previous slide.
-- Right arrow: next slide.
-- Escape: close slideshow.
+- Left / right arrow: previous / next slide (Shift+Right skips to the next post).
+- Up / down arrow: upvote / downvote the current post (through the session).
+- Page Up / Page Down: jump back / ahead 10.
 - Space: pause/resume timer or video playback.
-- Controls must be keyboard accessible.
-- Overlay should avoid trapping the user without an obvious close path.
+- M: mute / unmute. F: fullscreen. ?: keyboard-shortcut help. Escape: close (or
+  dismiss an open panel first).
+- Controls must be keyboard accessible; the modal traps focus and makes the page
+  `inert` while open, with an obvious close path (top-right ×, backdrop, Escape).
 
 ## Compatibility
 
 Primary target is Firefox on desktop. The extension should coexist with Reddit Enhancement Suite by using isolated content scripts, avoiding global page mutations where possible, and namespacing injected DOM/classes.
 
-## V2 Backlog
+## Backlog
 
-These features are intentionally outside the first implementation but should shape early architecture enough that v2 does not require a rewrite.
+Work intentionally outside the current build. (Downloading the current media,
+pan & zoom, and Reddit-video audio shipped - see ADRs 0017, 0010, 0018.)
 
-### Download media
+### Higher-resolution inspection
 
-Add a download action for the current slide. The feature should support direct images first, then galleries and playable video clips where technically and legally reasonable. It should use browser download APIs instead of inventing a custom downloader UI.
+The byline already shows each slide's source dimensions, and slides track
+original-vs-preview quality (`i.redd.it` original vs a `preview.redd.it`
+fallback). The remaining idea is an explicit "downscaled preview" indicator and,
+where Reddit exposes one, a path to the full-resolution original.
 
-Design questions for v2:
+### Streaming the blob-proxy playback
 
-- Should downloads use post titles, Reddit IDs, provider names, or timestamps in filenames?
-- Should a gallery download action save only the current slide, the current post's gallery, or the whole slideshow queue?
-- Should downloads be single-click or require confirmation for external providers and NSFW media?
-- How should failed Redgifs or provider-restricted downloads degrade?
-
-### Highest-resolution image viewing
-
-Improve the image pipeline for ultra-high-resolution subreddits and 4K displays. Version 1 should already prefer original media URLs, but v2 should make high-resolution behavior explicit and inspectable.
-
-Desired v2 behavior:
-
-- Prefer original image URLs over Reddit previews whenever possible.
-- Preserve and display image dimensions when known.
-- Avoid browser downscaling artifacts where possible.
-- Provide a visible indicator when only a preview/lower-resolution fallback is available.
-- Support image preloading without fetching far ahead indefinitely.
-
-### Pan and zoom
-
-Add image inspection controls for large images that do not fit comfortably on screen.
-
-Possible controls:
-
-- Zoom in/out/reset.
-- Fit to screen vs actual size.
-- Click-drag or keyboard panning.
-- Optional scroll-wheel zoom.
-- Preserve slideshow navigation without making arrow-key panning confusing.
-
-Open UX question:
-
-- When zoomed in, should arrow keys pan the image or continue to move between slides? The likely answer is to keep slide navigation on left/right and use drag/WASD/trackpad for panning, but this should be tested.
+Parked - the proxied path buffers the whole clip before playing. Streaming it
+(MediaSource) would need an in-browser remuxer for a narrow Chrome-only win; see
+`docs/research/proxy-streaming-mediasource.md`.
 
 ## Open Questions
 

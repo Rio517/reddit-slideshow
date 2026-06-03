@@ -27,8 +27,14 @@ AirPlay or Chromecast that window to your TV for a hands-off, lean-back feed.
 - Auto-advance on a timer or arrow through manually; videos advance when they end.
 - Pages forever - follows Reddit's pagination so the show keeps going.
 - Per-kind rendering: `<img>` for images/galleries and native `<video>` for
-  `v.redd.it`, Redgifs, Imgur, Streamable, Giphy, and Catbox.
-- Skips duplicates (reposts, crossposts, repeated galleries) and broken media.
+  `v.redd.it`, Redgifs, Imgur, Streamable, Giphy, and Catbox - with Reddit-video
+  **audio** (a companion track synced to the silent fallback clip).
+- Skips duplicates (reposts, crossposts, repeated galleries) and broken media -
+  duplicates are filtered before they show.
+- **Upvote/downvote** the current post with the **↑/↓** keys, through your
+  logged-in session.
+- **Download** the current media, or open the original post, from the overlay.
+- A byline under each slide: `/u/author to /r/subreddit from {domain} at {W×H}`.
 - Lots to tune from the overlay's gear, applied live with no reload - see
   [Settings](#settings).
 
@@ -97,8 +103,9 @@ startup that you can dismiss).
   slideshow to see it run.
 - Open any `old.reddit.com` or `www.reddit.com` feed, then click the toolbar
   icon or press **Alt+Shift+S**.
-- Keys: **←/→** previous/next, **Space** play/pause, **M** mute, **Esc** close.
-  You can also click the dark backdrop to close.
+- Keys: **←/→** previous/next, **↑/↓** upvote/downvote, **Space** play/pause,
+  **M** mute, **F** fullscreen, **Esc** close. You can also click the dark
+  backdrop to close.
 - Open settings from the **gear** in the overlay's control rail (or the
   extension's options page); changes apply to the running slideshow immediately.
 
@@ -200,9 +207,10 @@ done yet.
 No analytics, no tracking, no developer servers - the extension fetches only the
 Reddit feed and the media you are viewing (including clips resolved from Redgifs,
 Imgur, Streamable, Giphy, and Catbox), plus, for re-upload detection, the image
-bytes it hashes locally on your device. Your Reddit cookies go to Reddit only;
-every provider request is cookie-less. Settings are stored locally. See
-[PRIVACY.md](PRIVACY.md).
+bytes it hashes locally on your device. The one action that writes to your Reddit
+account is voting, and only when you press **↑/↓**. Your Reddit cookies go to
+Reddit only; every provider request is cookie-less. Settings are stored locally.
+See [PRIVACY.md](PRIVACY.md).
 
 ## License
 

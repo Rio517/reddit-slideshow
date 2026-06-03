@@ -1,6 +1,6 @@
 # Privacy Policy - Reddit Slideshow Spectacular!
 
-_Last updated: 2026-05-31_
+_Last updated: 2026-06-03_
 
 **Short version: Reddit Slideshow Spectacular! collects nothing, sends nothing to
 the developer, and has no analytics, tracking, ads, or accounts. Everything it
@@ -32,6 +32,19 @@ operated by the developer (there is none):
   the post links - Reddit's own hosts (`i.redd.it`, `v.redd.it`), Catbox
   (`files.catbox.moe`), and other image hosts - the same way they would load on
   Reddit itself.
+- **Reddit-video audio.** `v.redd.it` clips carry their audio as a separate
+  stream, so the background fetches that clip's small DASH manifest from
+  `v.redd.it` (**without cookies**) to find the audio track's URL, which your
+  browser then plays alongside the silent video.
+- **Voting (only when you press a key).** Pressing **↑/↓** casts an
+  upvote/downvote on the current post through your logged-in session: the
+  background sends your Reddit session cookies to Reddit's `/api/vote` (and
+  `/api/me.json`, for the required CSRF token). This is the **only** action the
+  extension takes that writes to your Reddit account, and it happens **only** when
+  you press the key. Nothing is sent anywhere but Reddit.
+- **Download.** The download control saves the current media to your device with
+  the browser's downloads API; the file is fetched from its host (without cookies)
+  and saved locally - nothing is uploaded.
 - **Provider clips.** For some providers the extension first resolves a directly-
   playable video URL - from the provider's API (`api.redgifs.com`,
   `api.streamable.com`) or by rewriting the link (Imgur, Giphy). Your browser then
@@ -66,10 +79,15 @@ operated by the developer (there is none):
   so the background can fetch Reddit-hosted images and previews to compute the
   local perceptual hash used for on-by-default re-upload detection. These fetches
   are made without cookies; nothing leaves your device.
+- **Host access to `v.redd.it`** - so the background can fetch a Reddit video's
+  DASH manifest (without cookies) to find its separate audio track. The video and
+  audio themselves load directly in the page and need no permission.
 - **Host access to `api.redgifs.com`, `media.redgifs.com`, `i.imgur.com`,
   `*.streamable.com`, `*.giphy.com`** - so the background can resolve and fetch
   provider clips (Redgifs, Imgur, Streamable, Giphy) and play them as native
   video. These fetches are made without cookies.
+- **`downloads`** - so the download control can save the media you are viewing to
+  your device, with a sensible filename.
 
 The extension requests no other permissions: no browsing history, no bookmarks,
 no access to other sites, and no remote code.
