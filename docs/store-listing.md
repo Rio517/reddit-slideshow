@@ -24,7 +24,9 @@ https://rio517.github.io/reddit-slideshow-spectacular/
 
 **Chrome Web Store - short description (must be ≤ 132 chars):**
 
-Turn your old or new Reddit feeds into a full-screen, keyboard-driven media slideshow. Free, Private, Local, No Tracking.
+Turn your old or new Reddit feeds into a full-screen, keyboard-driven media slideshow. Free, Private, Local, No Ads.
+
+https://rio517.github.io/reddit-slideshow-spectacular/
 
 (126 characters.)
 
@@ -40,15 +42,9 @@ settings stored locally.
 
 ## 3. Detailed description (plain text - paste as-is)
 
-Reddit Slideshow Spectacular! turns the Reddit feed you're already viewing
-into a full-screen, keyboard-driven media slideshow. Open a feed, subreddit,
-multireddit, or search results on old.reddit.com or www.reddit.com, click the
-toolbar icon (or press Alt+Shift+S), and lean back.
+Reddit Slideshow Spectacular! turns your Reddit feeds into full-screen, keyboard-driven media slideshow. Open a feed, subreddit, multireddit, or search results on old.reddit.com or www.reddit.com, click the toolbar icon (or press Alt+Shift+S), and lean back.
 
-It reuses your existing logged-in Reddit session - no API keys, no sign-in, no
-extra account. It walks media posts in the order Reddit returns them and pages
-through the feed automatically, so the slideshow keeps going past the first
-page.
+The Slideshow reuses your existing logged-in Reddit session - no API keys, no sign-in, no extra account. It walks media posts in the order Reddit returns them and pages through the feed automatically, so the slideshow keeps going past the first page.
 
 WHAT IT PLAYS
 
@@ -60,23 +56,16 @@ WHAT IT PLAYS
 - Catbox video and image files
 - Crossposts, resolved to the original post's media
 
-The queue is media-only: text/self posts, outbound article links, stickied
-announcements, and promoted/ad posts are skipped, and media that fails to load
-is skipped too - so the slideshow never lands on a dead slide.
+The queue is media-only: text/self posts, outbound article links, stickied announcements, and promoted/ad posts are skipped, and media that fails to load is skipped too - so the slideshow never lands on a dead slide.
 
 CONTROLS
 
-- Keyboard: Left/Right to move (Shift+Right skips to the next post; Page
-  Up/Page Down jump back/ahead 10), Up/Down to upvote/downvote the post, Space to
-  play/pause, M to mute, F for fullscreen, Esc to close
-- An on-screen control rail: previous, play/pause, next, mute, fullscreen, open
-  in a window, and settings
-- Under each slide: a byline (who posted it, to which subreddit, the source and
-  resolution), with buttons to open the original post or download the media
+- Keyboard: Left/Right to move (Shift+Right skips to the next post; Page Up/Page Down jump back/ahead 10), Up/Down to upvote/downvote the post, Space to play/pause, M to mute, F for fullscreen, Esc to close
+- An on-screen control rail: previous, play/pause, next, mute, fullscreen, open in a window, and settings
+- Under each slide: a byline (who posted it, to which subreddit, the source and resolution), with buttons to open the original post or download the media
 - Click the position counter to jump straight to any post in the loaded queue
 - Click the dark backdrop to close
-- Images advance on a timer you set; the timer keeps running even after you
-  arrow through manually, and videos advance when the clip ends
+- Images advance on a timer you set; the timer keeps running even after you arrow through manually, and videos advance when the clip ends
 
 NICE TOUCHES
 
@@ -84,11 +73,8 @@ NICE TOUCHES
 - Optional top countdown timer bar (on video slides, every slide, or never)
 - Optional slow pan & zoom for images too big to see at once
 - A pinned position counter and post title so you always know where you are
-- "Open in a window" reopens the slideshow in a minimal popup window, ready to
-  AirPlay or Chromecast to a TV or second screen for a lean-back, big-screen feed
-- Duplicate skipping: reposts, crossposts, and repeated galleries are skipped,
-  and a perceptual hash (on by default) also catches the same image re-uploaded
-  under a new link - solo vs. in a gallery
+- "Open in a window" reopens the slideshow in a minimal popup window, ready to AirPlay or Chromecast to a TV or second screen for a lean-back, big-screen feed
+- Duplicate skipping: reposts, crossposts, and repeated galleries are skipped, and a perceptual hash (on by default) also catches the same image re-uploaded under a new link - solo vs. in a gallery
 - "Open original" jumps to the source post
 
 SETTINGS (apply live, no reload)
@@ -98,18 +84,15 @@ SETTINGS (apply live, no reload)
 - Timer bar visibility
 - How long to wait for slow media before moving on
 - Autoplay videos on/off, start muted on/off
-- Include NSFW - by default follows your Reddit session, showing over-18 content
-  only insofar as your account already does
+- Include NSFW - by default follows your Reddit session, showing over-18 content only insofar as your account already does
 - Skip duplicate media, including re-uploaded images (on by default)
 - Pan & zoom large images (or all images), with full control over the sequence
 
 PRIVACY
-No analytics, no tracking, no ads, no accounts, and no developer servers (there
-are none). The extension only fetches the media you're viewing: the feed and
-its media from Reddit, and provider clips from Imgur, Redgifs, Streamable, Giphy,
-and Catbox. The one thing that writes to your Reddit account is voting, and only
-when you press the up/down keys. Your settings are stored locally on your computer,
-and it ships no remote code. Full policy: see the privacy policy link.
+
+No analytics, no tracking, no ads, no accounts, and no developer servers (there are none). The extension only fetches the media you're viewing: the feed and its media from Reddit, and provider clips from Imgur, Redgifs, Streamable, Giphy, and Catbox. The one thing that writes to your Reddit account is voting, and only when you press the up/down keys. Your settings are stored locally on your computer, and it ships no remote code. Full policy: see the privacy policy link.
+
+Open source, MIT licensed.
 
 Built as a Manifest V3 WebExtension for Firefox and Chromium browsers (Chrome,
 Edge, Brave). Open source, MIT licensed.
@@ -266,28 +249,15 @@ want a third tile.)
 
 Reddit Slideshow Spectacular! has one purpose: to turn the Reddit feed the user is currently viewing into a full-screen, keyboard-driven media slideshow of that feed's images and videos.
 
-**Why each host permission is needed (Chrome requires per-host justification):**
+**Host-permissions justification (Chrome's single field - max 1000 chars; paste the line below as-is. `downloads` is a separate per-permission field above):**
 
-- **old.reddit.com / www.reddit.com** - Read the listing JSON for the page the
-  user launched the slideshow from (either Reddit frontend) to build and
-  paginate the slide queue; and, on the up/down keys, cast the user's vote on the
-  current post via `/api/vote`.
-- **api.redgifs.com / media.redgifs.com / i.imgur.com / imgur.com /
-  \*.streamable.com / \*.giphy.com** - Resolve and fetch provider clips (Redgifs,
-  Imgur `.gifv`, Streamable, Giphy) in the background so they play as native,
-  correctly-timed video instead of an opaque embed, and fetch the keyless
-  `imgur.com/ajaxalbums` list to expand an Imgur album into its images (all
-  requested without cookies). Catbox files load directly in the page and need no
-  permission.
-- **v.redd.it** - Fetch a Reddit video's DASH manifest (without cookies) to find
-  its separate audio track, so the clip can play with sound; the video itself
-  loads directly in the page.
-- **i.redd.it / preview.redd.it / external-preview.redd.it** - Fetch
-  Reddit-hosted images and previews (without cookies) to compute a perceptual
-  hash locally, so the same image re-uploaded under a new link is skipped.
-  This duplicate detection is on by default; the hash never leaves the computer.
-- **downloads** - Save the displayed media to the user's computer, on request, via
-  the in-overlay download control.
+All host access serves one purpose: turning the Reddit feed the user is viewing into a media slideshow. old.reddit.com / www.reddit.com - read the page's listing JSON to build and paginate the slide queue, and cast the user's up/down vote on the current post (only on the arrow keys). api.redgifs.com / media.redgifs.com / i.imgur.com / imgur.com, plus any streamable.com and giphy.com subdomain - resolve and fetch provider clips (Redgifs, Imgur .gifv, Streamable, Giphy) so they play as native video, and expand Imgur albums; all without cookies. v.redd.it - fetch a video's DASH manifest (without cookies) for its separate audio track so the clip plays with sound. i.redd.it / preview.redd.it / external-preview.redd.it - fetch Reddit images/previews (without cookies) to compute a local perceptual hash that skips re-uploaded duplicates (on by default); nothing leaves the device.
+
+(Catbox files.catbox.moe loads directly in the page and needs no host permission, so it's not in the field above.)
+
+## Downloads Justification
+
+Used solely for the in-overlay "download" control. When the user clicks it, the extension saves the single image or video currently shown in the slideshow to the user's computer via chrome.downloads, with a filename derived from the post. It runs only on that explicit click — never automatically — uploads nothing, and does not read or collect the user's download history.
 
 ---
 
@@ -313,3 +283,16 @@ fetches i.redd.it / preview.redd.it images) is on by default and can be turned
 off with the "Also skip re-uploaded images" setting.
 
 Source: https://github.com/Rio517/reddit-slideshow-spectacular
+
+---
+
+## 10. Source-code submission (AMO)
+
+AMO requires source because the build bundles and minifies (WXT, which uses Vite + esbuild). Upload the sources zip WXT emits at .output/reddit-slideshow-<version>-sources.zip (also attached to the matching GitHub release); it contains package-lock.json, build.sh, and BUILD.md.
+
+Build instructions (also in BUILD.md inside the source zip — paste into the reviewer build field):
+
+Operating system: Linux (Ubuntu 24.04 in CI) or macOS; no OS-specific steps.
+Node.js: 20.x LTS recommended; also builds on Node 24 (the AMO reviewer default). Install from https://nodejs.org/ or with nvm: nvm install 20 && nvm use 20. npm ships with Node (10+); no other global tools.
+Build: from the project root run ./build.sh (which runs `npm ci` then `npm run zip`). The submitted add-on is .output/reddit-slideshow-<version>-firefox.zip.
+All source is plain, readable, JSDoc-typed JavaScript — no obfuscation and no remote or eval'd code; the only minification is the standard WXT/Vite production build, for which this source is provided.
