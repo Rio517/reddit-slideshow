@@ -788,6 +788,46 @@ iframe.reddit-slideshow-media {
   letter-spacing: 0.02em;
   color: var(--rs-fg);
 }
+/* The "Spectacular!" half of the wordmark: an inline SVG outline (traced from
+   Monoton, see lib/wordmark-spectacular.js) so it renders without a webfont and
+   can't be defeated by the page's font-src CSP. currentColor drives the amber;
+   the glow is a drop-shadow filter (text-shadow doesn't apply to the SVG). */
+.rs-logo__neon {
+  display: inline-block;
+  height: 0.92em;
+  width: auto;
+  vertical-align: -0.07em;
+  color: var(--rs-accent);
+  filter: drop-shadow(0 0 6px rgba(255, 122, 24, 0.55))
+    drop-shadow(0 0 16px rgba(255, 122, 24, 0.35));
+  animation: rs-neon-flicker 6.5s linear infinite;
+}
+/* Neon-sign flicker, mirroring the website hero's wordmark. */
+@keyframes rs-neon-flicker {
+  0%,
+  18%,
+  22%,
+  60%,
+  100% {
+    opacity: 1;
+  }
+  19%,
+  21% {
+    opacity: 0.55;
+  }
+  20% {
+    opacity: 0.82;
+  }
+  61% {
+    opacity: 0.7;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rs-logo__neon {
+    animation: none;
+    opacity: 1;
+  }
+}
 
 .rs-logo__sub {
   margin: 0;

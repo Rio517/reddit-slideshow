@@ -114,6 +114,25 @@ describe("createOverlay", () => {
     expect(overlay.host.querySelector(".rs-stage")).toBeNull();
   });
 
+  it("renders the wordmark with the inline-SVG 'Spectacular!' mark on the splash and end card", () => {
+    const overlay = createOverlay(noopHandlers());
+
+    overlay.showLoading();
+    const name = overlay.root.querySelector(".rs-logo__name");
+    // "Reddit Slideshow " is sans text; "Spectacular!" is an inline SVG outline
+    // (no webfont) labelled for screen readers.
+    expect(name?.firstChild?.textContent).toBe("Reddit Slideshow ");
+    const neon = overlay.root.querySelector(".rs-logo__neon");
+    expect(neon?.tagName.toLowerCase()).toBe("svg");
+    expect(neon?.getAttribute("aria-label")).toBe("Spectacular!");
+    expect(neon?.querySelector("path")).toBeTruthy();
+
+    overlay.showEnd();
+    expect(
+      overlay.root.querySelector(".rs-logo__neon")?.getAttribute("aria-label"),
+    ).toBe("Spectacular!");
+  });
+
   it("makes the page inert while shown and restores it on hide", () => {
     const overlay = createOverlay(noopHandlers());
     document.documentElement.append(overlay.host);
@@ -916,8 +935,11 @@ describe("createOverlay", () => {
     overlay.showLoading();
     expect(overlay.root.querySelector(".rs-logo__mark")).toBeTruthy();
     expect(overlay.root.querySelector(".rs-logo__name")?.textContent).toBe(
-      "Reddit Slideshow Spectacular!",
+      "Reddit Slideshow ",
     );
+    expect(
+      overlay.root.querySelector(".rs-logo__neon")?.getAttribute("aria-label"),
+    ).toBe("Spectacular!");
     expect(overlay.root.querySelector(".rs-logo__sub")?.textContent).toBe(
       "Loading…",
     );
