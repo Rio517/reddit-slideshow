@@ -15,6 +15,9 @@ as-is.
 
 **Name (both stores):** Reddit Slideshow Spectacular!
 
+**Homepage / website URL (both stores have a field for this):**
+https://rio517.github.io/reddit-slideshow-spectacular/
+
 ---
 
 ## 2. Summary / short description
@@ -234,11 +237,12 @@ copy of it.
 Two screenshots ship in the repo. Both stores accept PNGs; upload these (or
 regenerate the options shots with `npm run screenshots`).
 
-**docs/slideshow-demo.png** - the slideshow running full-screen over r/aww: an
-image fills the stage, with the position counter top-left, a bottom-left byline
-(`/u/author to /r/aww from i.redd.it at 1600×1067`) plus the open-original and
-download buttons, and the vertical control rail (prev / play / next, mute,
-fullscreen, open-in-window, help, and settings) down the right edge.
+**docs/slideshow-demo.png** - the slideshow running full-screen over
+r/SlideShowSpectacular: a golden-retriever puppy bounding through a sunlit meadow
+fills the stage, with the position counter top-left, a bottom-left byline
+(`/u/rio517 to /r/SlideShowSpectacular from i.redd.it at 1122×1482`) plus the
+open-original and download buttons, and the vertical control rail (prev / play /
+next, mute, fullscreen, open-in-window, help, and settings) down the right edge.
 
 Suggested caption: "Full-screen slideshow over your current feed - keyboard-driven, with a position counter and a minimal control rail."
 
