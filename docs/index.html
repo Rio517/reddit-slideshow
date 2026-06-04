@@ -47,8 +47,9 @@
         </span>
       </a>
       <nav class="topnav">
-        <a href="#program">Program</a>
+        <a href="#program">The Program</a>
         <a href="#tickets">Install</a>
+        <a href="#contribute">Editors</a>
         <a
           class="topnav__cta"
           href="https://github.com/Rio517/reddit-slideshow-spectacular"
@@ -64,55 +65,87 @@
         <div class="marquee">
           <span class="bulbs bulbs--top" aria-hidden="true"></span>
           <div class="marquee__inner">
-            <p class="kicker">
-              <span class="kicker__star">✦</span> Now showing — in your browser
-            </p>
-            <h1 class="headline">
-              <span class="headline__line">Your Reddit&mdash;</span>
-              <span class="headline__neon">spectacular</span>
-              <span class="headline__line">in full&#8209;screen.</span>
-            </h1>
-            <p class="lede">
-              The images and videos in the feed you're
-              <em>already&nbsp;watching</em> — played back as a full-screen,
-              keyboard-driven show. Open any feed and press&nbsp;play.
-            </p>
-            <div class="cta">
-              <a
-                class="btn btn--ticket"
-                href="https://github.com/Rio517/reddit-slideshow-spectacular#install"
-                rel="noopener"
-                >Get it on GitHub</a
-              >
-              <a
-                class="btn btn--ghost"
-                href="https://old.reddit.com/r/SlideShowSpectacular"
-                rel="noopener"
-                >See it live <span aria-hidden="true">↗</span></a
-              >
+            <div class="marquee__text">
+              <h1 class="headline">
+                <span class="headline__line">Reddit Slideshow</span>
+                <span class="headline__neon">spectacular</span>
+              </h1>
+              <p class="lede">
+                The images and videos in
+                <em>your feeds</em> — played back as a full-screen,
+                keyboard-driven slideshow. Free. Private. Spectacular!
+              </p>
+              <div class="cta">
+                <a
+                  class="btn btn--ticket"
+                  href="https://chromewebstore.google.com/detail/reddit-slideshow-spectacu/pcfajhfnnkkpadnfedkgjfgclffeoenp"
+                  rel="noopener"
+                  >Chrome <span aria-hidden="true">↗</span></a
+                >
+                <a
+                  class="btn btn--ghost"
+                  href="https://github.com/Rio517/reddit-slideshow-spectacular/releases/latest"
+                  rel="noopener"
+                  >Firefox (.zip) <span aria-hidden="true">↗</span></a
+                >
+                <a
+                  class="btn btn--ghost"
+                  href="https://github.com/Rio517/reddit-slideshow-spectacular"
+                  rel="noopener"
+                  >Source code</a
+                >
+              </div>
+              <p class="fineprint">
+                <span aria-hidden="true">★</span> open source · no account · no
+                tracking · no advertising <span aria-hidden="true">★</span>
+              </p>
             </div>
-            <p class="fineprint">
-              <span aria-hidden="true">★</span> Free &amp; open source · no
-              account · no tracking · no servers
-            </p>
+            <figure class="screen marquee__screen">
+              <div class="screen__frame">
+                <img
+                  src="slideshow-demo.png"
+                  width="1280"
+                  height="800"
+                  alt="The slideshow running full-screen over r/SlideShowSpectacular: a golden-retriever puppy bounding through a sunlit meadow, with the position counter top-left, the control rail down the right, and a byline reading /u/rio517 to /r/SlideShowSpectacular from i.redd.it at 1122×1482."
+                />
+                <span class="screen__scan" aria-hidden="true"></span>
+                <span class="screen__glare" aria-hidden="true"></span>
+              </div>
+              <figcaption>
+                <span class="reel">Reel 01</span> A real show over
+                r/SlideShowSpectacular
+              </figcaption>
+            </figure>
           </div>
           <span class="bulbs bulbs--bottom" aria-hidden="true"></span>
         </div>
+      </section>
 
-        <figure class="screen">
+      <!-- ============ DEMO / LOOPING VIDEO ============ -->
+      <section class="demo" aria-label="The slideshow in motion">
+        <header class="rubric">
+          <h2 class="rubric__title">Demo Reel</h2>
+        </header>
+        <figure class="screen demo__screen">
           <div class="screen__frame">
-            <img
-              src="slideshow-demo.png"
+            <video
+              class="demo__video"
+              autoplay
+              loop
+              muted
+              playsinline
+              poster="slideshow-demo.png"
               width="1280"
               height="800"
-              alt="The slideshow running full-screen over r/SlideShowSpectacular: a golden-retriever puppy bounding through a sunlit meadow, with the position counter top-left, the control rail down the right, and a byline reading /u/rio517 to /r/SlideShowSpectacular from i.redd.it at 1122×1482."
-            />
+            >
+              <source src="slideshow.webm" type="video/webm" />
+            </video>
             <span class="screen__scan" aria-hidden="true"></span>
             <span class="screen__glare" aria-hidden="true"></span>
           </div>
           <figcaption>
-            <span class="reel">Reel 01</span> A real show over
-            r/SlideShowSpectacular
+            <span class="reel">Reel 02</span> Paging through
+            r/SlideShowSpectacular — the puppy, then two cats
           </figcaption>
         </figure>
       </section>
@@ -122,10 +155,10 @@
         <p class="lobby__kicker">The fine print, up front</p>
         <div class="lobby__cards">
           <article class="lcard">
-            <h3>Built on your session</h3>
+            <h3>Built on your Feeds</h3>
             <p>
-              Reuses your logged-in Reddit — no API keys, no second account,
-              nothing to re-subscribe to.
+              Reuses your logged-in Reddit — browse to your feed, open the
+              browser.
             </p>
           </article>
           <article class="lcard">
@@ -142,10 +175,18 @@
               the TV.
             </p>
           </article>
+          <article class="lcard">
+            <h3>No ads, ever</h3>
+            <p>
+              No advertisements and no ad trackers — nothing riding along
+              between you and your feed.
+            </p>
+          </article>
         </div>
       </section>
 
       <!-- ============ PROGRAM / FEATURES ============ -->
+
       <section id="program" class="program">
         <header class="rubric">
           <span class="rubric__eyebrow">The Program</span>
@@ -157,57 +198,42 @@
           <div class="frames">
             <article class="frame">
               <span class="frame__no">Frame 01</span>
-              <h3>One key to launch</h3>
+              <h3>Endless, no repeats</h3>
               <p>
-                Open any <code>old.reddit.com</code> or
-                <code>www.reddit.com</code> feed and press <kbd>Alt</kbd
-                ><kbd>Shift</kbd><kbd>S</kbd> — it starts at the top of the
-                current view, in its own sort.
+                Pages through your feed forever, filtering reposts, crossposts,
+                and re-uploads with a local perceptual hash.
               </p>
             </article>
             <article class="frame">
               <span class="frame__no">Frame 02</span>
-              <h3>Plays the whole web</h3>
+              <h3>Video, GIFs &amp; images</h3>
               <p>
-                Direct images, galleries, Reddit-hosted video
-                <em>with audio</em>, Redgifs, Imgur, Streamable, Giphy, Catbox,
-                and crossposts — each rendered the right way.
+                Reddit video <em>with sound</em>, plus Redgifs, Imgur,
+                Streamable, Giphy, Catbox, galleries, and direct images.
               </p>
             </article>
             <article class="frame">
               <span class="frame__no">Frame 03</span>
-              <h3>Pages forever</h3>
+              <h3>Keyboard optimized</h3>
               <p>
-                Auto-advance on a timer or arrow through by hand; videos move on
-                when they end. It follows Reddit's pagination so the show keeps
-                going.
+                Launch with <kbd>Alt</kbd><kbd>Shift</kbd><kbd>S</kbd> and run
+                the whole show from the keys — full map below.
               </p>
             </article>
             <article class="frame">
               <span class="frame__no">Frame 04</span>
-              <h3>No repeats, no dead ends</h3>
+              <h3>Integrated voting</h3>
               <p>
-                Filters reposts, crossposts, repeated galleries, and broken
-                media before they show — even the same image re-uploaded under a
-                new link, via a local perceptual hash.
+                Upvote or downvote with <kbd>↑</kbd> / <kbd>↓</kbd> through your
+                own session — or download and open originals.
               </p>
             </article>
             <article class="frame">
               <span class="frame__no">Frame 05</span>
-              <h3>Vote without leaving</h3>
+              <h3>Advanced configuration</h3>
               <p>
-                Upvote or downvote the current post with <kbd>↑</kbd> /
-                <kbd>↓</kbd>, straight through your logged-in session. Download
-                the media or open the original from the overlay.
-              </p>
-            </article>
-            <article class="frame">
-              <span class="frame__no">Frame 06</span>
-              <h3>Tune it live</h3>
-              <p>
-                Seconds per slide, transitions, pan &amp; zoom for huge images,
-                NSFW, the countdown bar — all from the overlay's gear, applied
-                with no reload.
+                Tune timing, transitions, pan &amp; zoom, and NSFW live from the
+                overlay's gear — no reload.
               </p>
             </article>
           </div>
@@ -221,78 +247,179 @@
           <span class="rubric__eyebrow">The Controls</span>
           <h2 class="rubric__title">Hands on the keyboard</h2>
         </header>
-        <ul class="caps">
-          <li><kbd>←</kbd><kbd>→</kbd><span>prev / next</span></li>
-          <li><kbd>↑</kbd><kbd>↓</kbd><span>upvote / downvote</span></li>
-          <li><kbd>Space</kbd><span>play / pause</span></li>
-          <li><kbd>M</kbd><span>mute</span></li>
-          <li><kbd>F</kbd><span>fullscreen</span></li>
-          <li><kbd>Esc</kbd><span>close</span></li>
-        </ul>
+        <div class="keycard">
+          <p class="keycard__title">Keyboard shortcuts</p>
+          <table class="keytable">
+            <tbody>
+              <tr>
+                <th scope="row" class="keytable__keys">
+                  <kbd>Alt</kbd><span class="keytable__sep">+</span
+                  ><kbd>Shift</kbd><span class="keytable__sep">+</span
+                  ><kbd>S</kbd>
+                </th>
+                <td>Launch the slideshow</td>
+              </tr>
+              <tr>
+                <th scope="row" class="keytable__keys">
+                  <kbd>←</kbd><span class="keytable__sep">/</span><kbd>→</kbd>
+                </th>
+                <td>Previous / next slide</td>
+              </tr>
+              <tr>
+                <th scope="row" class="keytable__keys">
+                  <kbd>Shift</kbd><span class="keytable__sep">+</span
+                  ><kbd>→</kbd>
+                </th>
+                <td>Skip to the next post</td>
+              </tr>
+              <tr>
+                <th scope="row" class="keytable__keys">
+                  <kbd>Page Up</kbd><span class="keytable__sep">/</span
+                  ><kbd>Page Down</kbd>
+                </th>
+                <td>Jump back / ahead 10</td>
+              </tr>
+              <tr>
+                <th scope="row" class="keytable__keys">
+                  <kbd>↑</kbd><span class="keytable__sep">/</span><kbd>↓</kbd>
+                </th>
+                <td>Upvote / downvote the post</td>
+              </tr>
+              <tr>
+                <th scope="row" class="keytable__keys"><kbd>Space</kbd></th>
+                <td>Play / pause</td>
+              </tr>
+              <tr>
+                <th scope="row" class="keytable__keys"><kbd>M</kbd></th>
+                <td>Mute / unmute</td>
+              </tr>
+              <tr>
+                <th scope="row" class="keytable__keys"><kbd>F</kbd></th>
+                <td>Fullscreen</td>
+              </tr>
+              <tr>
+                <th scope="row" class="keytable__keys"><kbd>Esc</kbd></th>
+                <td>Close, or dismiss a panel</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
 
       <!-- ============ TICKETS / INSTALL ============ -->
       <section id="tickets" class="acts">
         <header class="rubric">
           <span class="rubric__eyebrow">Admission</span>
-          <h2 class="rubric__title">Get in, in three acts</h2>
+          <h2 class="rubric__title">Get your ticket</h2>
         </header>
         <p class="acts__note">
-          It isn't on the Firefox Add-ons site or Chrome Web Store yet, so you
-          load the built extension yourself — in <strong>your</strong> browser,
-          using your real Reddit session.
+          Free, open source, and private — it runs on your own logged-in Reddit
+          session. <strong>Chrome:</strong> install from the Web Store.
+          <strong>Firefox:</strong> in review on the Add-ons store — grab the
+          <code>.zip</code> from the latest release in the meantime.
         </p>
 
-        <ol class="act-list">
-          <li class="act">
-            <span class="act__no" aria-hidden="true">I</span>
-            <div class="act__body">
-              <h3>Build it</h3>
-              <pre><code>npm install
-npm run build         <span class="cmt"># Firefox → .output/firefox-mv3/</span>
-npm run build:chrome  <span class="cmt"># Chrome  → .output/chrome-mv3/</span></code></pre>
-            </div>
-          </li>
-          <li class="act">
-            <span class="act__no" aria-hidden="true">II</span>
-            <div class="act__body">
-              <h3>Load it</h3>
-              <p>
-                <strong>Firefox:</strong> <code>about:debugging</code> → Load
-                Temporary Add-on → pick
-                <code>.output/firefox-mv3/manifest.json</code>.
-              </p>
-              <p>
-                <strong>Chrome:</strong> <code>chrome://extensions</code> →
-                Developer mode → Load unpacked → select
-                <code>.output/chrome-mv3/</code>.
-              </p>
-            </div>
-          </li>
-          <li class="act">
-            <span class="act__no" aria-hidden="true">III</span>
-            <div class="act__body">
-              <h3>Press play</h3>
-              <p>
-                Open a feed (or
-                <a
-                  href="https://old.reddit.com/r/SlideShowSpectacular"
-                  rel="noopener"
-                  >r/SlideShowSpectacular</a
-                >) and hit the toolbar icon or <kbd>Alt</kbd><kbd>Shift</kbd
-                ><kbd>S</kbd>.
-              </p>
-            </div>
-          </li>
-        </ol>
-        <p class="acts__more">
-          Full steps — permanent install, signing — are in the
+        <div class="boxoffice">
           <a
-            href="https://github.com/Rio517/reddit-slideshow-spectacular#install"
+            class="btn btn--ticket btn--big"
+            href="https://chromewebstore.google.com/detail/reddit-slideshow-spectacu/pcfajhfnnkkpadnfedkgjfgclffeoenp"
             rel="noopener"
-            >README</a
-          >.
+            >Add to Chrome <span aria-hidden="true">↗</span></a
+          >
+          <a
+            class="btn btn--ghost btn--big"
+            href="https://github.com/Rio517/reddit-slideshow-spectacular/releases/latest"
+            rel="noopener"
+            >Firefox .zip <span aria-hidden="true">↗</span></a
+          >
+        </div>
+
+        <p class="acts__more">
+          Rather build it yourself? Follow the
+          <a
+            href="https://github.com/Rio517/reddit-slideshow-spectacular#build-from-source"
+            rel="noopener"
+            >build-from-source guide</a
+          >
+          on GitHub.
         </p>
+      </section>
+
+      <!-- ============ EDITORS / CONTRIBUTE (clapperboard) ============ -->
+      <section id="contribute" class="cuttingroom">
+        <div class="clapper">
+          <div class="clapper__arm" aria-hidden="true">
+            <span class="clapper__pivot"></span>
+          </div>
+          <div class="clapper__slate">
+            <p class="clapper__chalk" aria-hidden="true">
+              <b>Prod.</b> Open source <b>Dir.</b> You <b>Take</b> ∞
+            </p>
+            <h2 class="clapper__title">
+              Editors <span class="clapper__neon">welcome</span>
+            </h2>
+            <p class="clapper__note">
+              It's an open production. Splice in a feature, patch a bad frame,
+              or request the reel you wish it played. Roll camera.
+            </p>
+            <div class="clapper__cta">
+              <a
+                class="btn btn--ticket"
+                href="https://github.com/Rio517/reddit-slideshow-spectacular"
+                rel="noopener"
+                >Fork on GitHub <span aria-hidden="true">↗</span></a
+              >
+              <a
+                class="btn btn--ghost"
+                href="https://github.com/Rio517/reddit-slideshow-spectacular/issues"
+                rel="noopener"
+                >Open an issue <span aria-hidden="true">↗</span></a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ CREDITS / TIP JAR (end-credit card) ============ -->
+      <section id="credits" class="credits">
+        <div class="credits__card">
+          <span class="film-band" aria-hidden="true"></span>
+          <div class="credits__body">
+            <h2 class="credits__title">Credits</h2>
+            <dl class="credits__list">
+              <div>
+                <dt>A production of</dt>
+                <dd>
+                  <a
+                    href="https://continuously.improving.engineer"
+                    rel="noopener"
+                    >Mario Olivio Flores</a
+                  >
+                </dd>
+              </div>
+              <div>
+                <dt>Edited with</dt>
+                <dd>
+                  <a href="https://claude.com/claude-code" rel="noopener"
+                    >Claude Code</a
+                  >
+                </dd>
+              </div>
+            </dl>
+            <a
+              class="ticket-tip"
+              href="https://github.com/sponsors/Rio517"
+              rel="noopener"
+            >
+              <span class="ticket-tip__stub" aria-hidden="true">★</span>
+              <span class="ticket-tip__main"
+                >Support the projectionist
+                <span aria-hidden="true">↗</span></span
+              >
+            </a>
+          </div>
+          <span class="film-band" aria-hidden="true"></span>
+        </div>
       </section>
     </main>
 
@@ -300,33 +427,38 @@ npm run build:chrome  <span class="cmt"># Chrome  → .output/chrome-mv3/</span>
     <footer class="stub">
       <div class="stub__main">
         <div class="stub__brand">
-          <img src="icon.svg" alt="" width="30" height="30" />
+          <img src="icon.svg" alt="" width="28" height="28" />
+          <span class="stub__name">Reddit Slideshow</span>
           <span class="brand__neon">Spectacular!</span>
         </div>
         <nav class="stub__links">
           <a
             href="https://github.com/Rio517/reddit-slideshow-spectacular"
             rel="noopener"
-            >GitHub</a
+            >GitHub Source</a
           >
+          <span aria-hidden="true">★</span>
           <a
             href="https://github.com/Rio517/reddit-slideshow-spectacular/blob/main/PRIVACY.md"
             rel="noopener"
             >Privacy</a
           >
+          <span aria-hidden="true">★</span>
+
           <a href="https://old.reddit.com/r/SlideShowSpectacular" rel="noopener"
             >r/SlideShowSpectacular</a
           >
+
+          <span aria-hidden="true">★</span>
+
+          <a href="#">MIT License</a>
         </nav>
         <p class="stub__fine">
-          MIT licensed · not affiliated with Reddit · built by
-          <a href="https://github.com/Rio517" rel="noopener"
+          not affiliated with Reddit built by
+          <a href="https://continuously.improving.engineer" rel="noopener"
             >Mario Olivio Flores</a
           >
         </p>
-      </div>
-      <div class="stub__tear" aria-hidden="true">
-        <span class="stub__admit">Admit One</span>
       </div>
     </footer>
   </body>
