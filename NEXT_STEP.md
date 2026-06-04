@@ -1,10 +1,9 @@
 # NEXT_STEP - Reddit Slideshow Spectacular!
 
 **Branch:** `main` · **Status:** local green gate (typecheck/lint/format/test +
-both builds + web-ext lint). The backlog is cleared; what remains is a
-real-browser confirm of the features implemented this session (§1). Streaming
-the proxy fallback was investigated and parked (see the §1 note). The version
-bump to 1.0.0 is deliberately not done (user's call).
+both builds + web-ext lint). What remains is the real-browser confirm in §1 and
+the deferred 1.0.0 version bump (user's call). Streaming the proxy fallback is
+parked (see the §1 note).
 
 > **Hard rule:** work directly on `main`. Do not create branches or worktrees unless the user explicitly asks. See `AGENTS.md`.
 
@@ -49,10 +48,10 @@ giant commit.
 > Chrome-only win. The full reasoning + the Playwright evidence are in
 > `docs/research/proxy-streaming-mediasource.md`.
 
-### Implemented this session - needs a real-browser confirm
+### Needs a real-browser confirm
 
-Shipped with unit tests, but their live/browser behavior can't be exercised
-offline. Confirm each in a logged-in Firefox + Chrome before trusting it:
+These have unit tests but can't be exercised offline. Confirm each in a
+logged-in Firefox + Chrome before trusting it:
 
 - **Redgifs lazy resolution** (ADR 0016) - the page now ships iframe embeds and
   the session resolves each to native video on approach; confirm the on-approach
@@ -65,6 +64,11 @@ offline. Confirm each in a logged-in Firefox + Chrome before trusting it:
   hotlink-protected CDNs, with no reddit Referer) land with the filename hint.
 - **Up/down-key voting** (ADR 0019) - confirm a real cast vote, the toggle/clear,
   the modhash 403-refresh, and the not-logged-in optimistic revert.
+- **Neon "Spectacular!" wordmark** - the overlay splash + end card draw it as an
+  inline SVG outline (`lib/wordmark-spectacular.js`, traced from Monoton), so it
+  no longer depends on a webfont or the page CSP (the web-accessible font fell
+  back to sans in Firefox over reddit). Confirm it renders on both browsers. The
+  options page still uses the Monoton `@font-face` (extension-origin, works).
 
 ### Media providers - the pattern
 
