@@ -66,7 +66,8 @@ is skipped too - so the slideshow never lands on a dead slide.
 
 CONTROLS
 
-- Keyboard: Left/Right to move, Up/Down to upvote/downvote the post, Space to
+- Keyboard: Left/Right to move (Shift+Right skips to the next post; Page
+  Up/Page Down jump back/ahead 10), Up/Down to upvote/downvote the post, Space to
   play/pause, M to mute, F for fullscreen, Esc to close
 - An on-screen control rail: previous, play/pause, next, mute, fullscreen, open
   in a window, and settings
@@ -301,8 +302,10 @@ only to Reddit, Reddit's media hosts, and the content providers a post links to
 Settings are stored locally via storage.local.
 
 How to test: sign in to Reddit, open any media-heavy feed on
-old.reddit.com or www.reddit.com (e.g. https://old.reddit.com/r/aww/), and
-click the "Reddit Slideshow Spectacular!" toolbar icon (or press Alt+Shift+S). A
+old.reddit.com or www.reddit.com (e.g.
+https://old.reddit.com/r/SlideShowSpectacular/, which has one post of every
+supported media type), and click the "Reddit Slideshow Spectacular!" toolbar
+icon (or press Alt+Shift+S). A
 full-screen slideshow opens over the page. Use Left/Right to navigate, Space
 to play/pause, M to mute, F for fullscreen, and Esc to close. The gear icon
 opens settings, which apply live. Re-upload detection (the perceptual hash that
