@@ -60,11 +60,17 @@ live, no reload:
 
 ## Install
 
-It isn't on the Firefox Add-ons site or the Chrome Web Store yet, so you load the
-built extension yourself. This runs it in **your** browser, using your real
-(logged-in) Reddit session.
+**[Add to Chrome](https://chromewebstore.google.com/detail/reddit-slideshow-spectacu/pcfajhfnnkkpadnfedkgjfgclffeoenp)**
+— free, from the Chrome Web Store (also Edge, Brave, and other Chromium
+browsers). It runs entirely in **your** browser, on your real (logged-in) Reddit
+session.
 
-First build it:
+**Firefox:** coming soon to [addons.mozilla.org](https://addons.mozilla.org/).
+Until then, build it from source below.
+
+### Build from source
+
+Prefer to build it yourself — or want the Firefox build now? First build it:
 
 ```sh
 npm install
@@ -72,7 +78,7 @@ npm run build         # Firefox → .output/firefox-mv3/
 npm run build:chrome  # Chrome  → .output/chrome-mv3/
 ```
 
-### Firefox
+#### Firefox
 
 1. Open `about:debugging#/runtime/this-firefox`.
 2. Click **Load Temporary Add-on…** and pick
@@ -84,7 +90,7 @@ a permanent install, use Firefox Developer Edition / Nightly / ESR, set
 `xpinstall.signatures.required` to `false` in `about:config`, then install the
 `npm run zip` package from `about:addons` → **Install Add-on From File…**.
 
-### Chrome (also Edge, Brave, other Chromium browsers)
+#### Chrome (unpacked, for development)
 
 1. Open `chrome://extensions`.
 2. Turn on **Developer mode** (toggle, top-right).

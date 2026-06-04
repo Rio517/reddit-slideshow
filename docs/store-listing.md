@@ -15,35 +15,23 @@ as-is.
 
 **Name (both stores):** Reddit Slideshow Spectacular!
 
-There is no separate store/display name; the manifest `name` is
-"Reddit Slideshow Spectacular!" and the same name works on both stores.
-
-Leading with "Reddit" is deliberate: it's the de-facto Chrome-store convention
-(Reddit Enhancement Suite and dozens of others lead with it), it matches the
-companion subreddit r/redditslideshowspectacular, and it surfaces for the "reddit
-slideshow" searches people actually type. The affiliation risk is low and the
-same one those extensions carry; if a reviewer ever pushes back, "(unofficial)"
-or a "… for Reddit" rename is a cheap fallback. The "!" is part of the name -
-keep it (Yahoo!-style mid-sentence).
-
 ---
 
 ## 2. Summary / short description
 
 **Chrome Web Store - short description (must be ≤ 132 chars):**
 
-> Turn any Reddit feed into a full-screen, keyboard-driven media slideshow -
-> images, galleries, video, Redgifs, Imgur, and more.
+Turn your old or new Reddit feeds into a full-screen, keyboard-driven media slideshow. Free, Private, Local, No Tracking.
 
 (126 characters.)
 
 **AMO - short "summary" field:**
 
-> Turn the Reddit feed you're already viewing into a full-screen,
-> keyboard-driven media slideshow. Works on old and new Reddit, reuses your
-> logged-in session (no API keys), and plays images, galleries, video, and clips
-> from Redgifs, Imgur, Streamable, Giphy, and Catbox. No analytics, no tracking,
-> settings stored locally.
+Turn your Reddit feeds into a full-screen,
+keyboard-driven media slideshow. Works on old and new Reddit, reuses your
+logged-in session (no API keys), and plays images, galleries, video, and clips
+from Redgifs, Imgur, Streamable, Giphy, and Catbox. No analytics, no tracking,
+settings stored locally.
 
 ---
 
@@ -223,14 +211,7 @@ Use these answers:
 
 Plain-language summary to paste where a free-text box is offered:
 
-> Reddit Slideshow Spectacular! collects nothing and sends nothing to the developer - there
-> is no developer server, no analytics, no telemetry, no tracking, no ads, and
-> no accounts. It makes network requests only to Reddit, Reddit's media hosts,
-> and the content providers a post links to (Imgur, Redgifs, Streamable, Giphy,
-> Catbox), to fetch the media you're viewing; those provider requests are made
-> without cookies. The only thing it stores is your own
-> settings, kept locally via the browser's extension storage; removing the
-> extension removes them. The extension contains no remote code.
+Reddit Slideshow Spectacular! collects nothing and sends nothing to the developer - there is no developer server, no analytics, no telemetry, no tracking, no ads, and no accounts. It makes network requests only to Reddit, Reddit's media hosts, and the content providers a post links to (Imgur, Redgifs, Streamable, Giphy, Catbox), to fetch the media you're viewing; those provider requests are made without cookies. The only thing it stores is your own settings, kept locally via the browser's extension storage; removing the extension removes them. The extension contains no remote code.
 
 **AMO data-collection declaration:** the Firefox manifest already declares
 `data_collection_permissions: { required: ["none"] }` (see `wxt.config.ts`), so
@@ -259,16 +240,15 @@ image fills the stage, with the position counter top-left, a bottom-left byline
 download buttons, and the vertical control rail (prev / play / next, mute,
 fullscreen, open-in-window, help, and settings) down the right edge.
 
-> Suggested caption: "Full-screen slideshow over your current feed -
-> keyboard-driven, with a position counter and a minimal control rail."
+Suggested caption: "Full-screen slideshow over your current feed - keyboard-driven, with a position counter and a minimal control rail."
 
 **docs/screenshots/options-light.png** - the options page (light mode) showing
 every setting: image timer, transition between slides, top timer bar, skip-slow
 media, autoplay, start muted, include NSFW, hide duplicate media, always show
 count & title, detect re-uploaded images, and the pan & zoom sequence.
 
-> Suggested caption: "Every setting in one place - changes apply live to a
-> running slideshow."
+Suggested caption: "Every setting in one place - changes apply live to a
+running slideshow."
 
 (There's also a dark-mode variant at `docs/screenshots/options-dark.png` if you
 want a third tile.)
@@ -279,9 +259,7 @@ want a third tile.)
 
 **Single purpose (paste into the Chrome "single purpose" field):**
 
-> Reddit Slideshow Spectacular! has one purpose: to turn the Reddit feed the user is
-> currently viewing into a full-screen, keyboard-driven media slideshow of that
-> feed's images and videos.
+Reddit Slideshow Spectacular! has one purpose: to turn the Reddit feed the user is currently viewing into a full-screen, keyboard-driven media slideshow of that feed's images and videos.
 
 **Why each host permission is needed (Chrome requires per-host justification):**
 
@@ -310,21 +288,21 @@ want a third tile.)
 
 ## 9. Review notes (paste into "Notes for reviewers")
 
-> This is a plain-JavaScript Manifest V3 WebExtension built with WXT; the same
-> source builds the Firefox and Chrome packages. There is NO minified, obscured,
-> remote, or eval'd code - all logic ships in readable JS, and no script is
-> loaded from a remote server. No developer backend exists; the extension talks
-> only to Reddit, Reddit's media hosts, and the content providers a post links to
-> (Imgur, Redgifs, Streamable, Giphy, Catbox), to fetch the media being viewed.
-> Settings are stored locally via storage.local.
->
-> How to test: sign in to Reddit, open any media-heavy feed on
-> old.reddit.com or www.reddit.com (e.g. https://old.reddit.com/r/aww/), and
-> click the "Reddit Slideshow Spectacular!" toolbar icon (or press Alt+Shift+S). A
-> full-screen slideshow opens over the page. Use Left/Right to navigate, Space
-> to play/pause, M to mute, F for fullscreen, and Esc to close. The gear icon
-> opens settings, which apply live. Re-upload detection (the perceptual hash that
-> fetches i.redd.it / preview.redd.it images) is on by default and can be turned
-> off with the "Also skip re-uploaded images" setting.
->
-> Source: https://github.com/Rio517/reddit-slideshow-spectacular
+This is a plain-JavaScript Manifest V3 WebExtension built with WXT; the same
+source builds the Firefox and Chrome packages. There is NO minified, obscured,
+remote, or eval'd code - all logic ships in readable JS, and no script is
+loaded from a remote server. No developer backend exists; the extension talks
+only to Reddit, Reddit's media hosts, and the content providers a post links to
+(Imgur, Redgifs, Streamable, Giphy, Catbox), to fetch the media being viewed.
+Settings are stored locally via storage.local.
+
+How to test: sign in to Reddit, open any media-heavy feed on
+old.reddit.com or www.reddit.com (e.g. https://old.reddit.com/r/aww/), and
+click the "Reddit Slideshow Spectacular!" toolbar icon (or press Alt+Shift+S). A
+full-screen slideshow opens over the page. Use Left/Right to navigate, Space
+to play/pause, M to mute, F for fullscreen, and Esc to close. The gear icon
+opens settings, which apply live. Re-upload detection (the perceptual hash that
+fetches i.redd.it / preview.redd.it images) is on by default and can be turned
+off with the "Also skip re-uploaded images" setting.
+
+Source: https://github.com/Rio517/reddit-slideshow-spectacular

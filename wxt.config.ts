@@ -6,7 +6,7 @@ export default defineConfig({
     name: "Reddit Slideshow Spectacular!",
     description:
       "Turn an old or new Reddit feed into a full-screen, keyboard-driven media slideshow.",
-    homepage_url: "https://github.com/Rio517/reddit-slideshow-spectacular",
+    homepage_url: "https://rio517.github.io/reddit-slideshow-spectacular/",
     // "downloads": save the displayed media to the user's downloads on demand
     // (the in-overlay download control), driven from the background.
     permissions: ["storage", "downloads"],
