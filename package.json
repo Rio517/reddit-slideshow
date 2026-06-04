@@ -22,7 +22,8 @@
     "lint": "eslint .",
     "format": "prettier --check .",
     "webext:lint": "web-ext lint --source-dir .output/firefox-mv3",
-    "screenshots": "node scripts/screenshots.mjs"
+    "screenshots": "node scripts/screenshots.mjs",
+    "promo": "node scripts/promo-tiles.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",

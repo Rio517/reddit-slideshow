@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      @font-face {
+        font-family: "Monoton";
+        src: url("/fonts/monoton-400.woff2") format("woff2");
+        font-display: block;
+      }
+      @font-face {
+        font-family: "Oswald";
+        src: url("/fonts/oswald-latin.woff2") format("woff2");
+        font-weight: 200 700;
+        font-display: block;
+      }
+      @font-face {
+        font-family: "Hanken";
+        src: url("/fonts/hanken-500.woff2") format("woff2");
+        font-weight: 500;
+        font-display: block;
+      }
+      @font-face {
+        font-family: "DM Mono";
+        src: url("/fonts/dmmono-500.woff2") format("woff2");
+        font-weight: 500;
+        font-display: block;
+      }
+      * {
+        margin: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1400px;
+        height: 560px;
+      }
+      .tile {
+        width: 1400px;
+        height: 560px;
+        position: relative;
+        overflow: hidden;
+        padding: 58px 76px;
+        display: grid;
+        grid-template-columns: 1.02fr 0.98fr;
+        align-items: center;
+        gap: 56px;
+        background:
+          radial-gradient(
+            90% 120% at 22% -10%,
+            rgba(255, 122, 26, 0.22),
+            transparent 55%
+          ),
+          linear-gradient(180deg, #0a0c11, #08090d 75%);
+      }
+      .bulbs {
+        position: absolute;
+        left: 26px;
+        right: 26px;
+        height: 13px;
+        background-image: radial-gradient(
+          circle at center,
+          #ffe2b0 0 3.2px,
+          rgba(255, 180, 90, 0.35) 3.2px 4.8px,
+          transparent 5.4px
+        );
+        background-size: 33px 13px;
+        background-repeat: repeat-x;
+        background-position: center;
+        filter: drop-shadow(0 0 6px rgba(255, 140, 40, 0.5));
+      }
+      .bulbs--top {
+        top: 20px;
+      }
+      .bulbs--bottom {
+        bottom: 20px;
+      }
+      .copy {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      .icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 13px;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.55);
+        margin-bottom: 8px;
+      }
+      .sub {
+        font-family: "Oswald", sans-serif;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        font-size: 54px;
+        line-height: 0.98;
+        color: #f4ead6;
+      }
+      .neon {
+        font-family: "Monoton", cursive;
+        font-size: 52px;
+        line-height: 1.15;
+        color: #ffa23d;
+        letter-spacing: 0.02em;
+        text-shadow:
+          0 0 9px rgba(255, 140, 40, 0.6),
+          0 0 30px rgba(255, 140, 40, 0.45),
+          0 0 54px rgba(255, 140, 40, 0.25);
+      }
+      .tag {
+        margin-top: 12px;
+        max-width: 30ch;
+        font-family: "Hanken", system-ui, sans-serif;
+        font-size: 20px;
+        line-height: 1.45;
+        color: #d8cbb0;
+      }
+      .chips {
+        margin-top: 16px;
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #9aa0b2;
+      }
+      .screen {
+        border-radius: 12px;
+        padding: 10px;
+        background: linear-gradient(160deg, #20232e, #0c0e14);
+        border: 1px solid #39414f;
+        box-shadow:
+          0 40px 90px -34px rgba(0, 0, 0, 0.9),
+          0 0 70px -20px rgba(255, 140, 40, 0.22);
+      }
+      .screen img {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: 7px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="tile">
+      <span class="bulbs bulbs--top"></span>
+      <div class="copy">
+        <img class="icon" src="/icon.svg" alt="" />
+        <div class="sub">Reddit Slideshow</div>
+        <div class="neon">Spectacular!</div>
+        <div class="tag">
+          The images and videos in your feeds, played back as a full-screen,
+          keyboard-driven slideshow.
+        </div>
+        <div class="chips">Free · Private · No tracking · No ads</div>
+      </div>
+      <figure class="screen">
+        <img src="/slideshow-demo.png" alt="" />
+      </figure>
+      <span class="bulbs bulbs--bottom"></span>
+    </div>
+  </body>
+</html>

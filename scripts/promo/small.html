@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      @font-face {
+        font-family: "Monoton";
+        src: url("/fonts/monoton-400.woff2") format("woff2");
+        font-display: block;
+      }
+      @font-face {
+        font-family: "Oswald";
+        src: url("/fonts/oswald-latin.woff2") format("woff2");
+        font-weight: 200 700;
+        font-display: block;
+      }
+      @font-face {
+        font-family: "DM Mono";
+        src: url("/fonts/dmmono-500.woff2") format("woff2");
+        font-weight: 500;
+        font-display: block;
+      }
+      * {
+        margin: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 440px;
+        height: 280px;
+      }
+      .tile {
+        width: 440px;
+        height: 280px;
+        position: relative;
+        overflow: hidden;
+        padding: 30px 28px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        text-align: center;
+        background:
+          radial-gradient(
+            120% 95% at 50% -12%,
+            rgba(255, 122, 26, 0.24),
+            transparent 60%
+          ),
+          linear-gradient(180deg, #0a0c11, #08090d 72%);
+      }
+      .bulbs {
+        position: absolute;
+        left: 16px;
+        right: 16px;
+        height: 9px;
+        background-image: radial-gradient(
+          circle at center,
+          #ffe2b0 0 2.3px,
+          rgba(255, 180, 90, 0.35) 2.3px 3.4px,
+          transparent 3.9px
+        );
+        background-size: 23px 9px;
+        background-repeat: repeat-x;
+        background-position: center;
+        filter: drop-shadow(0 0 5px rgba(255, 140, 40, 0.5));
+      }
+      .bulbs--top {
+        top: 13px;
+      }
+      .bulbs--bottom {
+        bottom: 13px;
+      }
+      .icon {
+        width: 62px;
+        height: 62px;
+        border-radius: 14px;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.55);
+      }
+      .sub {
+        margin-top: 4px;
+        font-family: "Oswald", sans-serif;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 23px;
+        line-height: 1;
+        color: #f4ead6;
+      }
+      .neon {
+        font-family: "Monoton", cursive;
+        font-size: 33px;
+        line-height: 1.12;
+        color: #ffa23d;
+        letter-spacing: 0.02em;
+        text-shadow:
+          0 0 8px rgba(255, 140, 40, 0.6),
+          0 0 26px rgba(255, 140, 40, 0.45);
+      }
+      .tag {
+        margin-top: 8px;
+        font-family: "DM Mono", monospace;
+        font-size: 10.5px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #9aa0b2;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="tile">
+      <span class="bulbs bulbs--top"></span>
+      <img class="icon" src="/icon.svg" alt="" />
+      <div class="sub">Reddit Slideshow</div>
+      <div class="neon">Spectacular!</div>
+      <div class="tag">Your Reddit · Full-screen · Keyboard-driven</div>
+      <span class="bulbs bulbs--bottom"></span>
+    </div>
+  </body>
+</html>
