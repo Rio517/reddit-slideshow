@@ -391,10 +391,12 @@ main {
 .headline__line {
   font-family: var(--display);
   font-weight: 600;
-  font-size: clamp(2.5rem, 6.6vw, 4.1rem);
+  /* Neon line's scale × advance ratio, so it stays as wide as "spectacular". */
+  font-size: calc(clamp(2.1rem, 6vw, 3.7rem) * 1.05);
   line-height: 0.98;
   letter-spacing: 0.005em;
   color: var(--cream);
+  white-space: nowrap;
 }
 .headline__neon {
   font-family: var(--neon);
@@ -617,13 +619,15 @@ main {
   font-family: var(--display);
   font-weight: 600;
   font-size: 1.5rem;
+  line-height: 1.8rem;
   letter-spacing: 0.02em;
   color: var(--cream);
-  margin: 0.5rem 0 0.5rem;
+  margin: 0.5rem 0 1rem;
 }
 .lcard p {
   margin: 0;
   font-size: 1rem;
+  line-height: 1.3rem;
   color: var(--muted);
 }
 
@@ -695,6 +699,7 @@ main {
   font-family: var(--display);
   font-weight: 600;
   font-size: 1.62rem;
+  line-height: 1.05;
   letter-spacing: 0.015em;
   color: var(--cream);
   margin: 0.55rem 0 0.55rem;
