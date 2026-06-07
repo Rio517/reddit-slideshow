@@ -65,8 +65,9 @@ live, no reload:
 browsers). It runs entirely in **your** browser, on your real (logged-in) Reddit
 session.
 
-**Firefox:** coming soon to [addons.mozilla.org](https://addons.mozilla.org/).
-Until then, build it from source below.
+**[Add to Firefox](https://addons.mozilla.org/firefox/addon/reddit-slideshow-spectacular/)**
+— free, from Firefox Add-ons. Same private, local, logged-in-session behavior
+as the Chrome build.
 
 ### Build from source
 
@@ -207,8 +208,9 @@ The core logic in `lib/` is DOM/extension-agnostic and unit-tested; the
 
 ## Status
 
-v1 is feature-complete and unit-tested. Distribution (AMO signing/listing) is not
-done yet.
+v1 is feature-complete and unit-tested, and published on both the
+[Chrome Web Store](https://chromewebstore.google.com/detail/reddit-slideshow-spectacu/pcfajhfnnkkpadnfedkgjfgclffeoenp)
+and [Firefox Add-ons](https://addons.mozilla.org/firefox/addon/reddit-slideshow-spectacular/).
 
 ## Privacy
 

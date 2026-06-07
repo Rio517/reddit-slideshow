@@ -18,6 +18,11 @@ as-is.
 **Homepage / website URL (both stores have a field for this):**
 https://rio517.github.io/reddit-slideshow-spectacular/
 
+**Live listings:**
+
+- Chrome Web Store: https://chromewebstore.google.com/detail/reddit-slideshow-spectacu/pcfajhfnnkkpadnfedkgjfgclffeoenp
+- Firefox Add-ons: https://addons.mozilla.org/firefox/addon/reddit-slideshow-spectacular/
+
 ---
 
 ## 2. Summary / short description
