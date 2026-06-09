@@ -96,5 +96,65 @@
   "helpAboutEnd": {
     "message": ".",
     "description": "Help-panel about footer: trailing period after the donation link."
+  },
+  "settingsTitle": {
+    "message": "Settings",
+    "description": "Title of the in-overlay settings panel."
+  },
+  "settingsClose": {
+    "message": "Close settings",
+    "description": "Accessible label for the settings-panel close button."
+  },
+  "settingsTimer": {
+    "message": "Time per image",
+    "description": "Settings-panel label for the per-image timer slider."
+  },
+  "settingsTimerBar": {
+    "message": "Top Timer Bar",
+    "description": "Settings-panel label for the top timer-bar radios."
+  },
+  "settingsTimerBarGroup": {
+    "message": "Top timer bar",
+    "description": "Accessible group label for the top timer-bar radios."
+  },
+  "settingsTimerBarNone": {
+    "message": "None",
+    "description": "Settings-panel top-timer-bar option: none."
+  },
+  "settingsTimerBarVideo": {
+    "message": "Videos Only",
+    "description": "Settings-panel top-timer-bar option: videos only."
+  },
+  "settingsTimerBarAll": {
+    "message": "All",
+    "description": "Settings-panel top-timer-bar option: all."
+  },
+  "settingsAutoplay": {
+    "message": "Autoplay videos",
+    "description": "Settings-panel checkbox: autoplay videos."
+  },
+  "settingsStartMuted": {
+    "message": "Start muted",
+    "description": "Settings-panel checkbox: start muted."
+  },
+  "settingsIncludeNsfw": {
+    "message": "Include NSFW",
+    "description": "Settings-panel checkbox: include NSFW."
+  },
+  "settingsDedupe": {
+    "message": "Skip duplicates",
+    "description": "Settings-panel checkbox: skip duplicates."
+  },
+  "settingsPanZoom": {
+    "message": "Pan & zoom large images",
+    "description": "Settings-panel checkbox: pan and zoom large images."
+  },
+  "settingsAlwaysShowMeta": {
+    "message": "Always show count, title & skips",
+    "description": "Settings-panel checkbox: always show count, title and skips."
+  },
+  "settingsFullPreferences": {
+    "message": "Full preferences ↗",
+    "description": "Settings-panel button opening the full options page."
   }
 }
