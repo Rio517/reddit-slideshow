@@ -8,7 +8,7 @@ import { base64ToArrayBuffer } from "@/lib/bytes-base64.js";
 import { redgifsVideoSlide } from "@/lib/redgifs.js";
 import { redgifsId } from "@/lib/slides.js";
 import { createLogger } from "@/lib/log.js";
-import { setMessageGetter, setLocale } from "@/lib/i18n.js";
+import { setLocale, resolveLocale } from "@/lib/i18n.js";
 
 const log = createLogger("content");
 
@@ -19,12 +19,13 @@ export default defineContentScript({
   matches: ["https://old.reddit.com/*", "https://www.reddit.com/*"],
   cssInjectionMode: "manifest",
   main() {
-    // Drive the overlay's strings + direction from the browser's UI language.
-    // Wrapped (not a bare reference) so getMessage keeps its `this` binding.
-    setMessageGetter((key, subs) =>
-      browser.i18n.getMessage(/** @type {any} */ (key), subs),
-    );
-    setLocale(browser.i18n.getUILanguage());
+    // UI language: an immediate best-guess from the browser, then the stored
+    // override once settings load (and on change, applied to the next show start).
+    const uiLang = browser.i18n.getUILanguage();
+    setLocale(resolveLocale("auto", uiLang));
+    getSettings()
+      .then((s) => setLocale(resolveLocale(s.locale, uiLang)))
+      .catch(() => {});
 
     const session = createSlideshowSession({
       doc: document,
@@ -180,7 +181,10 @@ export default defineContentScript({
     browser.storage.onChanged.addListener((_changes, area) => {
       if (area !== "local") return;
       getSettings()
-        .then((next) => session.applyLiveSettings(next))
+        .then((next) => {
+          setLocale(resolveLocale(next.locale, uiLang));
+          session.applyLiveSettings(next);
+        })
         .catch((err) => log.warn("applyLiveSettings failed", err));
     });
 
