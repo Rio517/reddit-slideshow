@@ -36,5 +36,77 @@
   "actionTitle": {
     "message": "Start Reddit Slideshow Spectacular!",
     "description": "Toolbar button tooltip and keyboard-command description."
+  },
+  "helpAriaLabel": {
+    "message": "Keyboard shortcuts",
+    "description": "Accessible label for the keyboard-shortcuts help panel."
+  },
+  "helpTitle": {
+    "message": "Keyboard shortcuts",
+    "description": "Title of the keyboard-shortcuts help panel."
+  },
+  "helpClose": {
+    "message": "Close keyboard shortcuts",
+    "description": "Accessible label for the help-panel close button."
+  },
+  "helpIntro": {
+    "message": " is optimized for hands-free or keyboard navigation.",
+    "description": "Help-panel intro line; follows the italicized product name."
+  },
+  "helpShortcutLaunch": {
+    "message": "Launch the slideshow",
+    "description": "Help-panel shortcut description: launch."
+  },
+  "helpShortcutPrevNext": {
+    "message": "Previous / next slide",
+    "description": "Help-panel shortcut description: previous/next slide."
+  },
+  "helpShortcutNextPost": {
+    "message": "Skip to the next post",
+    "description": "Help-panel shortcut description: skip to next post."
+  },
+  "helpShortcutJump": {
+    "message": "Jump back / ahead 10",
+    "description": "Help-panel shortcut description: jump 10 back/ahead."
+  },
+  "helpShortcutVote": {
+    "message": "Upvote / downvote the post",
+    "description": "Help-panel shortcut description: upvote/downvote."
+  },
+  "helpShortcutPlayPause": {
+    "message": "Play / pause",
+    "description": "Help-panel shortcut description: play/pause."
+  },
+  "helpShortcutMute": {
+    "message": "Mute / unmute",
+    "description": "Help-panel shortcut description: mute/unmute."
+  },
+  "helpShortcutFullscreen": {
+    "message": "Fullscreen",
+    "description": "Help-panel shortcut description: fullscreen."
+  },
+  "helpShortcutEscape": {
+    "message": "Close, or dismiss an open panel",
+    "description": "Help-panel shortcut description: escape/dismiss."
+  },
+  "helpAboutFree": {
+    "message": " is free and ",
+    "description": "Help-panel about footer; follows the italicized product name."
+  },
+  "helpAboutOpenSource": {
+    "message": "open source",
+    "description": "Help-panel about footer: open-source link text."
+  },
+  "helpAboutConsider": {
+    "message": ", but consider a ",
+    "description": "Help-panel about footer; between the two links."
+  },
+  "helpAboutDonation": {
+    "message": "donation",
+    "description": "Help-panel about footer: donation link text."
+  },
+  "helpAboutEnd": {
+    "message": ".",
+    "description": "Help-panel about footer: trailing period after the donation link."
   }
 }
