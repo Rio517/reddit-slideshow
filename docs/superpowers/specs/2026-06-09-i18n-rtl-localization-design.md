@@ -12,10 +12,12 @@ The work splits into three tiers:
    strings + full RTL.
 3. **Ship the languages** — locale catalogs for es/fr/de/it/ar.
 
-**Ownership:** the maintainer supplies the foreign-language text. This design
-builds all infrastructure, the complete English catalog, full RTL, and
-ready-to-fill templates/stubs for the five other locales (which fall back to
-English until filled).
+**Ownership:** this design produces everything, including the foreign-language
+text. All infrastructure, the complete English catalog, full RTL, and the
+es/fr/de/it/ar translations (both UI catalogs and store listings) are delivered
+here. Translations are machine-drafted (Modern Standard Arabic for `ar`) and
+flagged for a recommended native-speaker review pass; English fallback covers
+any key left untranslated.
 
 ## Goals
 
@@ -117,13 +119,13 @@ per-category keys (`<base>_one`, `_two`, `_few`, `_many`, `_other`; full set so
 Arabic is correct) and let `tn()` pick via `Intl.PluralRules`, defaulting to
 `_other`. Phrase other counts to avoid grammatical plurals where possible.
 
-### Locale catalogs & stubs (Tier 3)
+### Locale catalogs (Tier 3)
 
-`_locales/{es,fr,de,it,ar}/messages.json` are generated with the **full English
-key set**, English values as placeholders, and the `description` field populated
-as a translator hint. Until edited they fall back to English; once edited they
-go live. A unit test enforces key parity with `en` (no missing/extra keys, and
-plural-category keys present) so a locale can't silently drift.
+`_locales/{es,fr,de,it,ar}/messages.json` are delivered fully translated, with
+the **full English key set** (including plural categories) and the `description`
+field carried over as context. Any key left untranslated falls back to English.
+A unit test enforces key parity with `en` (no missing/extra keys, plural
+categories present) so a locale can't silently drift.
 
 ### Store-listing localization (Tier 1)
 
@@ -132,9 +134,9 @@ plural-category keys present) so a locale can't silently drift.
 - `en.md` — canonical, synced from the **live public Firefox Add-ons listing**
   (name, summary, full description: WHAT IT PLAYS / CONTROLS / NICE TOUCHES /
   SETTINGS / PRIVACY). Captured below.
-- `{es,fr,de,it,ar}.md` — same structure with English source + a "translate
-  this" marker per field, for the maintainer to fill and paste into the AMO and
-  Chrome per-locale listing fields. `ar.md` notes the copy is RTL.
+- `{es,fr,de,it,ar}.md` — the English listing translated into each locale,
+  ready to paste into the Firefox Add-ons and Chrome per-locale listing fields.
+  `ar.md` is RTL copy.
 
 These are documentation deliverables; the stores' localized fields are entered
 manually in each dashboard.
@@ -173,14 +175,15 @@ Small commits, no push without explicit go:
    visually unchanged.
 2. Full RTL (logical CSS, `dir` toggle, byline bidi isolation). Verify en
    unchanged; spot-check pseudo-RTL.
-3. Locale stubs for es/fr/de/it/ar + key-parity tests.
-4. Store-listing templates under `docs/store-listing/`.
+3. Translated locale catalogs for es/fr/de/it/ar + key-parity tests.
+4. Translated store listings under `docs/store-listing/`.
 5. Flag the real-browser verification items.
 
 ## Risks / open items
 
 - WXT `_locales` output placement — confirm in step 1.
-- Translation quality (esp. Arabic MSA) is the maintainer's to supply; infra
-  ships regardless.
+- Translations are machine-drafted (esp. Arabic MSA) and should get a
+  native-speaker review pass before a wide release; English fallback de-risks
+  any gap.
 - RTL of the options page may surface layout quirks not visible offline — caught
   in real-browser verification.
