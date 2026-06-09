@@ -1,9 +1,12 @@
 # NEXT_STEP - Reddit Slideshow Spectacular!
 
 **Branch:** `main` · **Status:** local green gate (typecheck/lint/format/test +
-both builds + web-ext lint). What remains is the real-browser confirm in §1 and
-the deferred 1.0.0 version bump (user's call). Streaming the proxy fallback is
-parked (see the §1 note).
+both builds + web-ext lint). v1.0.0 is live on both stores. Localization
+(i18n + RTL — en/es/fr/de/it/ar, browser-language auto-select, full RTL for
+Arabic) is implemented on `main` and green locally, but unpushed and unreleased.
+What remains is the real-browser confirm in §1, an optional native-speaker pass
+on the machine-drafted translations, and the 1.1.0 release (user's call).
+Streaming the proxy fallback is parked (see the §1 note).
 
 > **Hard rule:** work directly on `main`. Do not create branches or worktrees unless the user explicitly asks. See `AGENTS.md`.
 
@@ -39,9 +42,22 @@ giant commit.
 
 ### Requested, not yet done
 
-- **Version bump to 1.0.0** when the user gives the go: only `package.json:3`
-  (WXT propagates it to both manifests), then tag + publish `v1.0.0` to trigger
-  `release.yml`. Left undone deliberately.
+- **Localization release (1.1.0)** when the user gives the go. The i18n + RTL
+  work is implemented on `main` and green locally, but unpushed and unreleased.
+  Architecture: native WebExtension `_locales` (browser auto-selects by UI
+  language); the agnostic `lib/` core never calls `browser.i18n` — `lib/i18n.js`
+  exposes `t`/`tn`/`localeDirection` with a bundled English fallback, and the
+  entrypoints inject `browser.i18n.getMessage` + the UI language. Source of truth
+  is `locales/<lang>.json` (6 files, 127 keys); `scripts/build-locales.mjs`
+  (npm run locales) generates the committed `public/_locales/**`; the catalog
+  integrity test enforces sync + key + placeholder parity. To ship: bump
+  `package.json:3` to `1.1.0` (WXT propagates to both manifests), push, then
+  tag + publish `v1.1.0` to trigger `release.yml`. Before release: (a) do the
+  Localization + RTL real-browser confirm in §1 below; (b) the translations are
+  machine-drafted and want a native-speaker pass, especially Arabic (~25% of
+  installs); (c) paste the localized listing copy from
+  `docs/store-listing/{en,es,fr,de,it,ar}.md` into the Firefox Add-ons and Chrome
+  per-locale listing fields.
 
 > **Not planned:** streaming the proxy fallback (MediaSource) was investigated
 > and parked - it needs a few-hundred-KB in-browser remuxer for a narrow
