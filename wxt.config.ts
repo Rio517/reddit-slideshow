@@ -4,8 +4,8 @@ export default defineConfig({
   manifestVersion: 3,
   manifest: ({ browser }) => ({
     name: "Reddit Slideshow Spectacular!",
-    description:
-      "Turn an old or new Reddit feed into a full-screen, keyboard-driven media slideshow.",
+    default_locale: "en",
+    description: "__MSG_extDescription__",
     homepage_url: "https://rio517.github.io/reddit-slideshow-spectacular/",
     // "downloads": save the displayed media to the user's downloads on demand
     // (the in-overlay download control), driven from the background.
@@ -57,7 +57,7 @@ export default defineConfig({
       128: "icon/128.png",
     },
     action: {
-      default_title: "Start Reddit Slideshow Spectacular!",
+      default_title: "__MSG_actionTitle__",
       default_icon: {
         16: "icon/16.png",
         32: "icon/32.png",
@@ -68,7 +68,7 @@ export default defineConfig({
     commands: {
       _execute_action: {
         suggested_key: { default: "Alt+Shift+S" },
-        description: "Start Reddit Slideshow Spectacular!",
+        description: "__MSG_actionTitle__",
       },
     },
     // Firefox-only: gecko id + data-collection declaration. Omitted on Chrome,

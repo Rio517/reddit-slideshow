@@ -32,5 +32,13 @@
         "content": "$1"
       }
     }
+  },
+  "extDescription": {
+    "message": "Turn an old or new Reddit feed into a full-screen, keyboard-driven media slideshow.",
+    "description": "Store/about description (shown in the browser's add-ons page and stores)."
+  },
+  "actionTitle": {
+    "message": "Start Reddit Slideshow Spectacular!",
+    "description": "Toolbar button tooltip and keyboard-command description."
   }
 }
