@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
@@ -9,7 +9,9 @@ import enRaw from "../../locales/en.json";
 const en = /** @type {any} */ (enRaw);
 const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const enKeys = Object.keys(en).sort();
-const locales = ["en", "es", "fr", "de", "it", "ar"];
+const locales = readdirSync(join(root, "locales"))
+  .filter((f) => f.endsWith(".json"))
+  .map((f) => f.replace(/\.json$/, ""));
 
 /** @param {string} lang */
 function loadSource(lang) {
@@ -39,7 +41,7 @@ describe("locale catalogs", () => {
     const cat = loadSource(lang);
     for (const key of enKeys) {
       const expected = Object.keys(en[key].placeholders ?? {}).sort();
-      const actual = Object.keys(cat[key].placeholders ?? {}).sort();
+      const actual = Object.keys((cat[key] ?? {}).placeholders ?? {}).sort();
       expect(actual, `${lang}/${key} placeholders`).toEqual(expected);
     }
   });
