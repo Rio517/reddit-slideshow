@@ -1,14 +1,17 @@
 # NEXT_STEP - Reddit Slideshow Spectacular!
 
-**Branch:** `main` · **Status:** local green gate (typecheck/lint/format/test +
-both builds + web-ext lint). v1.0.0 is live on both stores. Localization
-(i18n + RTL — en/es/fr/de/it/ar, full RTL for Arabic) plus an in-app Language
-picker are implemented on `main` and green locally, but unpushed and unreleased.
-The UI auto-detects the browser language and can be overridden under **Language**
-on the options page. What remains is the real-browser confirm in §1, an optional
-native-speaker pass on the machine-drafted translations, and the 1.1.0 release
-(user's call).
-Streaming the proxy fallback is parked (see the §1 note).
+**Branch:** `main` · **Status:** CI-green on `main`. v1.0.0 is live on both
+stores. **v1.1.0 — localization (i18n + RTL — en/es/fr/de/it/ar, full RTL for
+Arabic) plus an in-app Language picker — is pushed and released on GitHub**
+(tag `v1.1.0`; `release.yml` built + attached the Firefox / AMO-sources / Chrome
+zips). The UI auto-detects the browser language and can be overridden under
+**Language** on the options page. What remains for v1.1.0 to reach users:
+upload the release zips to the Chrome Web Store + Firefox Add-ons dashboards and
+submit for review, paste the localized listing copy from
+`docs/store-listing/{en,es,fr,de,it,ar}.md` into each store's per-locale fields,
+and (optional, recommended) a native-speaker pass on the machine-drafted
+translations — especially Arabic (~25% of installs); English fallback covers any
+gap meanwhile. Streaming the proxy fallback is parked (see the §1 note).
 
 > **Hard rule:** work directly on `main`. Do not create branches or worktrees unless the user explicitly asks. See `AGENTS.md`.
 
@@ -44,9 +47,17 @@ giant commit.
 
 ### Requested, not yet done
 
-- **Localization release (1.1.0)** when the user gives the go. The i18n + RTL
-  work plus an in-app Language picker are implemented on `main` and green
-  locally, but unpushed and unreleased. Architecture: source of truth is
+- **Localization release (1.1.0) — submit to the stores.** v1.1.0 (i18n + RTL +
+  in-app Language picker) is pushed and released on GitHub (tag `v1.1.0`, store
+  zips attached by `release.yml`). To reach users: download the release zips and
+  upload `*-chrome.zip` to the Chrome Web Store and `*-firefox.zip` (+
+  `*-sources.zip`, the build minifies) to Firefox Add-ons, submit both for
+  review, and paste the localized listing copy from
+  `docs/store-listing/{en,es,fr,de,it,ar}.md` into each store's per-locale fields.
+  A native-speaker pass on the machine-drafted translations (especially Arabic,
+  ~25% of installs) is recommended but optional — English fallback covers gaps,
+  and any locale file can be refreshed without code changes. Architecture
+  reference: source of truth is
   `locales/<lang>.json` (6 files, 129 keys); `lib/i18n.js` bundles all six
   catalogs and the default getter reads `CATALOGS[activeLocale]` with per-key
   English fallback, so `setLocale(resolveLocale(setting, uiLang))` switches
@@ -59,14 +70,7 @@ giant commit.
   `scripts/build-locales.mjs` (npm run locales) generates the committed
   `public/_locales/**`; the catalog integrity test enforces sync + key +
   placeholder parity. (Catalogs ship both bundled in JS and in `_locales` for the
-  manifest, so the package is ~516 KB — fine for an extension.) To ship: bump
-  `package.json:3` to `1.1.0` (WXT propagates to both manifests), push, then
-  tag + publish `v1.1.0` to trigger `release.yml`. Before release: (a) do the
-  Localization + RTL real-browser confirm in §1 below; (b) the translations are
-  machine-drafted and want a native-speaker pass, especially Arabic (~25% of
-  installs); (c) paste the localized listing copy from
-  `docs/store-listing/{en,es,fr,de,it,ar}.md` into the Firefox Add-ons and Chrome
-  per-locale listing fields.
+  manifest, so the package is ~516 KB — fine for an extension.)
 
 > **Not planned:** streaming the proxy fallback (MediaSource) was investigated
 > and parked - it needs a few-hundred-KB in-browser remuxer for a narrow
