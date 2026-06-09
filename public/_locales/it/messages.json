@@ -377,5 +377,33 @@
   "uiAnnounceNsfw": {
     "message": ", NSFW",
     "description": "Screen-reader announcement fragment marking an NSFW slide."
+  },
+  "skipReasonVideo": {
+    "message": "Video didn't load",
+    "description": "Skip reason: a video failed to load."
+  },
+  "skipReasonFetch": {
+    "message": "Couldn't fetch video",
+    "description": "Skip reason: a proxied video's bytes couldn't be fetched."
+  },
+  "skipReasonEmbed": {
+    "message": "Embed didn't load",
+    "description": "Skip reason: an embedded provider iframe failed to load."
+  },
+  "skipReasonImage": {
+    "message": "Image didn't load",
+    "description": "Skip reason: an image failed to load."
+  },
+  "skipReasonUnsupported": {
+    "message": "Unsupported link",
+    "description": "Skip reason: the media URL is unsupported (non-HTTPS or off-host)."
+  },
+  "skipReasonUnavailable": {
+    "message": "Unavailable",
+    "description": "Skip reason: generic fallback when media is unavailable."
+  },
+  "skipReasonDuplicate": {
+    "message": "Duplicate image",
+    "description": "Skip reason: a perceptual-duplicate image was skipped."
   }
 }
