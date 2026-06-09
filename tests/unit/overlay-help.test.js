@@ -1,8 +1,10 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { createHelpPanel } from "../../lib/overlay-help.js";
+import { setMessageGetter } from "../../lib/i18n.js";
 
 afterEach(() => {
   document.body.innerHTML = "";
+  setMessageGetter(null);
 });
 
 function make() {
@@ -93,6 +95,21 @@ describe("createHelpPanel", () => {
       expect(a.getAttribute("target")).toBe("_blank");
       expect(a.getAttribute("rel")).toContain("noopener");
     }
+  });
+
+  it("lets a translation reorder the brand marker within the intro", () => {
+    // Template with $brand$ at the END proves fillTemplate honors word order:
+    // the <em> should follow the leading text, not be pinned to the front.
+    setMessageGetter((key) => (key === "helpIntro" ? "Use $brand$." : ""));
+    const { root } = make();
+    const intro = /** @type {HTMLElement} */ (
+      root.querySelector(".rs-help-panel__intro")
+    );
+    expect(intro.textContent).toBe("Use Reddit Slideshow Spectacular!.");
+    expect(intro.firstChild?.nodeName).toBe("#text");
+    expect(intro.querySelector("em")?.textContent).toBe(
+      "Reddit Slideshow Spectacular!",
+    );
   });
 
   it("orders the panel as intro, list, about", () => {

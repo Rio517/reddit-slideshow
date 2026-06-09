@@ -14,6 +14,33 @@ setMessageGetter((key, subs) =>
 );
 localizeDocument(document, browser.i18n.getUILanguage());
 
+/**
+ * Build a fragment from a template containing $name$ markers, replacing each
+ * marker with the provided node and the rest with text nodes. Lets translators
+ * reorder the sentence around the dynamic nodes.
+ * @param {Document} doc
+ * @param {string} template
+ * @param {Record<string, Node>} nodes
+ */
+function fillTemplate(doc, template, nodes) {
+  const frag = doc.createDocumentFragment();
+  for (const part of template.split(/(\$[A-Za-z0-9_]+\$)/)) {
+    const m = part.match(/^\$([A-Za-z0-9_]+)\$$/);
+    if (m && nodes[m[1]]) frag.append(nodes[m[1]]);
+    else if (part) frag.append(doc.createTextNode(part));
+  }
+  return frag;
+}
+
+// Footer sentence: one translatable message with a $brand$ marker; the brand
+// stays a literal <em> so translators reorder around it without editing markup.
+const footerText = document.querySelector("#footerText");
+if (footerText) {
+  const brand = document.createElement("em");
+  brand.textContent = "Reddit Slideshow Spectacular!";
+  footerText.replaceChildren(fillTemplate(document, t("optFooter"), { brand }));
+}
+
 const timerSlider = requiredElement("#imageTimerSeconds", HTMLInputElement);
 const timerValue = requiredElement("#timerValue", HTMLOutputElement);
 const autoplay = requiredElement("#autoplay", HTMLInputElement);
