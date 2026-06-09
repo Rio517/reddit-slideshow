@@ -23,7 +23,7 @@ export default defineContentScript({
     // override once settings load (and on change, applied to the next show start).
     const uiLang = browser.i18n.getUILanguage();
     setLocale(resolveLocale("auto", uiLang));
-    getSettings()
+    const localeReady = getSettings()
       .then((s) => setLocale(resolveLocale(s.locale, uiLang)))
       .catch(() => {});
 
@@ -194,9 +194,10 @@ export default defineContentScript({
       return Promise.resolve({ ok: true });
     });
 
-    // A popout window opens the feed with the marker fragment; auto-start there.
+    // A popout window opens the feed with the marker fragment; auto-start once
+    // the saved locale is applied so the overlay isn't built in the wrong language.
     if (window.location.hash === `#${POPOUT_MARKER}`) {
-      session.start();
+      localeReady.then(() => session.start());
     }
   },
 });

@@ -27,10 +27,8 @@ function relocalize(locale) {
       fillTemplate(document, t("optFooter"), { brand }),
     );
   }
+  refreshPanZoomOutputs();
 }
-
-// Immediate best-guess; load() re-applies the stored choice.
-relocalize(resolveLocale("auto", uiLang));
 
 const timerSlider = requiredElement("#imageTimerSeconds", HTMLInputElement);
 const timerValue = requiredElement("#timerValue", HTMLOutputElement);
@@ -90,6 +88,17 @@ function panZoomOutText(id, value) {
   return value;
 }
 
+/** Set every pan-zoom <output> from its current slider value (locale-aware). */
+function refreshPanZoomOutputs() {
+  for (const [id, outId] of PAN_ZOOM_RANGES) {
+    const out = document.querySelector(`#${outId}`);
+    if (out) out.textContent = panZoomOutText(id, panZoomInputs[id].value);
+  }
+}
+
+// Immediate best-guess; load() re-applies the stored choice.
+relocalize(resolveLocale("auto", uiLang));
+
 async function load() {
   const settings = await getSettings();
   locale.value = settings.locale;
@@ -109,12 +118,10 @@ async function load() {
   }
   contentDedup.checked = settings.contentDedup;
   panZoom.checked = settings.panZoom;
-  for (const [id, outId] of PAN_ZOOM_RANGES) {
-    const value = String(/** @type {any} */ (settings)[id]);
-    panZoomInputs[id].value = value;
-    const out = document.querySelector(`#${outId}`);
-    if (out) out.textContent = panZoomOutText(id, value);
+  for (const [id] of PAN_ZOOM_RANGES) {
+    panZoomInputs[id].value = String(/** @type {any} */ (settings)[id]);
   }
+  refreshPanZoomOutputs();
   syncPanZoomEnabled();
 }
 
