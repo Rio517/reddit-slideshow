@@ -348,11 +348,13 @@
   <body>
     <main>
       <h1>Reddit Slideshow <span class="brand-neon">Spectacular!</span></h1>
-      <p class="sub">Settings apply the next time you start a slideshow.</p>
+      <p class="sub" data-i18n="optSubtitle">
+        Settings apply the next time you start a slideshow.
+      </p>
 
       <label class="field">
         <span class="field__label">
-          <span>Time per image</span>
+          <span data-i18n="optTimePerImage">Time per image</span>
           <span><output id="timerValue">5s</output></span>
         </span>
         <!-- Non-linear: value is an index into IMAGE_TIMER_STOPS (set live by
@@ -369,37 +371,47 @@
 
       <label class="field">
         <span class="field__label">
-          <span>Transition between slides</span>
+          <span data-i18n="optTransition">Transition between slides</span>
         </span>
         <select id="transition">
-          <option value="none">None</option>
-          <option value="fade">Fade</option>
-          <option value="slide">Slide</option>
-          <option value="push">Push</option>
-          <option value="zoom">Zoom</option>
-          <option value="flip">Flip</option>
+          <option value="none" data-i18n="optTransitionNone">None</option>
+          <option value="fade" data-i18n="optTransitionFade">Fade</option>
+          <option value="slide" data-i18n="optTransitionSlide">Slide</option>
+          <option value="push" data-i18n="optTransitionPush">Push</option>
+          <option value="zoom" data-i18n="optTransitionZoom">Zoom</option>
+          <option value="flip" data-i18n="optTransitionFlip">Flip</option>
         </select>
       </label>
 
       <div class="field">
-        <span class="field__label"><span>Top Timer Bar</span></span>
+        <span class="field__label"
+          ><span data-i18n="optTimerBar">Top Timer Bar</span></span
+        >
         <div class="radio">
           <label class="radio__opt">
-            <input type="radio" name="timerBar" value="none" /> None
+            <input type="radio" name="timerBar" value="none" />
+            <span data-i18n="optTimerBarNone">None</span>
           </label>
           <label class="radio__opt">
-            <input type="radio" name="timerBar" value="video" /> Videos Only
+            <input type="radio" name="timerBar" value="video" />
+            <span data-i18n="optTimerBarVideo">Videos Only</span>
           </label>
           <label class="radio__opt">
-            <input type="radio" name="timerBar" value="all" /> All
+            <input type="radio" name="timerBar" value="all" />
+            <span data-i18n="optTimerBarAll">All</span>
           </label>
         </div>
       </div>
 
       <label class="field">
         <span class="field__label">
-          <span>Skip media that won't load after</span>
-          <span><output id="maxLoadWaitValue">5</output> seconds</span>
+          <span data-i18n="optMaxLoadWait"
+            >Skip media that won't load after</span
+          >
+          <span
+            ><output id="maxLoadWaitValue">5</output>
+            <span data-i18n="optSeconds">seconds</span></span
+          >
         </span>
         <input
           id="maxLoadWaitSeconds"
@@ -413,35 +425,41 @@
 
       <label class="check">
         <input id="autoplay" type="checkbox" />
-        <span>Autoplay videos</span>
+        <span data-i18n="optAutoplay">Autoplay videos</span>
       </label>
 
       <label class="check">
         <input id="startMuted" type="checkbox" />
-        <span>Start videos muted</span>
+        <span data-i18n="optStartMuted">Start videos muted</span>
       </label>
 
       <label class="check">
         <input id="includeNsfw" type="checkbox" />
         <span>
-          Include NSFW content
-          <span class="hint">As Reddit shows it for your session.</span>
+          <span data-i18n="optIncludeNsfw">Include NSFW content</span>
+          <span class="hint" data-i18n="optIncludeNsfwHint"
+            >As Reddit shows it for your session.</span
+          >
         </span>
       </label>
 
       <label class="check">
         <input id="dedupe" type="checkbox" />
         <span>
-          Hide duplicate media
-          <span class="hint">Skip reposts and crossposts already shown.</span>
+          <span data-i18n="optDedupe">Hide duplicate media</span>
+          <span class="hint" data-i18n="optDedupeHint"
+            >Skip reposts and crossposts already shown.</span
+          >
         </span>
       </label>
 
       <label class="check">
         <input id="alwaysShowMeta" type="checkbox" />
         <span>
-          Always show count, title &amp; skips
-          <span class="hint">
+          <span data-i18n="optAlwaysShowMeta"
+            >Always show count, title &amp; skips</span
+          >
+          <span class="hint" data-i18n="optAlwaysShowMetaHint">
             Keep them visible even when the controls auto-hide, so a gap in the
             count from a skipped item stays explained.
           </span>
@@ -451,8 +469,8 @@
       <label class="check">
         <input id="contentDedup" type="checkbox" />
         <span>
-          Also skip re-uploaded images
-          <span class="hint">
+          <span data-i18n="optContentDedup">Also skip re-uploaded images</span>
+          <span class="hint" data-i18n="optContentDedupHint">
             Catches the same image re-posted under a new link (solo vs in a
             gallery). On by default; turn off if it ever over-skips.
           </span>
@@ -463,8 +481,10 @@
         <label class="panzoom__head">
           <input id="panZoom" type="checkbox" />
           <span class="panzoom__heading">
-            <span class="panzoom__title">Pan &amp; zoom large images</span>
-            <span class="hint">
+            <span class="panzoom__title" data-i18n="optPanZoom"
+              >Pan &amp; zoom large images</span
+            >
+            <span class="hint" data-i18n="optPanZoomHint">
               A slow pan and zoom, only on images too big to see at once - push
               in, drift top→bottom, pull back out.
             </span>
@@ -474,7 +494,9 @@
         <div class="panzoom__body">
           <div class="pz-row">
             <span class="pz-row__label">
-              <span>Pan &amp; zoom applies to</span>
+              <span data-i18n="optPanZoomApplies"
+                >Pan &amp; zoom applies to</span
+              >
               <!-- The "×" lives in the output; main.js shows "All images" at 1×. -->
               <span><output id="panZoomMinOversizeValue">1.5×</output></span>
             </span>
@@ -486,7 +508,7 @@
               step="0.05"
               value="1.5"
             />
-            <span class="pz-row__note">
+            <span class="pz-row__note" data-i18n="optPanZoomAppliesNote">
               “All images” moves every image. Higher only moves images that much
               larger than the window - the rest just show for the normal timer.
             </span>
@@ -494,7 +516,7 @@
 
           <div class="pz-row">
             <span class="pz-row__label">
-              <span>Zoom level</span>
+              <span data-i18n="optPanZoomZoomLevel">Zoom level</span>
               <span><output id="panZoomScaleValue">2</output>×</span>
             </span>
             <input
@@ -508,13 +530,15 @@
           </div>
 
           <div class="pz-seq">
-            <span class="pz-seq__title">Per-image sequence</span>
+            <span class="pz-seq__title" data-i18n="optPanZoomSequence"
+              >Per-image sequence</span
+            >
             <ol class="pz-steps">
               <li class="pz-step">
                 <span class="pz-step__num">1</span>
                 <label class="pz-step__ctl">
                   <span class="pz-row__label">
-                    <span>Show whole image</span>
+                    <span data-i18n="optPanZoomShow">Show whole image</span>
                     <span><output id="panZoomShowValue">2</output> s</span>
                   </span>
                   <input
@@ -531,7 +555,7 @@
                 <span class="pz-step__num">2</span>
                 <label class="pz-step__ctl">
                   <span class="pz-row__label">
-                    <span>Zoom in</span>
+                    <span data-i18n="optPanZoomZoomIn">Zoom in</span>
                     <span><output id="panZoomZoomInValue">2</output> s</span>
                   </span>
                   <input
@@ -548,7 +572,7 @@
                 <span class="pz-step__num">3</span>
                 <label class="pz-step__ctl">
                   <span class="pz-row__label">
-                    <span>Pan top → bottom</span>
+                    <span data-i18n="optPanZoomPan">Pan top → bottom</span>
                     <span><output id="panZoomPanValue">6</output> s</span>
                   </span>
                   <input
@@ -565,7 +589,7 @@
                 <span class="pz-step__num">4</span>
                 <label class="pz-step__ctl">
                   <span class="pz-row__label">
-                    <span>Zoom out</span>
+                    <span data-i18n="optPanZoomZoomOut">Zoom out</span>
                     <span><output id="panZoomZoomOutValue">2</output> s</span>
                   </span>
                   <input
@@ -582,7 +606,9 @@
                 <span class="pz-step__num">5</span>
                 <label class="pz-step__ctl">
                   <span class="pz-row__label">
-                    <span>Show whole image again</span>
+                    <span data-i18n="optPanZoomShowEnd"
+                      >Show whole image again</span
+                    >
                     <span><output id="panZoomShowEndValue">2</output> s</span>
                   </span>
                   <input
@@ -601,12 +627,14 @@
       </section>
 
       <footer class="footer">
-        <em>Reddit Slideshow Spectacular!</em> is free and open source.<br />
+        <em>Reddit Slideshow Spectacular!</em
+        ><span data-i18n="optFooterText"> is free and open source.</span><br />
         <a
           class="footer__link"
           href="https://github.com/sponsors/Rio517"
           target="_blank"
           rel="noopener noreferrer"
+          data-i18n="optFooterLink"
           >Sponsor it on GitHub ↗</a
         >
       </footer>

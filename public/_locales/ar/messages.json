@@ -405,5 +405,161 @@
   "skipReasonDuplicate": {
     "message": "Duplicate image",
     "description": "Skip reason: a perceptual-duplicate image was skipped."
+  },
+  "optSubtitle": {
+    "message": "Settings apply the next time you start a slideshow.",
+    "description": "Options page subtitle under the heading."
+  },
+  "optTimePerImage": {
+    "message": "Time per image",
+    "description": "Options label for the per-image timer slider."
+  },
+  "optTransition": {
+    "message": "Transition between slides",
+    "description": "Options label for the slide-transition select."
+  },
+  "optTransitionNone": {
+    "message": "None",
+    "description": "Transition option: none."
+  },
+  "optTransitionFade": {
+    "message": "Fade",
+    "description": "Transition option: fade."
+  },
+  "optTransitionSlide": {
+    "message": "Slide",
+    "description": "Transition option: slide."
+  },
+  "optTransitionPush": {
+    "message": "Push",
+    "description": "Transition option: push."
+  },
+  "optTransitionZoom": {
+    "message": "Zoom",
+    "description": "Transition option: zoom."
+  },
+  "optTransitionFlip": {
+    "message": "Flip",
+    "description": "Transition option: flip."
+  },
+  "optTimerBar": {
+    "message": "Top Timer Bar",
+    "description": "Options label for the top timer-bar radios."
+  },
+  "optTimerBarNone": {
+    "message": "None",
+    "description": "Options top-timer-bar option: none."
+  },
+  "optTimerBarVideo": {
+    "message": "Videos Only",
+    "description": "Options top-timer-bar option: videos only."
+  },
+  "optTimerBarAll": {
+    "message": "All",
+    "description": "Options top-timer-bar option: all."
+  },
+  "optMaxLoadWait": {
+    "message": "Skip media that won't load after",
+    "description": "Options label for the max-load-wait slider."
+  },
+  "optSeconds": {
+    "message": "seconds",
+    "description": "Unit suffix after the max-load-wait value (e.g. 5 seconds)."
+  },
+  "optAutoplay": {
+    "message": "Autoplay videos",
+    "description": "Options checkbox: autoplay videos."
+  },
+  "optStartMuted": {
+    "message": "Start videos muted",
+    "description": "Options checkbox: start videos muted."
+  },
+  "optIncludeNsfw": {
+    "message": "Include NSFW content",
+    "description": "Options checkbox: include NSFW content."
+  },
+  "optIncludeNsfwHint": {
+    "message": "As Reddit shows it for your session.",
+    "description": "Options hint under the include-NSFW checkbox."
+  },
+  "optDedupe": {
+    "message": "Hide duplicate media",
+    "description": "Options checkbox: hide duplicate media."
+  },
+  "optDedupeHint": {
+    "message": "Skip reposts and crossposts already shown.",
+    "description": "Options hint under the hide-duplicate-media checkbox."
+  },
+  "optAlwaysShowMeta": {
+    "message": "Always show count, title & skips",
+    "description": "Options checkbox: always show count, title and skips."
+  },
+  "optAlwaysShowMetaHint": {
+    "message": "Keep them visible even when the controls auto-hide, so a gap in the count from a skipped item stays explained.",
+    "description": "Options hint under the always-show-meta checkbox."
+  },
+  "optContentDedup": {
+    "message": "Also skip re-uploaded images",
+    "description": "Options checkbox: also skip re-uploaded images."
+  },
+  "optContentDedupHint": {
+    "message": "Catches the same image re-posted under a new link (solo vs in a gallery). On by default; turn off if it ever over-skips.",
+    "description": "Options hint under the also-skip-re-uploaded-images checkbox."
+  },
+  "optPanZoom": {
+    "message": "Pan & zoom large images",
+    "description": "Options pan-and-zoom card title."
+  },
+  "optPanZoomHint": {
+    "message": "A slow pan and zoom, only on images too big to see at once - push in, drift top→bottom, pull back out.",
+    "description": "Options hint under the pan-and-zoom card title."
+  },
+  "optPanZoomApplies": {
+    "message": "Pan & zoom applies to",
+    "description": "Options label for the pan-and-zoom oversize-threshold slider."
+  },
+  "optPanZoomAppliesNote": {
+    "message": "“All images” moves every image. Higher only moves images that much larger than the window - the rest just show for the normal timer.",
+    "description": "Options note under the pan-and-zoom oversize-threshold slider."
+  },
+  "optPanZoomAllImages": {
+    "message": "All images",
+    "description": "Pan-and-zoom oversize-threshold output value at the 1x minimum."
+  },
+  "optPanZoomZoomLevel": {
+    "message": "Zoom level",
+    "description": "Options label for the pan-and-zoom zoom-level slider."
+  },
+  "optPanZoomSequence": {
+    "message": "Per-image sequence",
+    "description": "Options heading for the pan-and-zoom per-image step sequence."
+  },
+  "optPanZoomShow": {
+    "message": "Show whole image",
+    "description": "Pan-and-zoom step 1: show the whole image."
+  },
+  "optPanZoomZoomIn": {
+    "message": "Zoom in",
+    "description": "Pan-and-zoom step 2: zoom in."
+  },
+  "optPanZoomPan": {
+    "message": "Pan top → bottom",
+    "description": "Pan-and-zoom step 3: pan top to bottom."
+  },
+  "optPanZoomZoomOut": {
+    "message": "Zoom out",
+    "description": "Pan-and-zoom step 4: zoom out."
+  },
+  "optPanZoomShowEnd": {
+    "message": "Show whole image again",
+    "description": "Pan-and-zoom step 5: show the whole image again."
+  },
+  "optFooterText": {
+    "message": " is free and open source.",
+    "description": "Options footer; follows the italicized product name."
+  },
+  "optFooterLink": {
+    "message": "Sponsor it on GitHub ↗",
+    "description": "Options footer: GitHub Sponsors link text."
   }
 }

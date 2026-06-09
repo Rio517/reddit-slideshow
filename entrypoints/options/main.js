@@ -6,7 +6,7 @@ import {
   formatImageTimer,
 } from "@/lib/settings.js";
 import { requiredElement } from "@/lib/dom.js";
-import { setMessageGetter } from "@/lib/i18n.js";
+import { setMessageGetter, t } from "@/lib/i18n.js";
 import { localizeDocument } from "@/lib/i18n-dom.js";
 
 setMessageGetter((key, subs) =>
@@ -66,7 +66,7 @@ const panZoomInputs = Object.fromEntries(
  */
 function panZoomOutText(id, value) {
   if (id === "panZoomMinOversize") {
-    return Number(value) <= 1 ? "All images" : `${value}×`;
+    return Number(value) <= 1 ? t("optPanZoomAllImages") : `${value}×`;
   }
   return value;
 }
