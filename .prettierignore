@@ -6,3 +6,4 @@ coverage/
 web-ext-artifacts/
 .claude/
 package-lock.json
+public/_locales/

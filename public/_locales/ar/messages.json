@@ -1,0 +1,36 @@
+{
+  "extName": {
+    "message": "Reddit Slideshow Spectacular!",
+    "description": "The extension name."
+  },
+  "byline": {
+    "message": "$author$ to $subreddit$",
+    "description": "Slide byline.",
+    "placeholders": {
+      "author": {
+        "content": "$1"
+      },
+      "subreddit": {
+        "content": "$2"
+      }
+    }
+  },
+  "skipped_one": {
+    "message": "$count$ skipped",
+    "description": "Skipped counter, singular.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "skipped_other": {
+    "message": "$count$ skipped",
+    "description": "Skipped counter, plural.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  }
+}

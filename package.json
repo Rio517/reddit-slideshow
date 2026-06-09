@@ -23,7 +23,8 @@
     "format": "prettier --check .",
     "webext:lint": "web-ext lint --source-dir .output/firefox-mv3",
     "screenshots": "node scripts/screenshots.mjs",
-    "promo": "node scripts/promo-tiles.mjs"
+    "promo": "node scripts/promo-tiles.mjs",
+    "locales": "node scripts/build-locales.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
