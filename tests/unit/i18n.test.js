@@ -19,7 +19,7 @@ describe("t", () => {
   });
 
   it("substitutes named placeholders positionally", () => {
-    expect(t("byline", ["u/alice", "r/pics"])).toBe("u/alice to r/pics");
+    expect(t("uiAnnouncePosition", ["5", "10"])).toBe("5 of 10");
   });
 
   it("coerces non-string substitutions", () => {
@@ -38,15 +38,13 @@ describe("t", () => {
   });
 
   it("inserts a substitution value containing $$ verbatim (single pass)", () => {
-    expect(t("byline", ["a$$b", "r/pics"])).toBe("a$$b to r/pics");
+    expect(t("uiAnnouncePosition", ["a$$b", "10"])).toBe("a$$b of 10");
   });
 
   it("does not re-substitute $name$ that appears inside a value", () => {
-    // byline has $author$ then $subreddit$; a value containing $subreddit$
+    // uiAnnouncePosition has $index$ then $total$; a value containing $total$
     // must be inserted verbatim, not re-expanded.
-    expect(t("byline", ["$subreddit$", "r/pics"])).toBe(
-      "$subreddit$ to r/pics",
-    );
+    expect(t("uiAnnouncePosition", ["$total$", "10"])).toBe("$total$ of 10");
   });
 });
 

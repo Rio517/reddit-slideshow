@@ -1,16 +1,4 @@
 {
-  "byline": {
-    "message": "$author$ to $subreddit$",
-    "description": "Slide byline.",
-    "placeholders": {
-      "author": {
-        "content": "$1"
-      },
-      "subreddit": {
-        "content": "$2"
-      }
-    }
-  },
   "skipped_one": {
     "message": "$count$ skipped",
     "description": "Skipped counter, singular.",

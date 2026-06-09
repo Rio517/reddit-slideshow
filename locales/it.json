@@ -1,31 +1,39 @@
 {
-  "byline": {
-    "message": "$author$ a $subreddit$",
-    "description": "Slide byline.",
-    "placeholders": {
-      "author": { "content": "$1" },
-      "subreddit": { "content": "$2" }
-    }
-  },
   "skipped_one": {
     "message": "$count$ saltato",
     "description": "Skipped counter, singular.",
-    "placeholders": { "count": { "content": "$1" } }
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   },
   "skipped_other": {
     "message": "$count$ saltati",
     "description": "Skipped counter, plural.",
-    "placeholders": { "count": { "content": "$1" } }
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   },
   "skippedTitle_one": {
     "message": "$count$ elemento saltato - clicca per visualizzare",
     "description": "Skipped-button tooltip, singular.",
-    "placeholders": { "count": { "content": "$1" } }
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   },
   "skippedTitle_other": {
     "message": "$count$ elementi saltati - clicca per visualizzare",
     "description": "Skipped-button tooltip, plural.",
-    "placeholders": { "count": { "content": "$1" } }
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   },
   "extDescription": {
     "message": "Trasforma un feed Reddit (vecchio o nuovo) in una presentazione multimediale a schermo intero, controllata da tastiera.",
@@ -278,7 +286,11 @@
   "uiConfirmKeepCountdown": {
     "message": "Continua a guardare ($seconds$s)",
     "description": "Confirmation button while it counts down to auto-dismiss.",
-    "placeholders": { "seconds": { "content": "$1" } }
+    "placeholders": {
+      "seconds": {
+        "content": "$1"
+      }
+    }
   },
   "uiConfirmDo": {
     "message": "Chiudi",
@@ -287,7 +299,11 @@
   "uiSkippedTitle": {
     "message": "Saltati ($count$)",
     "description": "Skipped-panel title with the total count.",
-    "placeholders": { "count": { "content": "$1" } }
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   },
   "uiSkippedUntitled": {
     "message": "Senza titolo",
@@ -296,7 +312,11 @@
   "uiSkippedNote": {
     "message": "Visualizzazione dei $count$ più recenti.",
     "description": "Skipped-panel note when only the most recent items are retained.",
-    "placeholders": { "count": { "content": "$1" } }
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   },
   "uiSkippedAnnounce": {
     "message": "Contenuto multimediale non disponibile saltato",
@@ -305,7 +325,11 @@
   "uiSkippedAnnounceTitled": {
     "message": "Contenuto multimediale non disponibile saltato: $title$",
     "description": "Screen-reader announcement when titled media is auto-skipped.",
-    "placeholders": { "title": { "content": "$1" } }
+    "placeholders": {
+      "title": {
+        "content": "$1"
+      }
+    }
   },
   "uiPlaceholderTitle": {
     "message": "Contenuto non disponibile",
@@ -331,14 +355,22 @@
     "message": "$index$ di $total$",
     "description": "Screen-reader announcement of the current slide position.",
     "placeholders": {
-      "index": { "content": "$1" },
-      "total": { "content": "$2" }
+      "index": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
     }
   },
   "uiAnnounceTitle": {
     "message": ", $title$",
     "description": "Screen-reader announcement fragment appending the slide title.",
-    "placeholders": { "title": { "content": "$1" } }
+    "placeholders": {
+      "title": {
+        "content": "$1"
+      }
+    }
   },
   "uiAnnounceNsfw": {
     "message": ", NSFW",

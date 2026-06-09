@@ -1,31 +1,39 @@
 {
-  "byline": {
-    "message": "$author$ إلى $subreddit$",
-    "description": "Slide byline.",
-    "placeholders": {
-      "author": { "content": "$1" },
-      "subreddit": { "content": "$2" }
-    }
-  },
   "skipped_one": {
     "message": "تم تخطّي $count$",
     "description": "Skipped counter, singular.",
-    "placeholders": { "count": { "content": "$1" } }
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   },
   "skipped_other": {
     "message": "تم تخطّي $count$",
     "description": "Skipped counter, plural.",
-    "placeholders": { "count": { "content": "$1" } }
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   },
   "skippedTitle_one": {
     "message": "تم تخطّي عنصر واحد ($count$) - انقر للعرض",
     "description": "Skipped-button tooltip, singular.",
-    "placeholders": { "count": { "content": "$1" } }
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   },
   "skippedTitle_other": {
     "message": "تم تخطّي $count$ عنصر - انقر للعرض",
     "description": "Skipped-button tooltip, plural.",
-    "placeholders": { "count": { "content": "$1" } }
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   },
   "extDescription": {
     "message": "حوِّل أيّ صفحة في Reddit، القديمة أو الجديدة، إلى عرض شرائح للوسائط بملء الشاشة يُتحكَّم به عبر لوحة المفاتيح.",
@@ -278,7 +286,11 @@
   "uiConfirmKeepCountdown": {
     "message": "متابعة المشاهدة ($seconds$ ث)",
     "description": "Confirmation button while it counts down to auto-dismiss.",
-    "placeholders": { "seconds": { "content": "$1" } }
+    "placeholders": {
+      "seconds": {
+        "content": "$1"
+      }
+    }
   },
   "uiConfirmDo": {
     "message": "إغلاق",
@@ -287,7 +299,11 @@
   "uiSkippedTitle": {
     "message": "المُتخطّاة ($count$)",
     "description": "Skipped-panel title with the total count.",
-    "placeholders": { "count": { "content": "$1" } }
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   },
   "uiSkippedUntitled": {
     "message": "بلا عنوان",
@@ -296,7 +312,11 @@
   "uiSkippedNote": {
     "message": "عرض أحدث $count$.",
     "description": "Skipped-panel note when only the most recent items are retained.",
-    "placeholders": { "count": { "content": "$1" } }
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   },
   "uiSkippedAnnounce": {
     "message": "تم تخطّي وسائط غير متاحة",
@@ -305,7 +325,11 @@
   "uiSkippedAnnounceTitled": {
     "message": "تم تخطّي وسائط غير متاحة: $title$",
     "description": "Screen-reader announcement when titled media is auto-skipped.",
-    "placeholders": { "title": { "content": "$1" } }
+    "placeholders": {
+      "title": {
+        "content": "$1"
+      }
+    }
   },
   "uiPlaceholderTitle": {
     "message": "الوسائط غير متاحة",
@@ -331,14 +355,22 @@
     "message": "$index$ من $total$",
     "description": "Screen-reader announcement of the current slide position.",
     "placeholders": {
-      "index": { "content": "$1" },
-      "total": { "content": "$2" }
+      "index": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
     }
   },
   "uiAnnounceTitle": {
     "message": "، $title$",
     "description": "Screen-reader announcement fragment appending the slide title.",
-    "placeholders": { "title": { "content": "$1" } }
+    "placeholders": {
+      "title": {
+        "content": "$1"
+      }
+    }
   },
   "uiAnnounceNsfw": {
     "message": "، غير لائق",
