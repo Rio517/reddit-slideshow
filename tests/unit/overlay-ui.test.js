@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createOverlay } from "../../lib/overlay-ui.js";
+import { setLocale } from "../../lib/i18n.js";
 import { imageTimerStopSeconds } from "../../lib/settings.js";
 
 /** @typedef {ReturnType<typeof createOverlay>} Overlay */
@@ -87,6 +88,9 @@ describe("createOverlay", () => {
     vi.useRealTimers();
     // show() makes the page inert; tests that don't hide() must not leak it.
     document.body.inert = false;
+    // The RTL test sets the locale to Arabic; reset so this realm-shared module
+    // state (vitest isolate:false) can't leak into other tests/files.
+    setLocale("en");
   });
 
   it("builds the chrome with eleven controls, hidden by default", () => {
@@ -528,6 +532,56 @@ describe("createOverlay", () => {
       overlay.root.querySelector(".rs-meta__author")
     );
     expect(author?.hidden).toBe(true);
+  });
+
+  it("wraps the byline data tokens in <bdi> so LTR tokens stay readable in RTL", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.show();
+    overlay.renderCurrent(
+      imageSlide({
+        author: "alice",
+        subreddit: "aww",
+        sourceWidth: 1920,
+        sourceHeight: 1080,
+        sourceUrl: "https://i.redd.it/x.jpg",
+      }),
+      {
+        index: 0,
+        total: 1,
+        exhausted: true,
+        effectiveSeconds: 5,
+        playing: true,
+      },
+    );
+    // Four data tokens present (author, subreddit, domain, resolution), each a
+    // <bdi> (the anchors wrap an inner one; domain/res are themselves <bdi>).
+    const bdis = overlay.root.querySelectorAll(".rs-meta__byline bdi");
+    expect(bdis.length).toBeGreaterThanOrEqual(4);
+    // The connectives ("to"/"from"/"at") are NOT bidi-wrapped.
+    for (const sep of overlay.root.querySelectorAll(".rs-meta__sep")) {
+      expect(sep.querySelector("bdi")).toBeNull();
+    }
+    // The exact token text is preserved (the overlay-ui guard contract).
+    expect(overlay.root.querySelector(".rs-meta__author")?.textContent).toBe(
+      "/u/alice",
+    );
+    expect(overlay.root.querySelector(".rs-meta__domain")?.textContent).toBe(
+      "i.redd.it",
+    );
+    expect(overlay.root.querySelector(".rs-meta__res")?.textContent).toBe(
+      "1920×1080",
+    );
+  });
+
+  it("defaults the overlay root to dir=ltr", () => {
+    const overlay = createOverlay(noopHandlers());
+    expect(overlay.root.dir).toBe("ltr");
+  });
+
+  it("mirrors the overlay root to dir=rtl under an RTL locale", () => {
+    setLocale("ar");
+    const overlay = createOverlay(noopHandlers());
+    expect(overlay.root.dir).toBe("rtl");
   });
 
   it("shows the title spinner during the pending window and clears it on failure", () => {

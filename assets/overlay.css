@@ -7,6 +7,10 @@
      TRANSITION_MS in lib/overlay-ui.js. */
   --rs-tx-dur: 0.45s;
   --rs-tx-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Sign for directional horizontal transforms: +1 in LTR, -1 in RTL. Multiply
+     every directional translateX by this so the slide/push/idle/toggle motions
+     mirror under RTL; centering translateX(-50%) transforms are left untouched. */
+  --rs-dir: 1;
 
   position: fixed;
   inset: 0;
@@ -25,6 +29,13 @@
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
+}
+
+/* RTL locales (Arabic et al.): flip the directional-transform sign. The dir
+   attribute is set on the root element in lib/overlay-ui.js (Part A); logical
+   properties (inset-inline-*, text-align: start/end) mirror on their own. */
+#reddit-slideshow-root[dir="rtl"] {
+  --rs-dir: -1;
 }
 
 #reddit-slideshow-root[hidden] {
@@ -72,6 +83,12 @@
   transform-origin: left center;
   background: linear-gradient(90deg, var(--rs-accent), #ffcf9e);
   box-shadow: 0 0 14px rgba(255, 122, 24, 0.65);
+}
+
+/* The progress sweep grows from the inline-start edge: left in LTR, right in
+   RTL (transform-origin takes only physical keywords). */
+#reddit-slideshow-root[dir="rtl"] .rs-timer__fill {
+  transform-origin: right center;
 }
 
 @keyframes rs-sweep {
@@ -227,7 +244,7 @@
 @keyframes rs-enter-slide-fwd {
   from {
     opacity: 0;
-    transform: translateX(16%);
+    transform: translateX(calc(16% * var(--rs-dir)));
   }
   to {
     opacity: 1;
@@ -237,7 +254,7 @@
 @keyframes rs-enter-slide-back {
   from {
     opacity: 0;
-    transform: translateX(-16%);
+    transform: translateX(calc(-16% * var(--rs-dir)));
   }
   to {
     opacity: 1;
@@ -251,7 +268,7 @@
   }
   to {
     opacity: 0;
-    transform: translateX(-16%);
+    transform: translateX(calc(-16% * var(--rs-dir)));
   }
 }
 @keyframes rs-exit-slide-back {
@@ -261,12 +278,12 @@
   }
   to {
     opacity: 0;
-    transform: translateX(16%);
+    transform: translateX(calc(16% * var(--rs-dir)));
   }
 }
 @keyframes rs-enter-push-fwd {
   from {
-    transform: translateX(100%);
+    transform: translateX(calc(100% * var(--rs-dir)));
   }
   to {
     transform: translateX(0);
@@ -274,7 +291,7 @@
 }
 @keyframes rs-enter-push-back {
   from {
-    transform: translateX(-100%);
+    transform: translateX(calc(-100% * var(--rs-dir)));
   }
   to {
     transform: translateX(0);
@@ -285,7 +302,7 @@
     transform: translateX(0);
   }
   to {
-    transform: translateX(-100%);
+    transform: translateX(calc(-100% * var(--rs-dir)));
   }
 }
 @keyframes rs-exit-push-back {
@@ -293,7 +310,7 @@
     transform: translateX(0);
   }
   to {
-    transform: translateX(100%);
+    transform: translateX(calc(100% * var(--rs-dir)));
   }
 }
 @keyframes rs-enter-flip-fwd {
@@ -392,7 +409,7 @@ iframe.reddit-slideshow-media {
    top, the title row, then the byline at the bottom. */
 .rs-meta {
   position: absolute;
-  left: 26px;
+  inset-inline-start: 26px;
   bottom: 30px;
   z-index: 6;
   display: flex;
@@ -539,7 +556,7 @@ iframe.reddit-slideshow-media {
 /* Control bar */
 .rs-controls {
   position: absolute;
-  right: 16px;
+  inset-inline-end: 16px;
   top: 50%;
   z-index: 6;
   transform: translateY(-50%);
@@ -567,7 +584,7 @@ iframe.reddit-slideshow-media {
 }
 
 #reddit-slideshow-root.rs-idle .rs-controls {
-  transform: translateY(-50%) translateX(12px);
+  transform: translateY(-50%) translateX(calc(12px * var(--rs-dir)));
 }
 
 /* "Always show count, title & skips": the bottom meta bar and the top-left
@@ -657,7 +674,7 @@ iframe.reddit-slideshow-media {
 .rs-close-top {
   position: absolute;
   top: 18px;
-  right: 22px;
+  inset-inline-end: 22px;
   z-index: 7;
   background: rgba(10, 12, 18, 0.62);
   backdrop-filter: blur(14px);
@@ -899,7 +916,7 @@ iframe.reddit-slideshow-media {
 /* Pagination buffering hint */
 .rs-buffering {
   position: absolute;
-  right: 24px;
+  inset-inline-end: 24px;
   bottom: 34px;
   display: flex;
   align-items: center;
@@ -1034,7 +1051,7 @@ iframe.reddit-slideshow-media {
 .rs-topleft {
   position: absolute;
   top: 22px;
-  left: 26px;
+  inset-inline-start: 26px;
   z-index: 7;
   display: flex;
   align-items: center;
@@ -1069,7 +1086,7 @@ iframe.reddit-slideshow-media {
 .rs-skipped-panel {
   position: absolute;
   top: 58px;
-  left: 26px;
+  inset-inline-start: 26px;
   z-index: 7;
   width: min(360px, 60vw);
   max-height: 50vh;
@@ -1102,7 +1119,7 @@ iframe.reddit-slideshow-media {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  text-align: left;
+  text-align: start;
   font: inherit;
   font-size: 13px;
   color: var(--rs-muted);
@@ -1143,7 +1160,7 @@ iframe.reddit-slideshow-media {
 /* In-overlay settings panel */
 .rs-settings-panel {
   position: absolute;
-  right: 70px;
+  inset-inline-end: 70px;
   top: 50%;
   transform: translateY(-50%);
   z-index: 8;
@@ -1219,7 +1236,7 @@ iframe.reddit-slideshow-media {
 .rs-set__out {
   flex: none;
   min-width: 34px;
-  text-align: right;
+  text-align: end;
   font-variant-numeric: tabular-nums;
   color: var(--rs-accent);
 }
@@ -1297,7 +1314,7 @@ iframe.reddit-slideshow-media {
   content: "";
   position: absolute;
   top: 2px;
-  left: 2px;
+  inset-inline-start: 2px;
   width: 14px;
   height: 14px;
   border-radius: 50%;
@@ -1313,7 +1330,7 @@ iframe.reddit-slideshow-media {
 }
 
 .rs-set__check input:checked::before {
-  transform: translateX(16px);
+  transform: translateX(calc(16px * var(--rs-dir)));
   background: #0b0d12;
 }
 
@@ -1326,7 +1343,7 @@ iframe.reddit-slideshow-media {
   margin-top: 2px;
   font: inherit;
   font-size: 13px;
-  text-align: left;
+  text-align: start;
   color: var(--rs-accent);
   background: transparent;
   border: none;
@@ -1404,7 +1421,7 @@ iframe.reddit-slideshow-media {
 /* Jump-to-post list */
 .rs-jump-panel {
   position: absolute;
-  left: 26px;
+  inset-inline-start: 26px;
   top: 58px;
   z-index: 8;
   width: min(340px, 72vw);
@@ -1439,7 +1456,7 @@ iframe.reddit-slideshow-media {
   grid-template-columns: auto 1fr;
   align-items: center;
   gap: 10px;
-  text-align: left;
+  text-align: start;
   font: inherit;
   font-size: 13px;
   color: var(--rs-fg);
@@ -1496,7 +1513,7 @@ iframe.reddit-slideshow-media {
   font-variant-numeric: tabular-nums;
   font-size: 11px;
   color: var(--rs-accent);
-  text-align: right;
+  text-align: end;
 }
 
 /* The domain part of the subline: where the media is from. Truncates;
