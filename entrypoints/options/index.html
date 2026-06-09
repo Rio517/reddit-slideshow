@@ -23,6 +23,13 @@
         --input-bg: #0c0f15;
         --toggle-off: rgba(255, 255, 255, 0.1);
         --toggle-knob: rgba(255, 255, 255, 0.6);
+        /* Sign for directional horizontal transforms: +1 LTR, -1 RTL. The
+           toggle knob travels by this so it mirrors under RTL. localizeDocument
+           sets <html dir> from the active locale. */
+        --rs-dir: 1;
+      }
+      [dir="rtl"] {
+        --rs-dir: -1;
       }
       /* The slideshow overlay keeps its own fixed dark theme; only this
          preferences page follows the OS light/dark setting. */
@@ -167,7 +174,7 @@
         content: "";
         position: absolute;
         top: 2px;
-        left: 2px;
+        inset-inline-start: 2px;
         width: 17px;
         height: 17px;
         border-radius: 50%;
@@ -183,7 +190,7 @@
       }
       .check input:checked::before,
       .panzoom__head input:checked::before {
-        transform: translateX(17px);
+        transform: translateX(calc(17px * var(--rs-dir)));
         background: #0b0d12;
       }
       .check input:focus-visible,
@@ -297,7 +304,7 @@
       .pz-steps::before {
         content: "";
         position: absolute;
-        left: 13px;
+        inset-inline-start: 13px;
         top: 10px;
         bottom: 10px;
         width: 2px;
