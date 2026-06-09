@@ -156,5 +156,190 @@
   "settingsFullPreferences": {
     "message": "Full preferences ↗",
     "description": "Settings-panel button opening the full options page."
+  },
+  "uiAriaLabel": {
+    "message": "Reddit slideshow",
+    "description": "Accessible label for the slideshow overlay dialog."
+  },
+  "uiJumpToPost": {
+    "message": "Jump to a post",
+    "description": "Position-counter tooltip/label and jump-list title."
+  },
+  "uiOpenOriginal": {
+    "message": "Open original",
+    "description": "Control label: open the post's original media."
+  },
+  "uiDownload": {
+    "message": "Download",
+    "description": "Control label: download the current media."
+  },
+  "uiNsfw": {
+    "message": "NSFW",
+    "description": "Badge marking a not-safe-for-work slide."
+  },
+  "bylineSepTo": {
+    "message": "to",
+    "description": "Byline connective between author and subreddit (e.g. /u/x to /r/y)."
+  },
+  "bylineSepFrom": {
+    "message": "from",
+    "description": "Byline connective before the media domain."
+  },
+  "bylineSepAt": {
+    "message": "at",
+    "description": "Byline connective before the media resolution."
+  },
+  "uiPrev": {
+    "message": "Previous (←)",
+    "description": "Control label: previous slide (with the ← shortcut)."
+  },
+  "uiPlayPause": {
+    "message": "Play/pause (Space)",
+    "description": "Control label: play/pause (with the Space shortcut)."
+  },
+  "uiNext": {
+    "message": "Next (→)",
+    "description": "Control label: next slide (with the → shortcut)."
+  },
+  "uiMuteUnmute": {
+    "message": "Mute/unmute (M)",
+    "description": "Control label: mute/unmute (with the M shortcut)."
+  },
+  "uiFullscreen": {
+    "message": "Fullscreen (F)",
+    "description": "Control label: enter fullscreen (with the F shortcut)."
+  },
+  "uiFullscreenExit": {
+    "message": "Exit fullscreen (F)",
+    "description": "Control label/tooltip: exit fullscreen (with the F shortcut)."
+  },
+  "uiPopout": {
+    "message": "Open in a window",
+    "description": "Control label: open the slideshow in a separate window."
+  },
+  "uiHelp": {
+    "message": "Keyboard shortcuts (?)",
+    "description": "Control label: open keyboard shortcuts (with the ? shortcut)."
+  },
+  "uiSettings": {
+    "message": "Settings",
+    "description": "Control label: open the in-overlay settings panel."
+  },
+  "uiClose": {
+    "message": "Close (Esc)",
+    "description": "Control label: close the slideshow (with the Esc shortcut)."
+  },
+  "uiPlay": {
+    "message": "Play (Space)",
+    "description": "Play-button tooltip while paused (with the Space shortcut)."
+  },
+  "uiPause": {
+    "message": "Pause (Space)",
+    "description": "Play-button tooltip while playing (with the Space shortcut)."
+  },
+  "uiMute": {
+    "message": "Mute (M)",
+    "description": "Mute-button tooltip while unmuted (with the M shortcut)."
+  },
+  "uiUnmute": {
+    "message": "Unmute (M)",
+    "description": "Mute-button tooltip while muted (with the M shortcut)."
+  },
+  "uiVoteUp": {
+    "message": "▲ Upvoted",
+    "description": "Toast confirming an upvote."
+  },
+  "uiVoteDown": {
+    "message": "▼ Downvoted",
+    "description": "Toast confirming a downvote."
+  },
+  "uiVoteRemoved": {
+    "message": "Vote removed",
+    "description": "Toast confirming a cleared vote."
+  },
+  "uiVoteError": {
+    "message": "Couldn't vote",
+    "description": "Toast shown when a vote fails."
+  },
+  "uiBuffering": {
+    "message": "Loading more",
+    "description": "Hint shown while more media is loading."
+  },
+  "uiConfirmClose": {
+    "message": "You are pretty far into this slideshow… are you sure you want to close?",
+    "description": "Confirmation prompt before closing a slideshow viewed deep into the queue."
+  },
+  "uiConfirmKeep": {
+    "message": "Keep watching",
+    "description": "Confirmation button: keep watching (dismiss the close prompt)."
+  },
+  "uiConfirmKeepCountdown": {
+    "message": "Keep watching ($seconds$s)",
+    "description": "Confirmation button while it counts down to auto-dismiss.",
+    "placeholders": { "seconds": { "content": "$1" } }
+  },
+  "uiConfirmDo": {
+    "message": "Close",
+    "description": "Confirmation button: close the slideshow."
+  },
+  "uiSkippedTitle": {
+    "message": "Skipped ($count$)",
+    "description": "Skipped-panel title with the total count.",
+    "placeholders": { "count": { "content": "$1" } }
+  },
+  "uiSkippedUntitled": {
+    "message": "Untitled",
+    "description": "Skipped-panel fallback label for an item with no title or URL."
+  },
+  "uiSkippedNote": {
+    "message": "Showing the most recent $count$.",
+    "description": "Skipped-panel note when only the most recent items are retained.",
+    "placeholders": { "count": { "content": "$1" } }
+  },
+  "uiSkippedAnnounce": {
+    "message": "Skipped unavailable media",
+    "description": "Screen-reader announcement when media is auto-skipped (no title)."
+  },
+  "uiSkippedAnnounceTitled": {
+    "message": "Skipped unavailable media: $title$",
+    "description": "Screen-reader announcement when titled media is auto-skipped.",
+    "placeholders": { "title": { "content": "$1" } }
+  },
+  "uiPlaceholderTitle": {
+    "message": "Media unavailable",
+    "description": "Failure-card title when a slide's media has no title."
+  },
+  "uiPlaceholderNote": {
+    "message": "This media could not be loaded.",
+    "description": "Failure-card note when a slide's media fails to load."
+  },
+  "uiPlaceholderOpen": {
+    "message": "Open original ↗",
+    "description": "Failure-card button to open the post's original media."
+  },
+  "uiLoading": {
+    "message": "Loading…",
+    "description": "Subtitle on the branded loading splash."
+  },
+  "uiEnd": {
+    "message": "That's everything - press → to start over",
+    "description": "End card prompting a replay from the top."
+  },
+  "uiAnnouncePosition": {
+    "message": "$index$ of $total$",
+    "description": "Screen-reader announcement of the current slide position.",
+    "placeholders": {
+      "index": { "content": "$1" },
+      "total": { "content": "$2" }
+    }
+  },
+  "uiAnnounceTitle": {
+    "message": ", $title$",
+    "description": "Screen-reader announcement fragment appending the slide title.",
+    "placeholders": { "title": { "content": "$1" } }
+  },
+  "uiAnnounceNsfw": {
+    "message": ", NSFW",
+    "description": "Screen-reader announcement fragment marking an NSFW slide."
   }
 }
