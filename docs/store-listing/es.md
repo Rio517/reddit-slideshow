@@ -12,16 +12,58 @@ Convierte tus feeds de Reddit, antiguos o nuevos, en un pase de diapositivas mul
 
 ## Description
 
-Reddit Slideshow Spectacular! convierte tus feeds de Reddit en un pase de diapositivas multimedia a pantalla completa y controlado con el teclado. Abre un feed, un subreddit, un multireddit o los resultados de búsqueda en old.reddit.com o www.reddit.com, haz clic en el icono de la barra de herramientas (o pulsa Alt+Shift+S) y reclínate.
+Reddit Slideshow Spectacular! convierte tus feeds de Reddit en un pase de diapositivas multimedia a pantalla completa y controlado con el teclado. Abre un feed, subreddit, multireddit o resultados de búsqueda en old.reddit.com o www.reddit.com, haz clic en el icono de la barra de herramientas (o pulsa Alt+Shift+S) y recuéstate a disfrutar.
 
-El pase de diapositivas reutiliza tu sesión de Reddit ya iniciada: sin claves de API, sin inicio de sesión y sin cuentas adicionales. Recorre las publicaciones multimedia en el orden en que las devuelve Reddit y avanza por el feed de forma automática, así que el pase de diapositivas continúa más allá de la primera página.
+El pase de diapositivas reutiliza tu sesión de Reddit ya iniciada: sin claves de API, sin inicio de sesión adicional y sin cuentas extra. Recorre las publicaciones multimedia en el orden en que Reddit las devuelve y avanza por el feed de forma automática, de modo que el pase de diapositivas continúa más allá de la primera página.
 
-QUÉ REPRODUCE: imágenes directas de Reddit, galerías, vídeo alojado en Reddit con sonido, clips de Redgifs, Imgur, Streamable y Giphy, álbumes de Imgur, archivos de Catbox y crossposts. Se omiten las publicaciones de texto, los enlaces externos, las publicaciones fijadas y los anuncios.
+NOVEDADES - V1.1.0
 
-CONTROLES: atajos de teclado (teclas de flecha Left/Right, Space, M, F, Esc), una barra de controles en pantalla e información de cada diapositiva con opciones de descarga.
+Se ha añadido compatibilidad con varios idiomas: español, alemán, francés, italiano y árabe.
 
-DETALLES AGRADABLES: transiciones de fundido, deslizamiento, empuje y zoom, temporizador de cuenta atrás opcional, paneo y zoom para imágenes grandes, omisión de duplicados mediante hash perceptual y modo ventana para emitir en el televisor.
+QUÉ REPRODUCE
 
-AJUSTES: tiempos configurables, transiciones, visibilidad del temporizador, reproducción automática, filtrado de contenido NSFW y opciones de omisión de duplicados.
+- Imágenes directas de Reddit (resolución completa desde i.redd.it cuando está disponible)
+- Galerías de Reddit, desplegadas en una diapositiva por imagen
+- Vídeo alojado en Reddit (v.redd.it), con su sonido (la pista de audio independiente)
+- Clips de Redgifs, Imgur (.gifv), Streamable y Giphy, reproducidos como vídeo nativo
+- Álbumes de Imgur, desplegados en una diapositiva por imagen
+- Archivos de vídeo e imagen de Catbox
+- Crossposts, resueltos al contenido multimedia de la publicación original
 
-PRIVACIDAD: sin analíticas, sin rastreo, sin anuncios, sin cuentas y sin servidores del desarrollador.
+La cola es solo multimedia: las publicaciones de texto, los enlaces a artículos externos, los anuncios fijados y las publicaciones patrocinadas se omiten; el contenido que no carga también se salta, así que el pase de diapositivas nunca se detiene en una diapositiva vacía.
+
+CONTROLES
+
+- Teclado: Left/Right para avanzar y retroceder (Shift+Right salta a la siguiente publicación; Page Up/Page Down saltan 10 hacia atrás/adelante), Up/Down para votar positivo/negativo, Space para reproducir/pausar, M para silenciar, F para pantalla completa, Esc para cerrar
+- Una barra de controles en pantalla: anterior, reproducir/pausar, siguiente, silenciar, pantalla completa, abrir en ventana y ajustes
+- Bajo cada diapositiva: una línea de créditos (quién la publicó, en qué subreddit, la fuente y la resolución), con botones para abrir la publicación original o descargar el contenido
+- Haz clic en el contador de posición para ir directamente a cualquier publicación de la cola cargada
+- Haz clic en el fondo oscuro para cerrar
+- Las imágenes avanzan con un temporizador que tú ajustas; el temporizador sigue corriendo aunque avances manualmente con las flechas, y los vídeos avanzan al terminar el clip
+
+DETALLES AGRADABLES
+
+- Transiciones entre diapositivas: fundido, deslizamiento, empuje, zoom, volteo o ninguna
+- Barra de cuenta atrás opcional en la parte superior (en diapositivas de vídeo, en todas las diapositivas o nunca)
+- Paneo y zoom lento opcional para imágenes demasiado grandes para verse de una vez
+- Contador de posición y título de la publicación siempre visibles para que sepas dónde estás
+- "Abrir en ventana" reabre el pase de diapositivas en una ventana emergente minimalista, lista para emitir por AirPlay o Chromecast a un televisor o segunda pantalla para disfrutar de un feed cómodo en pantalla grande
+- Omisión de duplicados: se saltan reposts, crossposts y galerías repetidas; además, un hash perceptual (activado por defecto) también detecta la misma imagen subida de nuevo con un enlace diferente, ya sea sola o dentro de una galería
+- "Abrir original" lleva directamente a la publicación fuente
+
+AJUSTES (se aplican en tiempo real, sin recarga)
+
+- Tiempo por imagen (de 1 segundo a 5 minutos, con escala de precisión en los valores bajos)
+- Transición entre diapositivas
+- Visibilidad de la barra del temporizador
+- Tiempo de espera para contenido lento antes de pasar al siguiente
+- Reproducción automática de vídeos activada/desactivada, inicio silenciado activado/desactivado
+- Incluir contenido NSFW — por defecto sigue tu sesión de Reddit, mostrando contenido para mayores de 18 solo en la medida en que tu cuenta ya lo haga
+- Omitir contenido multimedia duplicado, incluidas imágenes subidas de nuevo (activado por defecto)
+- Paneo y zoom en imágenes grandes (o en todas las imágenes), con control total sobre la secuencia
+
+PRIVACIDAD
+
+Sin analíticas, sin rastreo, sin anuncios, sin cuentas y sin servidores del desarrollador (no existen). La extensión solo obtiene el contenido que estás viendo: el feed y su contenido multimedia desde Reddit, y los clips de proveedores como Imgur, Redgifs, Streamable, Giphy y Catbox. Lo único que escribe en tu cuenta de Reddit es el voto, y solo cuando pulsas las teclas de arriba/abajo. Tus ajustes se almacenan localmente en tu ordenador y no incluye código remoto. Política completa: consulta el enlace a la política de privacidad.
+
+Código abierto, licencia MIT.
