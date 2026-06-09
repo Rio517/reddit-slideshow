@@ -69,6 +69,12 @@ session.
 — free, from Firefox Add-ons. Same private, local, logged-in-session behavior
 as the Chrome build.
 
+### Languages
+
+The interface is available in English, Spanish, French, German, Italian, and
+Arabic, selected automatically from your browser's language. Arabic renders
+right-to-left. The slideshow content is whatever your Reddit feed contains.
+
 ### Build from source
 
 Prefer to build it yourself — or want the Firefox build now? First build it:
