@@ -105,6 +105,7 @@ function settings(overrides) {
     panZoomZoomOutSeconds: 2,
     panZoomShowEndSeconds: 2,
     panZoomMinOversize: 1.5,
+    locale: "auto",
     ...overrides,
   };
 }

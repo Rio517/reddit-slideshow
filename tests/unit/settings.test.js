@@ -8,6 +8,7 @@ import {
   imageTimerStopIndex,
   imageTimerStopSeconds,
   formatImageTimer,
+  UI_LOCALES,
 } from "../../lib/settings.js";
 
 describe("normalizeSettings", () => {
@@ -146,12 +147,31 @@ describe("getSettings / saveSettings", () => {
       panZoomZoomOutSeconds: 2,
       panZoomShowEndSeconds: 2,
       panZoomMinOversize: 1.5,
+      locale: "auto",
     });
   });
 
   it("clamps out-of-range stored values on read", async () => {
     await browser.storage.local.set({ imageTimerSeconds: 999 });
     expect((await getSettings()).imageTimerSeconds).toBe(300);
+  });
+});
+
+describe("locale setting", () => {
+  it("defaults to auto", () => {
+    expect(DEFAULT_SETTINGS.locale).toBe("auto");
+    expect(normalizeSettings({}).locale).toBe("auto");
+  });
+  it("keeps a supported explicit locale", () => {
+    expect(normalizeSettings({ locale: "ar" }).locale).toBe("ar");
+    expect(normalizeSettings({ locale: "de" }).locale).toBe("de");
+  });
+  it("rejects an unsupported or junk locale", () => {
+    expect(normalizeSettings({ locale: "pl" }).locale).toBe("auto");
+    expect(normalizeSettings({ locale: 5 }).locale).toBe("auto");
+  });
+  it("exposes the supported set including auto", () => {
+    expect(UI_LOCALES).toEqual(["auto", "en", "es", "fr", "de", "it", "ar"]);
   });
 });
 
