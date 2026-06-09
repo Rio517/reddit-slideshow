@@ -8,6 +8,7 @@ import { base64ToArrayBuffer } from "@/lib/bytes-base64.js";
 import { redgifsVideoSlide } from "@/lib/redgifs.js";
 import { redgifsId } from "@/lib/slides.js";
 import { createLogger } from "@/lib/log.js";
+import { setMessageGetter, setLocale } from "@/lib/i18n.js";
 
 const log = createLogger("content");
 
@@ -18,6 +19,13 @@ export default defineContentScript({
   matches: ["https://old.reddit.com/*", "https://www.reddit.com/*"],
   cssInjectionMode: "manifest",
   main() {
+    // Drive the overlay's strings + direction from the browser's UI language.
+    // Wrapped (not a bare reference) so getMessage keeps its `this` binding.
+    setMessageGetter((key, subs) =>
+      browser.i18n.getMessage(/** @type {any} */ (key), subs),
+    );
+    setLocale(browser.i18n.getUILanguage());
+
     const session = createSlideshowSession({
       doc: document,
       // Mount the overlay in a shadow root carrying its own stylesheet.

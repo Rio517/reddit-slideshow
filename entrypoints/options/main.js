@@ -6,6 +6,13 @@ import {
   formatImageTimer,
 } from "@/lib/settings.js";
 import { requiredElement } from "@/lib/dom.js";
+import { setMessageGetter } from "@/lib/i18n.js";
+import { localizeDocument } from "@/lib/i18n-dom.js";
+
+setMessageGetter((key, subs) =>
+  browser.i18n.getMessage(/** @type {any} */ (key), subs),
+);
+localizeDocument(document, browser.i18n.getUILanguage());
 
 const timerSlider = requiredElement("#imageTimerSeconds", HTMLInputElement);
 const timerValue = requiredElement("#timerValue", HTMLOutputElement);
