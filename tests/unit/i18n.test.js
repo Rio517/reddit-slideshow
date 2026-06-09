@@ -36,6 +36,18 @@ describe("t", () => {
     setMessageGetter((key) => (key === "extName" ? "OVERRIDE" : ""));
     expect(t("extName")).toBe("OVERRIDE");
   });
+
+  it("unescapes $$ and substitutes in a single pass", () => {
+    expect(t("escapeTest", ["a$$b"])).toBe("Cost is $5 for a$$b");
+  });
+
+  it("does not re-substitute $name$ that appears inside a value", () => {
+    // byline has $author$ then $subreddit$; a value containing $subreddit$
+    // must be inserted verbatim, not re-expanded.
+    expect(t("byline", ["$subreddit$", "r/pics"])).toBe(
+      "$subreddit$ to r/pics",
+    );
+  });
 });
 
 describe("tn", () => {

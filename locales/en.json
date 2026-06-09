@@ -20,5 +20,10 @@
     "message": "$count$ skipped",
     "description": "Skipped counter, plural.",
     "placeholders": { "count": { "content": "$1" } }
+  },
+  "escapeTest": {
+    "message": "Cost is $$5 for $item$",
+    "description": "Test-only: $$ escaping + placeholder.",
+    "placeholders": { "item": { "content": "$1" } }
   }
 }
