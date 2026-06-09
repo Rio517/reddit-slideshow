@@ -1,4 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
+import ar from "../../locales/ar.json";
+import fr from "../../locales/fr.json";
 import {
   t,
   tn,
@@ -6,6 +8,8 @@ import {
   setMessageGetter,
   setLocale,
   currentLocale,
+  resolveLocale,
+  SUPPORTED_LOCALES,
 } from "../../lib/i18n.js";
 
 afterEach(() => {
@@ -56,8 +60,8 @@ describe("tn", () => {
   });
 
   it("falls back to _other when a category key is missing", () => {
-    setLocale("ar"); // Arabic 'two'/'few' categories not seeded -> _other
-    expect(tn("skipped", 10, [10])).toBe("10 skipped");
+    setLocale("ar"); // ar count 10 -> "few" (no skipped_few key) -> _other
+    expect(tn("skipped", 10, [10])).toBe(t("skipped_other", [10]));
   });
 });
 
@@ -74,5 +78,37 @@ describe("setLocale/currentLocale", () => {
     expect(currentLocale()).toBe("en");
     setLocale("fr");
     expect(currentLocale()).toBe("fr");
+  });
+});
+
+describe("resolveLocale", () => {
+  it("maps auto to the browser primary subtag when supported", () => {
+    expect(resolveLocale("auto", "en-US")).toBe("en");
+    expect(resolveLocale("auto", "ar")).toBe("ar");
+    expect(resolveLocale("auto", "fr-CA")).toBe("fr");
+  });
+  it("falls back to en for an unsupported browser language", () => {
+    expect(resolveLocale("auto", "pl")).toBe("en");
+    expect(resolveLocale("auto", "")).toBe("en");
+  });
+  it("returns a valid explicit choice, else en", () => {
+    expect(resolveLocale("de", "en-US")).toBe("de");
+    expect(resolveLocale("zz", "en-US")).toBe("en");
+  });
+  it("lists the six shipped locales", () => {
+    expect(SUPPORTED_LOCALES).toEqual(["en", "es", "fr", "de", "it", "ar"]);
+  });
+});
+
+describe("setLocale switches the catalog", () => {
+  it("returns the active locale's message", () => {
+    setLocale("ar");
+    expect(t("uiClose")).toBe(ar.uiClose.message);
+    setLocale("fr");
+    expect(t("uiClose")).toBe(fr.uiClose.message);
+  });
+  it("falls back to the key for an unknown message", () => {
+    setLocale("fr");
+    expect(t("definitely_not_a_key")).toBe("definitely_not_a_key");
   });
 });
