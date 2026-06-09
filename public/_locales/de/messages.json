@@ -1,6 +1,6 @@
 {
   "byline": {
-    "message": "$author$ to $subreddit$",
+    "message": "$author$ in $subreddit$",
     "description": "Slide byline.",
     "placeholders": {
       "author": {
@@ -12,7 +12,7 @@
     }
   },
   "skipped_one": {
-    "message": "$count$ skipped",
+    "message": "$count$ übersprungen",
     "description": "Skipped counter, singular.",
     "placeholders": {
       "count": {
@@ -21,7 +21,7 @@
     }
   },
   "skipped_other": {
-    "message": "$count$ skipped",
+    "message": "$count$ übersprungen",
     "description": "Skipped counter, plural.",
     "placeholders": {
       "count": {
@@ -30,7 +30,7 @@
     }
   },
   "skippedTitle_one": {
-    "message": "$count$ item skipped - click to view",
+    "message": "$count$ Element übersprungen – klicken zum Anzeigen",
     "description": "Skipped-button tooltip, singular.",
     "placeholders": {
       "count": {
@@ -39,7 +39,7 @@
     }
   },
   "skippedTitle_other": {
-    "message": "$count$ items skipped - click to view",
+    "message": "$count$ Elemente übersprungen – klicken zum Anzeigen",
     "description": "Skipped-button tooltip, plural.",
     "placeholders": {
       "count": {
@@ -48,151 +48,151 @@
     }
   },
   "extDescription": {
-    "message": "Turn an old or new Reddit feed into a full-screen, keyboard-driven media slideshow.",
+    "message": "Verwandelt einen alten oder neuen Reddit-Feed in eine Vollbild-Mediadiashow mit Tastatursteuerung.",
     "description": "Store/about description (shown in the browser's add-ons page and stores)."
   },
   "actionTitle": {
-    "message": "Start Reddit Slideshow Spectacular!",
+    "message": "Reddit Slideshow Spectacular! starten",
     "description": "Toolbar button tooltip and keyboard-command description."
   },
   "helpAriaLabel": {
-    "message": "Keyboard shortcuts",
+    "message": "Tastaturkürzel",
     "description": "Accessible label for the keyboard-shortcuts help panel."
   },
   "helpTitle": {
-    "message": "Keyboard shortcuts",
+    "message": "Tastaturkürzel",
     "description": "Title of the keyboard-shortcuts help panel."
   },
   "helpClose": {
-    "message": "Close keyboard shortcuts",
+    "message": "Tastaturkürzel schließen",
     "description": "Accessible label for the help-panel close button."
   },
   "helpIntro": {
-    "message": "{brand} is optimized for hands-free or keyboard navigation.",
+    "message": "{brand} ist für freihändige oder Tastaturnavigation optimiert.",
     "description": "Help-panel intro line. {brand} is the product name (italicized); keep the {brand} marker where the product name should appear."
   },
   "helpShortcutLaunch": {
-    "message": "Launch the slideshow",
+    "message": "Diashow starten",
     "description": "Help-panel shortcut description: launch."
   },
   "helpShortcutPrevNext": {
-    "message": "Previous / next slide",
+    "message": "Vorherige / nächste Folie",
     "description": "Help-panel shortcut description: previous/next slide."
   },
   "helpShortcutNextPost": {
-    "message": "Skip to the next post",
+    "message": "Zum nächsten Beitrag springen",
     "description": "Help-panel shortcut description: skip to next post."
   },
   "helpShortcutJump": {
-    "message": "Jump back / ahead 10",
+    "message": "10 zurück / vorspringen",
     "description": "Help-panel shortcut description: jump 10 back/ahead."
   },
   "helpShortcutVote": {
-    "message": "Upvote / downvote the post",
+    "message": "Beitrag hoch- / abwählen",
     "description": "Help-panel shortcut description: upvote/downvote."
   },
   "helpShortcutPlayPause": {
-    "message": "Play / pause",
+    "message": "Abspielen / Pause",
     "description": "Help-panel shortcut description: play/pause."
   },
   "helpShortcutMute": {
-    "message": "Mute / unmute",
+    "message": "Stumm / Ton an",
     "description": "Help-panel shortcut description: mute/unmute."
   },
   "helpShortcutFullscreen": {
-    "message": "Fullscreen",
+    "message": "Vollbild",
     "description": "Help-panel shortcut description: fullscreen."
   },
   "helpShortcutEscape": {
-    "message": "Close, or dismiss an open panel",
+    "message": "Schließen oder geöffnetes Panel verwerfen",
     "description": "Help-panel shortcut description: escape/dismiss."
   },
   "helpAbout": {
-    "message": "{brand} is free and {openSource}, but consider a {donation}.",
+    "message": "{brand} ist kostenlos und {openSource} – erwäge aber eine {donation}.",
     "description": "Help-panel about footer. {brand} is the product name (italicized); {openSource} and {donation} are links. Keep all three markers; translate the link text in helpAboutOpenSourceLink and helpAboutDonationLink."
   },
   "helpAboutOpenSourceLink": {
-    "message": "open source",
+    "message": "Open Source",
     "description": "Help-panel about footer: open-source link text (the {openSource} marker in helpAbout)."
   },
   "helpAboutDonationLink": {
-    "message": "donation",
+    "message": "Spende",
     "description": "Help-panel about footer: donation link text (the {donation} marker in helpAbout)."
   },
   "settingsTitle": {
-    "message": "Settings",
+    "message": "Einstellungen",
     "description": "Title of the in-overlay settings panel."
   },
   "settingsClose": {
-    "message": "Close settings",
+    "message": "Einstellungen schließen",
     "description": "Accessible label for the settings-panel close button."
   },
   "settingsTimer": {
-    "message": "Time per image",
+    "message": "Zeit pro Bild",
     "description": "Settings-panel label for the per-image timer slider."
   },
   "settingsTimerBar": {
-    "message": "Top Timer Bar",
+    "message": "Obere Fortschrittsleiste",
     "description": "Settings-panel label for the top timer-bar radios."
   },
   "settingsTimerBarGroup": {
-    "message": "Top timer bar",
+    "message": "Obere Fortschrittsleiste",
     "description": "Accessible group label for the top timer-bar radios."
   },
   "settingsTimerBarNone": {
-    "message": "None",
+    "message": "Keine",
     "description": "Settings-panel top-timer-bar option: none."
   },
   "settingsTimerBarVideo": {
-    "message": "Videos Only",
+    "message": "Nur Videos",
     "description": "Settings-panel top-timer-bar option: videos only."
   },
   "settingsTimerBarAll": {
-    "message": "All",
+    "message": "Alle",
     "description": "Settings-panel top-timer-bar option: all."
   },
   "settingsAutoplay": {
-    "message": "Autoplay videos",
+    "message": "Videos automatisch abspielen",
     "description": "Settings-panel checkbox: autoplay videos."
   },
   "settingsStartMuted": {
-    "message": "Start muted",
+    "message": "Stumm starten",
     "description": "Settings-panel checkbox: start muted."
   },
   "settingsIncludeNsfw": {
-    "message": "Include NSFW",
+    "message": "NSFW einschließen",
     "description": "Settings-panel checkbox: include NSFW."
   },
   "settingsDedupe": {
-    "message": "Skip duplicates",
+    "message": "Duplikate überspringen",
     "description": "Settings-panel checkbox: skip duplicates."
   },
   "settingsPanZoom": {
-    "message": "Pan & zoom large images",
+    "message": "Große Bilder schwenken & zoomen",
     "description": "Settings-panel checkbox: pan and zoom large images."
   },
   "settingsAlwaysShowMeta": {
-    "message": "Always show count, title & skips",
+    "message": "Anzahl, Titel & Übersprungene immer anzeigen",
     "description": "Settings-panel checkbox: always show count, title and skips."
   },
   "settingsFullPreferences": {
-    "message": "Full preferences ↗",
+    "message": "Alle Einstellungen ↗",
     "description": "Settings-panel button opening the full options page."
   },
   "uiAriaLabel": {
-    "message": "Reddit slideshow",
+    "message": "Reddit-Diashow",
     "description": "Accessible label for the slideshow overlay dialog."
   },
   "uiJumpToPost": {
-    "message": "Jump to a post",
+    "message": "Zu einem Beitrag springen",
     "description": "Position-counter tooltip/label and jump-list title."
   },
   "uiOpenOriginal": {
-    "message": "Open original",
+    "message": "Original öffnen",
     "description": "Control label: open the post's original media."
   },
   "uiDownload": {
-    "message": "Download",
+    "message": "Herunterladen",
     "description": "Control label: download the current media."
   },
   "uiNsfw": {
@@ -200,59 +200,59 @@
     "description": "Badge marking a not-safe-for-work slide."
   },
   "bylineSepTo": {
-    "message": "to",
+    "message": "in",
     "description": "Byline connective between author and subreddit (e.g. /u/x to /r/y)."
   },
   "bylineSepFrom": {
-    "message": "from",
+    "message": "von",
     "description": "Byline connective before the media domain."
   },
   "bylineSepAt": {
-    "message": "at",
+    "message": "bei",
     "description": "Byline connective before the media resolution."
   },
   "uiPrev": {
-    "message": "Previous (←)",
+    "message": "Zurück (←)",
     "description": "Control label: previous slide (with the ← shortcut)."
   },
   "uiPlayPause": {
-    "message": "Play/pause (Space)",
+    "message": "Abspielen/Pause (Space)",
     "description": "Control label: play/pause (with the Space shortcut)."
   },
   "uiNext": {
-    "message": "Next (→)",
+    "message": "Weiter (→)",
     "description": "Control label: next slide (with the → shortcut)."
   },
   "uiMuteUnmute": {
-    "message": "Mute/unmute (M)",
+    "message": "Stumm/Ton an (M)",
     "description": "Control label: mute/unmute (with the M shortcut)."
   },
   "uiFullscreen": {
-    "message": "Fullscreen (F)",
+    "message": "Vollbild (F)",
     "description": "Control label: enter fullscreen (with the F shortcut)."
   },
   "uiFullscreenExit": {
-    "message": "Exit fullscreen (F)",
+    "message": "Vollbild beenden (F)",
     "description": "Control label/tooltip: exit fullscreen (with the F shortcut)."
   },
   "uiPopout": {
-    "message": "Open in a window",
+    "message": "In einem Fenster öffnen",
     "description": "Control label: open the slideshow in a separate window."
   },
   "uiHelp": {
-    "message": "Keyboard shortcuts (?)",
+    "message": "Tastaturkürzel (?)",
     "description": "Control label: open keyboard shortcuts (with the ? shortcut)."
   },
   "uiSettings": {
-    "message": "Settings",
+    "message": "Einstellungen",
     "description": "Control label: open the in-overlay settings panel."
   },
   "uiClose": {
-    "message": "Close (Esc)",
+    "message": "Schließen (Esc)",
     "description": "Control label: close the slideshow (with the Esc shortcut)."
   },
   "uiPlay": {
-    "message": "Play (Space)",
+    "message": "Abspielen (Space)",
     "description": "Play-button tooltip while paused (with the Space shortcut)."
   },
   "uiPause": {
@@ -260,43 +260,43 @@
     "description": "Play-button tooltip while playing (with the Space shortcut)."
   },
   "uiMute": {
-    "message": "Mute (M)",
+    "message": "Stumm (M)",
     "description": "Mute-button tooltip while unmuted (with the M shortcut)."
   },
   "uiUnmute": {
-    "message": "Unmute (M)",
+    "message": "Ton an (M)",
     "description": "Mute-button tooltip while muted (with the M shortcut)."
   },
   "uiVoteUp": {
-    "message": "▲ Upvoted",
+    "message": "▲ Hochgewählt",
     "description": "Toast confirming an upvote."
   },
   "uiVoteDown": {
-    "message": "▼ Downvoted",
+    "message": "▼ Abgewählt",
     "description": "Toast confirming a downvote."
   },
   "uiVoteRemoved": {
-    "message": "Vote removed",
+    "message": "Stimme entfernt",
     "description": "Toast confirming a cleared vote."
   },
   "uiVoteError": {
-    "message": "Couldn't vote",
+    "message": "Abstimmen nicht möglich",
     "description": "Toast shown when a vote fails."
   },
   "uiBuffering": {
-    "message": "Loading more",
+    "message": "Lade mehr",
     "description": "Hint shown while more media is loading."
   },
   "uiConfirmClose": {
-    "message": "You are pretty far into this slideshow… are you sure you want to close?",
+    "message": "Du bist schon ziemlich weit in dieser Diashow… Wirklich schließen?",
     "description": "Confirmation prompt before closing a slideshow viewed deep into the queue."
   },
   "uiConfirmKeep": {
-    "message": "Keep watching",
+    "message": "Weiter ansehen",
     "description": "Confirmation button: keep watching (dismiss the close prompt)."
   },
   "uiConfirmKeepCountdown": {
-    "message": "Keep watching ($seconds$s)",
+    "message": "Weiter ansehen ($seconds$s)",
     "description": "Confirmation button while it counts down to auto-dismiss.",
     "placeholders": {
       "seconds": {
@@ -305,11 +305,11 @@
     }
   },
   "uiConfirmDo": {
-    "message": "Close",
+    "message": "Schließen",
     "description": "Confirmation button: close the slideshow."
   },
   "uiSkippedTitle": {
-    "message": "Skipped ($count$)",
+    "message": "Übersprungen ($count$)",
     "description": "Skipped-panel title with the total count.",
     "placeholders": {
       "count": {
@@ -318,11 +318,11 @@
     }
   },
   "uiSkippedUntitled": {
-    "message": "Untitled",
+    "message": "Ohne Titel",
     "description": "Skipped-panel fallback label for an item with no title or URL."
   },
   "uiSkippedNote": {
-    "message": "Showing the most recent $count$.",
+    "message": "Die letzten $count$ werden angezeigt.",
     "description": "Skipped-panel note when only the most recent items are retained.",
     "placeholders": {
       "count": {
@@ -331,11 +331,11 @@
     }
   },
   "uiSkippedAnnounce": {
-    "message": "Skipped unavailable media",
+    "message": "Nicht verfügbare Medien übersprungen",
     "description": "Screen-reader announcement when media is auto-skipped (no title)."
   },
   "uiSkippedAnnounceTitled": {
-    "message": "Skipped unavailable media: $title$",
+    "message": "Nicht verfügbare Medien übersprungen: $title$",
     "description": "Screen-reader announcement when titled media is auto-skipped.",
     "placeholders": {
       "title": {
@@ -344,27 +344,27 @@
     }
   },
   "uiPlaceholderTitle": {
-    "message": "Media unavailable",
+    "message": "Medium nicht verfügbar",
     "description": "Failure-card title when a slide's media has no title."
   },
   "uiPlaceholderNote": {
-    "message": "This media could not be loaded.",
+    "message": "Dieses Medium konnte nicht geladen werden.",
     "description": "Failure-card note when a slide's media fails to load."
   },
   "uiPlaceholderOpen": {
-    "message": "Open original ↗",
+    "message": "Original öffnen ↗",
     "description": "Failure-card button to open the post's original media."
   },
   "uiLoading": {
-    "message": "Loading…",
+    "message": "Wird geladen…",
     "description": "Subtitle on the branded loading splash."
   },
   "uiEnd": {
-    "message": "That's everything - press → to start over",
+    "message": "Das war alles – → drücken, um von vorne zu beginnen",
     "description": "End card prompting a replay from the top."
   },
   "uiAnnouncePosition": {
-    "message": "$index$ of $total$",
+    "message": "$index$ von $total$",
     "description": "Screen-reader announcement of the current slide position.",
     "placeholders": {
       "index": {
@@ -389,187 +389,187 @@
     "description": "Screen-reader announcement fragment marking an NSFW slide."
   },
   "skipReasonVideo": {
-    "message": "Video didn't load",
+    "message": "Video konnte nicht geladen werden",
     "description": "Skip reason: a video failed to load."
   },
   "skipReasonFetch": {
-    "message": "Couldn't fetch video",
+    "message": "Video konnte nicht abgerufen werden",
     "description": "Skip reason: a proxied video's bytes couldn't be fetched."
   },
   "skipReasonEmbed": {
-    "message": "Embed didn't load",
+    "message": "Einbettung konnte nicht geladen werden",
     "description": "Skip reason: an embedded provider iframe failed to load."
   },
   "skipReasonImage": {
-    "message": "Image didn't load",
+    "message": "Bild konnte nicht geladen werden",
     "description": "Skip reason: an image failed to load."
   },
   "skipReasonUnsupported": {
-    "message": "Unsupported link",
+    "message": "Nicht unterstützter Link",
     "description": "Skip reason: the media URL is unsupported (non-HTTPS or off-host)."
   },
   "skipReasonUnavailable": {
-    "message": "Unavailable",
+    "message": "Nicht verfügbar",
     "description": "Skip reason: generic fallback when media is unavailable."
   },
   "skipReasonDuplicate": {
-    "message": "Duplicate image",
+    "message": "Doppeltes Bild",
     "description": "Skip reason: a perceptual-duplicate image was skipped."
   },
   "optSubtitle": {
-    "message": "Settings apply the next time you start a slideshow.",
+    "message": "Einstellungen werden beim nächsten Start einer Diashow übernommen.",
     "description": "Options page subtitle under the heading."
   },
   "optTimePerImage": {
-    "message": "Time per image",
+    "message": "Zeit pro Bild",
     "description": "Options label for the per-image timer slider."
   },
   "optTransition": {
-    "message": "Transition between slides",
+    "message": "Übergang zwischen Folien",
     "description": "Options label for the slide-transition select."
   },
   "optTransitionNone": {
-    "message": "None",
+    "message": "Kein",
     "description": "Transition option: none."
   },
   "optTransitionFade": {
-    "message": "Fade",
+    "message": "Einblenden",
     "description": "Transition option: fade."
   },
   "optTransitionSlide": {
-    "message": "Slide",
+    "message": "Gleiten",
     "description": "Transition option: slide."
   },
   "optTransitionPush": {
-    "message": "Push",
+    "message": "Schieben",
     "description": "Transition option: push."
   },
   "optTransitionZoom": {
-    "message": "Zoom",
+    "message": "Zoomen",
     "description": "Transition option: zoom."
   },
   "optTransitionFlip": {
-    "message": "Flip",
+    "message": "Drehen",
     "description": "Transition option: flip."
   },
   "optTimerBar": {
-    "message": "Top Timer Bar",
+    "message": "Obere Fortschrittsleiste",
     "description": "Options label for the top timer-bar radios."
   },
   "optTimerBarNone": {
-    "message": "None",
+    "message": "Keine",
     "description": "Options top-timer-bar option: none."
   },
   "optTimerBarVideo": {
-    "message": "Videos Only",
+    "message": "Nur Videos",
     "description": "Options top-timer-bar option: videos only."
   },
   "optTimerBarAll": {
-    "message": "All",
+    "message": "Alle",
     "description": "Options top-timer-bar option: all."
   },
   "optMaxLoadWait": {
-    "message": "Skip media that won't load after",
+    "message": "Medien überspringen, die nach",
     "description": "Options label for the max-load-wait slider."
   },
   "optSeconds": {
-    "message": "seconds",
+    "message": "Sekunden nicht geladen sind",
     "description": "Unit suffix after the max-load-wait value (e.g. 5 seconds)."
   },
   "optAutoplay": {
-    "message": "Autoplay videos",
+    "message": "Videos automatisch abspielen",
     "description": "Options checkbox: autoplay videos."
   },
   "optStartMuted": {
-    "message": "Start videos muted",
+    "message": "Videos stumm starten",
     "description": "Options checkbox: start videos muted."
   },
   "optIncludeNsfw": {
-    "message": "Include NSFW content",
+    "message": "NSFW-Inhalte einschließen",
     "description": "Options checkbox: include NSFW content."
   },
   "optIncludeNsfwHint": {
-    "message": "As Reddit shows it for your session.",
+    "message": "So wie Reddit es für deine Sitzung anzeigt.",
     "description": "Options hint under the include-NSFW checkbox."
   },
   "optDedupe": {
-    "message": "Hide duplicate media",
+    "message": "Doppelte Medien ausblenden",
     "description": "Options checkbox: hide duplicate media."
   },
   "optDedupeHint": {
-    "message": "Skip reposts and crossposts already shown.",
+    "message": "Bereits gezeigte Reposts und Crossposts überspringen.",
     "description": "Options hint under the hide-duplicate-media checkbox."
   },
   "optAlwaysShowMeta": {
-    "message": "Always show count, title & skips",
+    "message": "Anzahl, Titel & Übersprungene immer anzeigen",
     "description": "Options checkbox: always show count, title and skips."
   },
   "optAlwaysShowMetaHint": {
-    "message": "Keep them visible even when the controls auto-hide, so a gap in the count from a skipped item stays explained.",
+    "message": "Immer sichtbar halten, auch wenn die Steuerelemente automatisch ausgeblendet werden – so bleibt eine Lücke in der Zählung durch übersprungene Elemente erklärt.",
     "description": "Options hint under the always-show-meta checkbox."
   },
   "optContentDedup": {
-    "message": "Also skip re-uploaded images",
+    "message": "Erneut hochgeladene Bilder ebenfalls überspringen",
     "description": "Options checkbox: also skip re-uploaded images."
   },
   "optContentDedupHint": {
-    "message": "Catches the same image re-posted under a new link (solo vs in a gallery). On by default; turn off if it ever over-skips.",
+    "message": "Erkennt dasselbe Bild unter einem neuen Link (einzeln oder in einer Galerie). Standardmäßig aktiv; deaktivieren, falls zu viele Bilder übersprungen werden.",
     "description": "Options hint under the also-skip-re-uploaded-images checkbox."
   },
   "optPanZoom": {
-    "message": "Pan & zoom large images",
+    "message": "Große Bilder schwenken & zoomen",
     "description": "Options pan-and-zoom card title."
   },
   "optPanZoomHint": {
-    "message": "A slow pan and zoom, only on images too big to see at once - push in, drift top→bottom, pull back out.",
+    "message": "Langsames Schwenken und Zoomen, nur bei Bildern, die zu groß zum vollständigen Betrachten sind – hineinzoomen, von oben nach unten gleiten, herauszoomen.",
     "description": "Options hint under the pan-and-zoom card title."
   },
   "optPanZoomApplies": {
-    "message": "Pan & zoom applies to",
+    "message": "Schwenken & Zoomen gilt für",
     "description": "Options label for the pan-and-zoom oversize-threshold slider."
   },
   "optPanZoomAppliesNote": {
-    "message": "“All images” moves every image. Higher only moves images that much larger than the window - the rest just show for the normal timer.",
+    "message": "„Alle Bilder“ bewegt jedes Bild. Höhere Werte bewegen nur Bilder, die entsprechend größer als das Fenster sind – die übrigen werden für den normalen Timer angezeigt.",
     "description": "Options note under the pan-and-zoom oversize-threshold slider."
   },
   "optPanZoomAllImages": {
-    "message": "All images",
+    "message": "Alle Bilder",
     "description": "Pan-and-zoom oversize-threshold output value at the 1x minimum."
   },
   "optPanZoomZoomLevel": {
-    "message": "Zoom level",
+    "message": "Zoomstufe",
     "description": "Options label for the pan-and-zoom zoom-level slider."
   },
   "optPanZoomSequence": {
-    "message": "Per-image sequence",
+    "message": "Ablauf pro Bild",
     "description": "Options heading for the pan-and-zoom per-image step sequence."
   },
   "optPanZoomShow": {
-    "message": "Show whole image",
+    "message": "Gesamtes Bild zeigen",
     "description": "Pan-and-zoom step 1: show the whole image."
   },
   "optPanZoomZoomIn": {
-    "message": "Zoom in",
+    "message": "Hineinzoomen",
     "description": "Pan-and-zoom step 2: zoom in."
   },
   "optPanZoomPan": {
-    "message": "Pan top → bottom",
+    "message": "Von oben nach unten schwenken",
     "description": "Pan-and-zoom step 3: pan top to bottom."
   },
   "optPanZoomZoomOut": {
-    "message": "Zoom out",
+    "message": "Herauszoomen",
     "description": "Pan-and-zoom step 4: zoom out."
   },
   "optPanZoomShowEnd": {
-    "message": "Show whole image again",
+    "message": "Gesamtes Bild erneut zeigen",
     "description": "Pan-and-zoom step 5: show the whole image again."
   },
   "optFooter": {
-    "message": "{brand} is free and open source.",
+    "message": "{brand} ist kostenlos und Open Source.",
     "description": "Options footer. {brand} is the product name (italicized); keep the {brand} marker where the product name should appear."
   },
   "optFooterLink": {
-    "message": "Sponsor it on GitHub ↗",
+    "message": "Auf GitHub sponsern ↗",
     "description": "Options footer: GitHub Sponsors link text."
   }
 }
