@@ -1,8 +1,4 @@
 {
-  "extName": {
-    "message": "Reddit Slideshow Spectacular!",
-    "description": "The extension name."
-  },
   "byline": {
     "message": "$author$ to $subreddit$",
     "description": "Slide byline.",

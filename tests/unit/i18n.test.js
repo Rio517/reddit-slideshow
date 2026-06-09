@@ -15,7 +15,7 @@ afterEach(() => {
 
 describe("t", () => {
   it("returns the English message by default", () => {
-    expect(t("extName")).toBe("Reddit Slideshow Spectacular!");
+    expect(t("actionTitle")).toBe("Start Reddit Slideshow Spectacular!");
   });
 
   it("substitutes named placeholders positionally", () => {
@@ -28,13 +28,13 @@ describe("t", () => {
 
   it("falls back to English then the key when the getter is empty", () => {
     setMessageGetter(() => "");
-    expect(t("extName")).toBe("Reddit Slideshow Spectacular!");
+    expect(t("actionTitle")).toBe("Start Reddit Slideshow Spectacular!");
     expect(t("nope")).toBe("nope");
   });
 
   it("uses an injected getter when it returns a value", () => {
-    setMessageGetter((key) => (key === "extName" ? "OVERRIDE" : ""));
-    expect(t("extName")).toBe("OVERRIDE");
+    setMessageGetter((key) => (key === "actionTitle" ? "OVERRIDE" : ""));
+    expect(t("actionTitle")).toBe("OVERRIDE");
   });
 
   it("inserts a substitution value containing $$ verbatim (single pass)", () => {
