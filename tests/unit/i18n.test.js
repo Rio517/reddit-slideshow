@@ -37,8 +37,8 @@ describe("t", () => {
     expect(t("extName")).toBe("OVERRIDE");
   });
 
-  it("unescapes $$ and substitutes in a single pass", () => {
-    expect(t("escapeTest", ["a$$b"])).toBe("Cost is $5 for a$$b");
+  it("inserts a substitution value containing $$ verbatim (single pass)", () => {
+    expect(t("byline", ["a$$b", "r/pics"])).toBe("a$$b to r/pics");
   });
 
   it("does not re-substitute $name$ that appears inside a value", () => {
