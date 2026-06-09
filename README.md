@@ -72,8 +72,8 @@ as the Chrome build.
 ### Languages
 
 The interface is available in English, Spanish, French, German, Italian, and
-Arabic, selected automatically from your browser's language. Arabic renders
-right-to-left. The slideshow content is whatever your Reddit feed contains.
+Arabic. It follows your browser's language by default, or pick one explicitly
+under **Language** on the options page. Arabic renders right-to-left.
 
 ### Build from source
 

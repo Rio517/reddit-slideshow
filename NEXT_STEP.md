@@ -85,14 +85,12 @@ logged-in Firefox + Chrome before trusting it:
   no longer depends on a webfont or the page CSP (the web-accessible font fell
   back to sans in Firefox over reddit). Confirm it renders on both browsers. The
   options page still uses the Monoton `@font-face` (extension-origin, works).
-- **Localization + RTL** — set the browser UI language to Arabic and confirm in
-  a logged-in Firefox + Chrome that the overlay and options strings are
-  translated, the layout mirrors correctly (control rail, position counter,
-  panels, byline), the byline's left-to-right tokens (u/author, r/subreddit,
-  domain, W×H) read correctly without scrambling, and nothing clips or
-  overflows. Spot-check Spanish/French/German/Italian too. Unit tests cover
-  catalog integrity, English output, and the `dir`/`<bdi>` structure only — not
-  rendered translation or mirrored layout.
+- **Localization + RTL** — on the options page, switch **Language** to each of
+  Spanish/French/German/Italian/Arabic and confirm the page re-localizes and (for
+  Arabic) flips to RTL live; then start a slideshow and confirm the overlay
+  renders in that language with correct mirroring and an unscrambled byline. Unit
+  tests cover catalog integrity, the per-locale getter, `resolveLocale`, and the
+  `dir`/`<bdi>` structure — not rendered glyphs/layout.
 
 ### Media providers - the pattern
 
