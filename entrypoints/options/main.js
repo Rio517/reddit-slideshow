@@ -6,22 +6,31 @@ import {
   formatImageTimer,
 } from "@/lib/settings.js";
 import { requiredElement } from "@/lib/dom.js";
-import { setMessageGetter, t } from "@/lib/i18n.js";
+import { t, resolveLocale } from "@/lib/i18n.js";
 import { localizeDocument, fillTemplate } from "@/lib/i18n-dom.js";
 
-setMessageGetter((key, subs) =>
-  browser.i18n.getMessage(/** @type {any} */ (key), subs),
-);
-localizeDocument(document, browser.i18n.getUILanguage());
+const uiLang = browser.i18n.getUILanguage();
 
-// Footer sentence: one translatable message with a {brand} marker; the brand
-// stays a literal <em> so translators reorder around it without editing markup.
-const footerText = document.querySelector("#footerText");
-if (footerText) {
-  const brand = document.createElement("em");
-  brand.textContent = "Reddit Slideshow Spectacular!";
-  footerText.replaceChildren(fillTemplate(document, t("optFooter"), { brand }));
+/**
+ * Apply a resolved locale to the page: strings, direction, and the footer.
+ * @param {string} locale
+ */
+function relocalize(locale) {
+  localizeDocument(document, locale);
+  // Footer sentence: one translatable message with a {brand} marker; the brand
+  // stays a literal <em> so translators reorder around it without editing markup.
+  const footerText = document.querySelector("#footerText");
+  if (footerText) {
+    const brand = document.createElement("em");
+    brand.textContent = "Reddit Slideshow Spectacular!";
+    footerText.replaceChildren(
+      fillTemplate(document, t("optFooter"), { brand }),
+    );
+  }
 }
+
+// Immediate best-guess; load() re-applies the stored choice.
+relocalize(resolveLocale("auto", uiLang));
 
 const timerSlider = requiredElement("#imageTimerSeconds", HTMLInputElement);
 const timerValue = requiredElement("#timerValue", HTMLOutputElement);
@@ -36,6 +45,7 @@ const maxLoadWaitValue = requiredElement(
   HTMLOutputElement,
 );
 const transition = requiredElement("#transition", HTMLSelectElement);
+const locale = requiredElement("#locale", HTMLSelectElement);
 const timerBarRadios = /** @type {NodeListOf<HTMLInputElement>} */ (
   document.querySelectorAll('input[name="timerBar"]')
 );
@@ -82,6 +92,8 @@ function panZoomOutText(id, value) {
 
 async function load() {
   const settings = await getSettings();
+  locale.value = settings.locale;
+  relocalize(resolveLocale(settings.locale, uiLang));
   timerSlider.value = String(imageTimerStopIndex(settings.imageTimerSeconds));
   timerValue.textContent = formatImageTimer(settings.imageTimerSeconds);
   autoplay.checked = settings.autoplay;
@@ -149,6 +161,15 @@ maxLoadWait.addEventListener("input", () => {
 });
 maxLoadWait.addEventListener("change", persist);
 transition.addEventListener("change", persist);
+// locale stays out of persist(): it's saved here and applied live.
+locale.addEventListener("change", async () => {
+  try {
+    await saveSettings({ locale: locale.value });
+  } catch {
+    // change listener; a failed write isn't actionable here
+  }
+  relocalize(resolveLocale(locale.value, uiLang));
+});
 for (const radio of timerBarRadios) radio.addEventListener("change", persist);
 panZoom.addEventListener("change", () => {
   syncPanZoomEnabled();

@@ -408,6 +408,14 @@
     "message": "تُطبَّق الإعدادات في المرّة التالية التي تبدأ فيها عرض شرائح.",
     "description": "Options page subtitle under the heading."
   },
+  "optLanguage": {
+    "message": "اللغة",
+    "description": "Language picker label on the options page."
+  },
+  "optLanguageAuto": {
+    "message": "تلقائي (لغة المتصفّح)",
+    "description": "Default language option that follows the browser."
+  },
   "optTimePerImage": {
     "message": "المدّة لكل صورة",
     "description": "Options label for the per-image timer slider."

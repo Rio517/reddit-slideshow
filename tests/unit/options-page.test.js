@@ -26,3 +26,17 @@ describe("options page footer", () => {
     expect(link?.getAttribute("rel") ?? "").toContain("noopener");
   });
 });
+
+describe("options page language picker", () => {
+  it("has a language select with auto + the six locales", () => {
+    const sel = doc.querySelector("#locale");
+    expect(sel).not.toBeNull();
+    const opts = [...(sel?.querySelectorAll("option") ?? [])].map(
+      (o) => /** @type {HTMLOptionElement} */ (o).value,
+    );
+    expect(opts).toEqual(["auto", "en", "es", "fr", "de", "it", "ar"]);
+    expect(
+      sel?.querySelector('option[value="auto"]')?.getAttribute("data-i18n"),
+    ).toBe("optLanguageAuto");
+  });
+});

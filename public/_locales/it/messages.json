@@ -408,6 +408,14 @@
     "message": "Le impostazioni si applicano alla prossima presentazione che avvii.",
     "description": "Options page subtitle under the heading."
   },
+  "optLanguage": {
+    "message": "Lingua",
+    "description": "Language picker label on the options page."
+  },
+  "optLanguageAuto": {
+    "message": "Automatica (lingua del browser)",
+    "description": "Default language option that follows the browser."
+  },
   "optTimePerImage": {
     "message": "Tempo per immagine",
     "description": "Options label for the per-image timer slider."

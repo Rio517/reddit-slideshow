@@ -408,6 +408,14 @@
     "message": "Settings apply the next time you start a slideshow.",
     "description": "Options page subtitle under the heading."
   },
+  "optLanguage": {
+    "message": "Language",
+    "description": "Language picker label on the options page."
+  },
+  "optLanguageAuto": {
+    "message": "Automatic (your browser's language)",
+    "description": "Default language option that follows the browser."
+  },
   "optTimePerImage": {
     "message": "Time per image",
     "description": "Options label for the per-image timer slider."

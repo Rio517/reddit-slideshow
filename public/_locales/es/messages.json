@@ -408,6 +408,14 @@
     "message": "La configuración se aplica la próxima vez que inicies un pase de diapositivas.",
     "description": "Options page subtitle under the heading."
   },
+  "optLanguage": {
+    "message": "Idioma",
+    "description": "Language picker label on the options page."
+  },
+  "optLanguageAuto": {
+    "message": "Automático (idioma del navegador)",
+    "description": "Default language option that follows the browser."
+  },
   "optTimePerImage": {
     "message": "Tiempo por imagen",
     "description": "Options label for the per-image timer slider."

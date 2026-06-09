@@ -408,6 +408,14 @@
     "message": "Les paramètres s'appliquent au prochain démarrage du diaporama.",
     "description": "Options page subtitle under the heading."
   },
+  "optLanguage": {
+    "message": "Langue",
+    "description": "Language picker label on the options page."
+  },
+  "optLanguageAuto": {
+    "message": "Automatique (langue du navigateur)",
+    "description": "Default language option that follows the browser."
+  },
   "optTimePerImage": {
     "message": "Durée par image",
     "description": "Options label for the per-image timer slider."

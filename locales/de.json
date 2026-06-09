@@ -408,6 +408,14 @@
     "message": "Einstellungen werden beim nächsten Start einer Diashow übernommen.",
     "description": "Options page subtitle under the heading."
   },
+  "optLanguage": {
+    "message": "Sprache",
+    "description": "Language picker label on the options page."
+  },
+  "optLanguageAuto": {
+    "message": "Automatisch (Sprache des Browsers)",
+    "description": "Default language option that follows the browser."
+  },
   "optTimePerImage": {
     "message": "Zeit pro Bild",
     "description": "Options label for the per-image timer slider."
