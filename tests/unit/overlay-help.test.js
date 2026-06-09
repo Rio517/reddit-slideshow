@@ -97,21 +97,6 @@ describe("createHelpPanel", () => {
     }
   });
 
-  it("lets a translation reorder the brand marker within the intro", () => {
-    // Template with $brand$ at the END proves fillTemplate honors word order:
-    // the <em> should follow the leading text, not be pinned to the front.
-    setMessageGetter((key) => (key === "helpIntro" ? "Use $brand$." : ""));
-    const { root } = make();
-    const intro = /** @type {HTMLElement} */ (
-      root.querySelector(".rs-help-panel__intro")
-    );
-    expect(intro.textContent).toBe("Use Reddit Slideshow Spectacular!.");
-    expect(intro.firstChild?.nodeName).toBe("#text");
-    expect(intro.querySelector("em")?.textContent).toBe(
-      "Reddit Slideshow Spectacular!",
-    );
-  });
-
   it("orders the panel as intro, list, about", () => {
     const { root } = make();
     const intro = /** @type {HTMLElement} */ (

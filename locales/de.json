@@ -48,8 +48,8 @@
     "description": "Accessible label for the help-panel close button."
   },
   "helpIntro": {
-    "message": "$brand$ is optimized for hands-free or keyboard navigation.",
-    "description": "Help-panel intro line. $brand$ is the product name (italicized); keep the $brand$ marker where the product name should appear."
+    "message": "{brand} is optimized for hands-free or keyboard navigation.",
+    "description": "Help-panel intro line. {brand} is the product name (italicized); keep the {brand} marker where the product name should appear."
   },
   "helpShortcutLaunch": {
     "message": "Launch the slideshow",
@@ -88,16 +88,16 @@
     "description": "Help-panel shortcut description: escape/dismiss."
   },
   "helpAbout": {
-    "message": "$brand$ is free and $openSource$, but consider a $donation$.",
-    "description": "Help-panel about footer. $brand$ is the product name (italicized); $openSource$ and $donation$ are links. Keep all three markers; translate the link text in helpAboutOpenSourceLink and helpAboutDonationLink."
+    "message": "{brand} is free and {openSource}, but consider a {donation}.",
+    "description": "Help-panel about footer. {brand} is the product name (italicized); {openSource} and {donation} are links. Keep all three markers; translate the link text in helpAboutOpenSourceLink and helpAboutDonationLink."
   },
   "helpAboutOpenSourceLink": {
     "message": "open source",
-    "description": "Help-panel about footer: open-source link text (the $openSource$ marker in helpAbout)."
+    "description": "Help-panel about footer: open-source link text (the {openSource} marker in helpAbout)."
   },
   "helpAboutDonationLink": {
     "message": "donation",
-    "description": "Help-panel about footer: donation link text (the $donation$ marker in helpAbout)."
+    "description": "Help-panel about footer: donation link text (the {donation} marker in helpAbout)."
   },
   "settingsTitle": {
     "message": "Settings",
@@ -521,8 +521,8 @@
     "description": "Pan-and-zoom step 5: show the whole image again."
   },
   "optFooter": {
-    "message": "$brand$ is free and open source.",
-    "description": "Options footer. $brand$ is the product name (italicized); keep the $brand$ marker where the product name should appear."
+    "message": "{brand} is free and open source.",
+    "description": "Options footer. {brand} is the product name (italicized); keep the {brand} marker where the product name should appear."
   },
   "optFooterLink": {
     "message": "Sponsor it on GitHub ↗",

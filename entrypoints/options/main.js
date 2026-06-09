@@ -7,32 +7,14 @@ import {
 } from "@/lib/settings.js";
 import { requiredElement } from "@/lib/dom.js";
 import { setMessageGetter, t } from "@/lib/i18n.js";
-import { localizeDocument } from "@/lib/i18n-dom.js";
+import { localizeDocument, fillTemplate } from "@/lib/i18n-dom.js";
 
 setMessageGetter((key, subs) =>
   browser.i18n.getMessage(/** @type {any} */ (key), subs),
 );
 localizeDocument(document, browser.i18n.getUILanguage());
 
-/**
- * Build a fragment from a template containing $name$ markers, replacing each
- * marker with the provided node and the rest with text nodes. Lets translators
- * reorder the sentence around the dynamic nodes.
- * @param {Document} doc
- * @param {string} template
- * @param {Record<string, Node>} nodes
- */
-function fillTemplate(doc, template, nodes) {
-  const frag = doc.createDocumentFragment();
-  for (const part of template.split(/(\$[A-Za-z0-9_]+\$)/)) {
-    const m = part.match(/^\$([A-Za-z0-9_]+)\$$/);
-    if (m && nodes[m[1]]) frag.append(nodes[m[1]]);
-    else if (part) frag.append(doc.createTextNode(part));
-  }
-  return frag;
-}
-
-// Footer sentence: one translatable message with a $brand$ marker; the brand
+// Footer sentence: one translatable message with a {brand} marker; the brand
 // stays a literal <em> so translators reorder around it without editing markup.
 const footerText = document.querySelector("#footerText");
 if (footerText) {
