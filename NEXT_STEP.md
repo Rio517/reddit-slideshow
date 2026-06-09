@@ -2,10 +2,12 @@
 
 **Branch:** `main` · **Status:** local green gate (typecheck/lint/format/test +
 both builds + web-ext lint). v1.0.0 is live on both stores. Localization
-(i18n + RTL — en/es/fr/de/it/ar, browser-language auto-select, full RTL for
-Arabic) is implemented on `main` and green locally, but unpushed and unreleased.
-What remains is the real-browser confirm in §1, an optional native-speaker pass
-on the machine-drafted translations, and the 1.1.0 release (user's call).
+(i18n + RTL — en/es/fr/de/it/ar, full RTL for Arabic) plus an in-app Language
+picker are implemented on `main` and green locally, but unpushed and unreleased.
+The UI auto-detects the browser language and can be overridden under **Language**
+on the options page. What remains is the real-browser confirm in §1, an optional
+native-speaker pass on the machine-drafted translations, and the 1.1.0 release
+(user's call).
 Streaming the proxy fallback is parked (see the §1 note).
 
 > **Hard rule:** work directly on `main`. Do not create branches or worktrees unless the user explicitly asks. See `AGENTS.md`.
@@ -43,14 +45,21 @@ giant commit.
 ### Requested, not yet done
 
 - **Localization release (1.1.0)** when the user gives the go. The i18n + RTL
-  work is implemented on `main` and green locally, but unpushed and unreleased.
-  Architecture: native WebExtension `_locales` (browser auto-selects by UI
-  language); the agnostic `lib/` core never calls `browser.i18n` — `lib/i18n.js`
-  exposes `t`/`tn`/`localeDirection` with a bundled English fallback, and the
-  entrypoints inject `browser.i18n.getMessage` + the UI language. Source of truth
-  is `locales/<lang>.json` (6 files, 127 keys); `scripts/build-locales.mjs`
-  (npm run locales) generates the committed `public/_locales/**`; the catalog
-  integrity test enforces sync + key + placeholder parity. To ship: bump
+  work plus an in-app Language picker are implemented on `main` and green
+  locally, but unpushed and unreleased. Architecture: source of truth is
+  `locales/<lang>.json` (6 files, 129 keys); `lib/i18n.js` bundles all six
+  catalogs and the default getter reads `CATALOGS[activeLocale]` with per-key
+  English fallback, so `setLocale(resolveLocale(setting, uiLang))` switches
+  strings + direction + plurals together. Entrypoints resolve the locale from the
+  `locale` setting ("auto" → browser UI language → a supported locale, or an
+  explicit pick); `browser.i18n` is used only for `getUILanguage()` and the
+  manifest `__MSG__` name/description/action (browser-locale — it can't follow the
+  in-app override). The options page has a **Language** `<select>` that
+  re-localizes live; the overlay applies the choice on its next start.
+  `scripts/build-locales.mjs` (npm run locales) generates the committed
+  `public/_locales/**`; the catalog integrity test enforces sync + key +
+  placeholder parity. (Catalogs ship both bundled in JS and in `_locales` for the
+  manifest, so the package is ~516 KB — fine for an extension.) To ship: bump
   `package.json:3` to `1.1.0` (WXT propagates to both manifests), push, then
   tag + publish `v1.1.0` to trigger `release.yml`. Before release: (a) do the
   Localization + RTL real-browser confirm in §1 below; (b) the translations are
