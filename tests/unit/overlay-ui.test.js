@@ -1499,6 +1499,28 @@ describe("createOverlay", () => {
     expect(live?.textContent).toBe("Skipped unavailable media: Dead clip");
   });
 
+  it("pluralizes the skipped badge and tooltip via tn() for singular and plural counts", () => {
+    const overlay = createOverlay(noopHandlers());
+    const badge = /** @type {HTMLElement | null} */ (
+      overlay.root.querySelector(".rs-skipped")
+    );
+    // Singular (total = 1): _one category.
+    overlay.setSkipped([imageSlide({ title: "Dead clip" })], 1);
+    expect(badge?.textContent).toBe("1 skipped");
+    expect(badge?.title).toBe("1 item skipped - click to view");
+    // Plural (total = 3): _other category.
+    overlay.setSkipped(
+      [
+        imageSlide({ title: "Dead clip 1" }),
+        imageSlide({ title: "Dead clip 2" }),
+        imageSlide({ title: "Dead clip 3" }),
+      ],
+      3,
+    );
+    expect(badge?.textContent).toBe("3 skipped");
+    expect(badge?.title).toBe("3 items skipped - click to view");
+  });
+
   it("dismissTopLayer closes the confirm first, then panels, returning false when empty", () => {
     const overlay = createOverlay(noopHandlers());
     expect(overlay.dismissTopLayer()).toBe(false); // nothing open

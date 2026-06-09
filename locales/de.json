@@ -17,6 +17,16 @@
     "description": "Skipped counter, plural.",
     "placeholders": { "count": { "content": "$1" } }
   },
+  "skippedTitle_one": {
+    "message": "$count$ item skipped - click to view",
+    "description": "Skipped-button tooltip, singular.",
+    "placeholders": { "count": { "content": "$1" } }
+  },
+  "skippedTitle_other": {
+    "message": "$count$ items skipped - click to view",
+    "description": "Skipped-button tooltip, plural.",
+    "placeholders": { "count": { "content": "$1" } }
+  },
   "extDescription": {
     "message": "Turn an old or new Reddit feed into a full-screen, keyboard-driven media slideshow.",
     "description": "Store/about description (shown in the browser's add-ons page and stores)."
