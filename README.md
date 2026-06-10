@@ -95,7 +95,7 @@ npm run build:chrome  # Chrome  → .output/chrome-mv3/
 Temporary add-ons are removed when you restart Firefox - just load it again. For
 a permanent install, use Firefox Developer Edition / Nightly / ESR, set
 `xpinstall.signatures.required` to `false` in `about:config`, then install the
-`npm run zip` package from `about:addons` → **Install Add-on From File…**.
+`npm run zip:firefox` package from `about:addons` → **Install Add-on From File…**.
 
 #### Chrome (unpacked, for development)
 
@@ -131,7 +131,8 @@ npm run dev          # WXT dev runner (fresh Firefox profile - not logged in)
 npm run build        # build BOTH → .output/firefox-mv3/ and .output/chrome-mv3/
 npm run build:firefox # Firefox MV3 only
 npm run build:chrome # Chrome MV3 only
-npm run zip          # packaged zip (Firefox / AMO)
+npm run zip          # build BOTH zips → .output/ (Firefox + sources, Chrome)
+npm run zip:firefox  # packaged zip (Firefox / AMO)
 npm run zip:chrome   # packaged zip (Chrome Web Store)
 npm run icons        # regenerate PNG icons from public/icon.svg (Bash + librsvg/rsvg-convert; macOS/Linux)
 npm test             # Vitest unit tests (fast; offline)
@@ -175,7 +176,7 @@ stores reject a re-used version.
 
 **Firefox (AMO):**
 
-1. `npm run zip` → a `.zip` in `.output/` (built extension + a sources zip).
+1. `npm run zip:firefox` → a `.zip` in `.output/` (built extension + a sources zip).
 2. Submit it as a new version at
    [addons.mozilla.org/developers](https://addons.mozilla.org/developers/).
    This extension requests only `storage` plus scoped Reddit/Redgifs hosts and

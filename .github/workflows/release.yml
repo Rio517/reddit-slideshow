@@ -38,10 +38,9 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      # `wxt zip` builds then packages: Firefox emits the extension zip + an AMO
-      # sources zip, Chrome emits its store zip - all under .output/.
+      # `npm run zip` packages both targets: Firefox emits the extension zip + an
+      # AMO sources zip, Chrome emits its store zip - all under .output/.
       - run: npm run zip
-      - run: npm run zip:chrome
       - run: ls -la .output/*.zip
       - name: Attach store zips to the release
         env:
