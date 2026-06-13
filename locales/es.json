@@ -567,5 +567,28 @@
   "optFooterLink": {
     "message": "Patrocínalo en GitHub ↗",
     "description": "Options footer: GitHub Sponsors link text."
+  },
+  "uiBlocked": {
+    "message": "Bloqueado u/$user$",
+    "description": "Toast confirming the author was blocked. $user$ is the username.",
+    "placeholders": { "user": { "content": "$1" } }
+  },
+  "uiFriended": {
+    "message": "Agregado u/$user$",
+    "description": "Toast confirming the author was added as a friend (old Reddit). $user$ is the username.",
+    "placeholders": { "user": { "content": "$1" } }
+  },
+  "uiFollowing": {
+    "message": "Siguiendo a u/$user$",
+    "description": "Toast confirming the author is now followed (new Reddit). $user$ is the username.",
+    "placeholders": { "user": { "content": "$1" } }
+  },
+  "uiDownloadStarted": {
+    "message": "Descargando…",
+    "description": "Toast confirming a media download has started."
+  },
+  "uiActionError": {
+    "message": "No se pudo completar",
+    "description": "Toast shown when a block/friend/follow action failed."
   }
 }

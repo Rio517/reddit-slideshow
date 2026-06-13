@@ -131,7 +131,7 @@ function fakeRequest(pages) {
 }
 
 /**
- * @param {{ pages?: any[], settingsOverrides?: Record<string, unknown>, openUrl?: (url: string) => void, openPopout?: () => void, saveSettings?: (patch: object) => Promise<unknown>, computeImageHash?: (url: string) => Promise<string | null>, createImage?: () => { src: string, decoding?: string }, createVideo?: () => { src: string, preload?: string, muted?: boolean }, resolveMedia?: (url: string) => Promise<string | null>, downloadMedia?: (url: string, filename: string) => void, resolveRedgifs?: (slide: any) => Promise<any>, resolveRedditAudio?: (slide: any) => Promise<string | null>, vote?: (id: string, dir: number) => Promise<any> }} [opts]
+ * @param {{ pages?: any[], settingsOverrides?: Record<string, unknown>, openUrl?: (url: string) => void, openPopout?: () => void, saveSettings?: (patch: object) => Promise<unknown>, computeImageHash?: (url: string) => Promise<string | null>, createImage?: () => { src: string, decoding?: string }, createVideo?: () => { src: string, preload?: string, muted?: boolean }, resolveMedia?: (url: string) => Promise<string | null>, downloadMedia?: (url: string, filename: string) => void, resolveRedgifs?: (slide: any) => Promise<any>, resolveRedditAudio?: (slide: any) => Promise<string | null>, vote?: (id: string, dir: number) => Promise<any>, block?: (name: string) => Promise<{ ok?: boolean }>, friend?: (name: string, fe: string) => Promise<{ ok?: boolean }>, frontend?: "old" | "new" }} [opts]
  */
 function makeSession({
   pages,
@@ -147,6 +147,9 @@ function makeSession({
   resolveRedgifs,
   resolveRedditAudio,
   vote,
+  block,
+  friend,
+  frontend,
 } = {}) {
   const request = fakeRequest(
     pages ?? [
@@ -175,6 +178,9 @@ function makeSession({
     resolveRedgifs,
     resolveRedditAudio,
     vote,
+    block,
+    friend,
+    frontend,
   });
   sessions.push(session);
   return { session, request };
@@ -1179,6 +1185,96 @@ describe("createSlideshowSession", () => {
     await session.start();
     session.handleKeydown(key("m"));
     expect(saved.at(-1)).toEqual({ startMuted: false });
+  });
+
+  it("downloads the current slide's media with the D key", async () => {
+    /** @type {Array<{ url: string, filename: string }>} */
+    const calls = [];
+    const { session } = makeSession({
+      downloadMedia: (url, filename) => calls.push({ url, filename }),
+    });
+    await session.start();
+    session.handleKeydown(key("d"));
+    await flush();
+    expect(calls).toEqual([
+      { url: "https://i.redd.it/a.jpg", filename: "a.jpg" },
+    ]);
+  });
+
+  it("blocks the author and skips to the next post with the I key", async () => {
+    /** @type {string[]} */
+    const blocked = [];
+    const { session } = makeSession({
+      block: async (name) => {
+        blocked.push(name);
+        return { ok: true };
+      },
+      pages: [
+        {
+          slides: [
+            imageSlide("p1", { postId: "p1", author: "spez" }),
+            imageSlide("p2", { postId: "p2", author: "other" }),
+          ],
+          after: null,
+          exhausted: true,
+          postsScanned: 2,
+        },
+      ],
+    });
+    await session.start();
+    session.handleKeydown(key("i"));
+    await flush();
+    expect(blocked).toEqual(["spez"]);
+    expect(mediaSrc()).toBe("https://i.redd.it/p2.jpg");
+    expect(text(".rs-vote-flash")).toContain("spez");
+  });
+
+  it("does nothing for the I key when the author is unknown", async () => {
+    /** @type {string[]} */
+    const blocked = [];
+    const { session } = makeSession({
+      block: async (name) => {
+        blocked.push(name);
+        return { ok: true };
+      },
+      pages: [
+        {
+          slides: [imageSlide("a", { author: undefined })],
+          after: null,
+          exhausted: true,
+          postsScanned: 1,
+        },
+      ],
+    });
+    await session.start();
+    session.handleKeydown(key("i"));
+    await flush();
+    expect(blocked).toEqual([]);
+  });
+
+  it("friends the author with the A key, passing the frontend", async () => {
+    /** @type {Array<[string, string]>} */
+    const friended = [];
+    const { session } = makeSession({
+      frontend: "new",
+      friend: async (name, fe) => {
+        friended.push([name, fe]);
+        return { ok: true };
+      },
+      pages: [
+        {
+          slides: [imageSlide("a", { author: "spez" })],
+          after: null,
+          exhausted: true,
+          postsScanned: 1,
+        },
+      ],
+    });
+    await session.start();
+    session.handleKeydown(key("a"));
+    await flush();
+    expect(friended).toEqual([["spez", "new"]]);
+    expect(text(".rs-vote-flash")).toContain("spez");
   });
 });
 
