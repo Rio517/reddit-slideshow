@@ -66,4 +66,54 @@ describe("createVoter", () => {
     const { vote } = createVoter({ fetchImpl: /** @type {any} */ (fetchImpl) });
     await expect(vote("t3_abc", 1)).rejects.toThrow();
   });
+
+  it("blocks a user: POSTs name + uh to /api/block_user", async () => {
+    /** @type {Array<{ url: string, opts: any }>} */
+    const calls = [];
+    const fetchImpl = vi.fn(async (/** @type {any} */ url, /** @type {any} */ opts) => {
+      calls.push({ url: String(url), opts });
+      return String(url).includes("/api/me.json")
+        ? jsonResponse({ data: { modhash: "MH" } })
+        : jsonResponse({});
+    });
+    const { blockUser } = createVoter({ fetchImpl: /** @type {any} */ (fetchImpl) });
+    expect(await blockUser("spez")).toBe(true);
+    const req = calls.find((c) => c.url.includes("/api/block_user"));
+    expect(req?.opts?.method).toBe("POST");
+    expect(req?.opts?.credentials).toBe("include");
+    const params = new URLSearchParams(req?.opts?.body);
+    expect(params.get("name")).toBe("spez");
+    expect(params.get("uh")).toBe("MH");
+  });
+
+  it("friends a user: POSTs type=friend + name + uh to /api/friend", async () => {
+    /** @type {Array<{ url: string, opts: any }>} */
+    const calls = [];
+    const fetchImpl = vi.fn(async (/** @type {any} */ url, /** @type {any} */ opts) => {
+      calls.push({ url: String(url), opts });
+      return String(url).includes("/api/me.json")
+        ? jsonResponse({ data: { modhash: "MH" } })
+        : jsonResponse({});
+    });
+    const { friendUser } = createVoter({ fetchImpl: /** @type {any} */ (fetchImpl) });
+    expect(await friendUser("spez", "old")).toBe(true);
+    const req = calls.find((c) => c.url.includes("/api/friend"));
+    const params = new URLSearchParams(req?.opts?.body);
+    expect(params.get("type")).toBe("friend");
+    expect(params.get("name")).toBe("spez");
+    expect(params.get("uh")).toBe("MH");
+  });
+
+  it("refreshes the modhash once on a 403 and retries a block", async () => {
+    let writeCalls = 0;
+    const fetchImpl = vi.fn(async (/** @type {any} */ url) => {
+      if (String(url).includes("/api/me.json"))
+        return jsonResponse({ data: { modhash: "MH" } });
+      writeCalls += 1;
+      return writeCalls === 1 ? jsonResponse({}, { status: 403 }) : jsonResponse({});
+    });
+    const { blockUser } = createVoter({ fetchImpl: /** @type {any} */ (fetchImpl) });
+    expect(await blockUser("spez")).toBe(true);
+    expect(writeCalls).toBe(2);
+  });
 });
