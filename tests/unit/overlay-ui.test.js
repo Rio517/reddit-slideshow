@@ -1608,6 +1608,27 @@ describe("createOverlay", () => {
     expect(overlay.dismissTopLayer()).toBe(true);
     expect(confirm?.hidden).toBe(true);
   });
+
+  it("flashMessage shows a transient toast with the given text", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.flashMessage("Blocked u/spez");
+    const flash = /** @type {HTMLElement} */ (
+      overlay.root.querySelector(".rs-vote-flash")
+    );
+    expect(flash.textContent).toBe("Blocked u/spez");
+    expect(flash.hidden).toBe(false);
+    vi.advanceTimersByTime(1300);
+    expect(flash.hidden).toBe(true);
+  });
+
+  it("flashMessage error variant uses the error class", () => {
+    const overlay = createOverlay(noopHandlers());
+    overlay.flashMessage("Couldn't do that", "error");
+    const flash = /** @type {HTMLElement} */ (
+      overlay.root.querySelector(".rs-vote-flash")
+    );
+    expect(flash.className).toContain("rs-vote-flash--error");
+  });
 });
 
 describe("help panel", () => {
