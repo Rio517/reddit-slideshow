@@ -1276,6 +1276,47 @@ describe("createSlideshowSession", () => {
     expect(friended).toEqual([["spez", "new"]]);
     expect(text(".rs-vote-flash")).toContain("spez");
   });
+
+  it("flashes an error when the block write is rejected", async () => {
+    const { session } = makeSession({
+      block: async () => ({ ok: false }),
+      pages: [
+        {
+          slides: [imageSlide("a", { author: "spez" })],
+          after: null,
+          exhausted: true,
+          postsScanned: 1,
+        },
+      ],
+    });
+    await session.start();
+    session.handleKeydown(key("i"));
+    await flush();
+    // The optimistic "Blocked u/spez" flash is replaced by the error flash.
+    expect(text(".rs-vote-flash")).toContain("Couldn't");
+    expect(text(".rs-vote-flash")).not.toContain("spez");
+  });
+
+  it("flashes an error when the friend write throws", async () => {
+    const { session } = makeSession({
+      frontend: "old",
+      friend: async () => {
+        throw new Error("network down");
+      },
+      pages: [
+        {
+          slides: [imageSlide("a", { author: "spez" })],
+          after: null,
+          exhausted: true,
+          postsScanned: 1,
+        },
+      ],
+    });
+    await session.start();
+    session.handleKeydown(key("a"));
+    await flush();
+    expect(text(".rs-vote-flash")).toContain("Couldn't");
+  });
 });
 
 describe("PageUp / PageDown ±10", () => {
