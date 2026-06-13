@@ -34,7 +34,7 @@ La coda contiene solo contenuti multimediali: post di testo, link esterni, annun
 
 CONTROLLI
 
-- Tastiera: Left/Right per spostarsi (Shift+Right salta al post successivo; Page Up/Page Down saltano avanti o indietro di 10 post), Up/Down per votare positivamente o negativamente, Space per riprodurre/mettere in pausa, M per silenziare, F per il fullscreen, Esc per chiudere
+- Tastiera: Left/Right per spostarsi (Shift+Right salta al post successivo; Page Up/Page Down saltano avanti o indietro di 10 post), Up/Down per votare positivamente o negativamente, Space per riprodurre/mettere in pausa, M per silenziare, F per il fullscreen, D per scaricare, I per bloccare l'autore (e saltare il suo post), A per aggiungerlo agli amici o seguirlo, Esc per chiudere
 - Una barra di controlli a schermo: precedente, riproduci/pausa, successivo, silenzia, schermo intero, apri in finestra e impostazioni
 - Sotto ogni diapositiva: la firma (chi ha pubblicato, in quale subreddit, la fonte e la risoluzione), con pulsanti per aprire il post originale o scaricare il media
 - Fai clic sul contatore di posizione per passare direttamente a qualsiasi post nella coda caricata
@@ -64,6 +64,6 @@ IMPOSTAZIONI (si applicano in tempo reale, senza ricaricamento)
 
 PRIVACY
 
-Nessuna analisi, nessun tracciamento, nessuna pubblicità, nessun account e nessun server dello sviluppatore (non ne esistono). L'estensione scarica solo i media che stai visualizzando: il feed e i relativi media da Reddit, e i clip dei provider Imgur, Redgifs, Streamable, Giphy e Catbox. L'unica azione che scrive sul tuo account Reddit è il voto, e solo quando premi i tasti su/giù. Le impostazioni sono salvate localmente sul tuo computer e l'estensione non carica codice remoto. Informativa completa: vedi il link alla privacy policy.
+Nessuna analisi, nessun tracciamento, nessuna pubblicità, nessun account e nessun server dello sviluppatore (non ne esistono). L'estensione scarica solo i media che stai visualizzando: il feed e i relativi media da Reddit, e i clip dei provider Imgur, Redgifs, Streamable, Giphy e Catbox. Le uniche cose che scrivono sul tuo account Reddit sono il voto (tasti su/giù), il blocco di un autore (I) e l'aggiunta o il follow di un autore (A), e solo quando premi il tasto corrispondente. Le impostazioni sono salvate localmente sul tuo computer e l'estensione non carica codice remoto. Informativa completa: vedi il link alla privacy policy.
 
 Open source, MIT licensed.

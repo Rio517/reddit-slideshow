@@ -34,7 +34,7 @@ La cola es solo multimedia: las publicaciones de texto, los enlaces a artículos
 
 CONTROLES
 
-- Teclado: Left/Right para avanzar y retroceder (Shift+Right salta a la siguiente publicación; Page Up/Page Down saltan 10 hacia atrás/adelante), Up/Down para votar positivo/negativo, Space para reproducir/pausar, M para silenciar, F para pantalla completa, Esc para cerrar
+- Teclado: Left/Right para avanzar y retroceder (Shift+Right salta a la siguiente publicación; Page Up/Page Down saltan 10 hacia atrás/adelante), Up/Down para votar positivo/negativo, Space para reproducir/pausar, M para silenciar, F para pantalla completa, D para descargar, I para bloquear al autor (y omitir su publicación), A para agregarlo como amigo o seguirlo, Esc para cerrar
 - Una barra de controles en pantalla: anterior, reproducir/pausar, siguiente, silenciar, pantalla completa, abrir en ventana y ajustes
 - Bajo cada diapositiva: una línea de créditos (quién la publicó, en qué subreddit, la fuente y la resolución), con botones para abrir la publicación original o descargar el contenido
 - Haz clic en el contador de posición para ir directamente a cualquier publicación de la cola cargada
@@ -64,6 +64,6 @@ AJUSTES (se aplican en tiempo real, sin recarga)
 
 PRIVACIDAD
 
-Sin analíticas, sin rastreo, sin anuncios, sin cuentas y sin servidores del desarrollador (no existen). La extensión solo obtiene el contenido que estás viendo: el feed y su contenido multimedia desde Reddit, y los clips de proveedores como Imgur, Redgifs, Streamable, Giphy y Catbox. Lo único que escribe en tu cuenta de Reddit es el voto, y solo cuando pulsas las teclas de arriba/abajo. Tus ajustes se almacenan localmente en tu ordenador y no incluye código remoto. Política completa: consulta el enlace a la política de privacidad.
+Sin analíticas, sin rastreo, sin anuncios, sin cuentas y sin servidores del desarrollador (no existen). La extensión solo obtiene el contenido que estás viendo: el feed y su contenido multimedia desde Reddit, y los clips de proveedores como Imgur, Redgifs, Streamable, Giphy y Catbox. Lo único que escribe en tu cuenta de Reddit es votar (teclas arriba/abajo), bloquear a un autor (I) y agregar o seguir a un autor (A), y solo cuando pulsas la tecla correspondiente. Tus ajustes se almacenan localmente en tu ordenador y no incluye código remoto. Política completa: consulta el enlace a la política de privacidad.
 
 Código abierto, licencia MIT.

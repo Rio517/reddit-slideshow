@@ -34,7 +34,7 @@ La file d'attente est exclusivement multimédia : les publications textuelles, l
 
 COMMANDES
 
-- Clavier : Left/Right pour naviguer (Shift+Right passe à la publication suivante ; Page Up/Page Down sautent 10 positions en arrière/avant), Up/Down pour voter pour ou contre la publication, Space pour lire/mettre en pause, M pour couper le son, F pour le plein écran, Esc pour fermer
+- Clavier : Left/Right pour naviguer (Shift+Right passe à la publication suivante ; Page Up/Page Down sautent 10 positions en arrière/avant), Up/Down pour voter pour ou contre la publication, Space pour lire/mettre en pause, M pour couper le son, F pour le plein écran, D pour télécharger, I pour bloquer l'auteur (et passer sa publication), A pour l'ajouter en ami ou le suivre, Esc pour fermer
 - Une barre de commandes à l'écran : précédent, lecture/pause, suivant, sourdine, plein écran, ouvrir dans une fenêtre et paramètres
 - Sous chaque diapositive : une ligne d'informations (auteur, subreddit, source et résolution), avec des boutons pour ouvrir la publication originale ou télécharger le média
 - Cliquez sur le compteur de position pour accéder directement à n'importe quelle publication de la file chargée
@@ -64,6 +64,6 @@ PARAMÈTRES (appliqués en direct, sans rechargement)
 
 CONFIDENTIALITÉ
 
-Aucune analyse d'audience, aucun pistage, aucune publicité, aucun compte et aucun serveur du développeur (il n'en existe pas). L'extension récupère uniquement les médias que vous consultez : le fil et ses médias depuis Reddit, ainsi que les clips des fournisseurs Imgur, Redgifs, Streamable, Giphy et Catbox. La seule action qui écrit dans votre compte Reddit est le vote, et uniquement lorsque vous appuyez sur les touches haut/bas. Vos paramètres sont stockés localement sur votre ordinateur et l'extension ne charge aucun code distant. Politique complète : voir le lien vers la politique de confidentialité.
+Aucune analyse d'audience, aucun pistage, aucune publicité, aucun compte et aucun serveur du développeur (il n'en existe pas). L'extension récupère uniquement les médias que vous consultez : le fil et ses médias depuis Reddit, ainsi que les clips des fournisseurs Imgur, Redgifs, Streamable, Giphy et Catbox. Les seules choses qui écrivent dans votre compte Reddit sont le vote (touches haut/bas), le blocage d'un auteur (I) et l'ajout ou le suivi d'un auteur (A), et uniquement lorsque vous appuyez sur la touche correspondante. Vos paramètres sont stockés localement sur votre ordinateur et l'extension ne charge aucun code distant. Politique complète : voir le lien vers la politique de confidentialité.
 
 Open source, MIT licensed.

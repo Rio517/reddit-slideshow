@@ -34,7 +34,7 @@ Die Warteschlange enthält nur Medienbeiträge: Text- und Self-Posts, ausgehende
 
 STEUERUNG
 
-- Tastatur: Left/Right zum Navigieren (Shift+Right springt zum nächsten Beitrag; Page Up/Page Down springen 10 Einträge zurück/vor), Up/Down zum Hoch-/Runtervoten, Space zum Abspielen/Pausieren, M zum Stummschalten, F für Vollbild, Esc zum Schließen
+- Tastatur: Left/Right zum Navigieren (Shift+Right springt zum nächsten Beitrag; Page Up/Page Down springen 10 Einträge zurück/vor), Up/Down zum Hoch-/Runtervoten, Space zum Abspielen/Pausieren, M zum Stummschalten, F für Vollbild, D zum Herunterladen, I zum Blockieren des Autors (und Überspringen seines Beitrags), A um ihn als Freund hinzuzufügen oder ihm zu folgen, Esc zum Schließen
 - Eine Steuerungsleiste auf dem Bildschirm: zurück, Abspielen/Pausieren, weiter, Stummschalten, Vollbild, in einem Fenster öffnen und Einstellungen
 - Unter jeder Folie: eine Infozeile (wer den Beitrag gepostet hat, in welchem Subreddit, Quelle und Auflösung) sowie Schaltflächen zum Öffnen des Originalbeitrags oder zum Herunterladen des Mediums
 - Klicke auf den Positionszähler, um direkt zu einem beliebigen Beitrag in der geladenen Warteschlange zu springen
@@ -64,6 +64,6 @@ EINSTELLUNGEN (werden sofort übernommen, kein Neuladen erforderlich)
 
 DATENSCHUTZ
 
-Keine Analysedaten, kein Tracking, keine Werbung, keine Konten und keine Entwicklerserver (es gibt keine). Die Erweiterung ruft nur die Medien ab, die du dir ansiehst: den Feed und seine Medien von Reddit sowie Clips der Anbieter Imgur, Redgifs, Streamable, Giphy und Catbox. Das Einzige, das in dein Reddit-Konto schreibt, ist das Abstimmen – und nur dann, wenn du die Hoch-/Runter-Tasten drückst. Deine Einstellungen werden lokal auf deinem Computer gespeichert, und die Erweiterung lädt keinen Remotecode. Vollständige Richtlinie: siehe den Link zur Datenschutzrichtlinie.
+Keine Analysedaten, kein Tracking, keine Werbung, keine Konten und keine Entwicklerserver (es gibt keine). Die Erweiterung ruft nur die Medien ab, die du dir ansiehst: den Feed und seine Medien von Reddit sowie Clips der Anbieter Imgur, Redgifs, Streamable, Giphy und Catbox. Das Einzige, was in dein Reddit-Konto schreibt, sind das Abstimmen (Hoch-/Runter-Tasten), das Blockieren eines Autors (I) und das Hinzufügen oder Folgen eines Autors (A) – und nur, wenn du die jeweilige Taste drückst. Deine Einstellungen werden lokal auf deinem Computer gespeichert, und die Erweiterung lädt keinen Remotecode. Vollständige Richtlinie: siehe den Link zur Datenschutzrichtlinie.
 
 Open source, MIT lizenziert.
