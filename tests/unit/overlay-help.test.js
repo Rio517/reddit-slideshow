@@ -43,7 +43,7 @@ describe("createHelpPanel", () => {
   it("lists one row per shortcut, each with a key badge and a description", () => {
     const panel = make();
     const rows = panel.root.querySelectorAll(".rs-help-panel__row");
-    expect(rows.length).toBe(9);
+    expect(rows.length).toBe(12);
     for (const row of rows) {
       expect(row.querySelector(".rs-help-panel__key")).not.toBeNull();
       expect(
