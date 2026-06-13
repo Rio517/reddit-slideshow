@@ -150,6 +150,34 @@ export default defineContentScript({
           })
           .catch((err) => log.warn("download message failed", url, err));
       },
+      // Which Reddit frontend launched the show: drives the friend/follow
+      // wording and (via the background) the write endpoint.
+      frontend: window.location.hostname === "old.reddit.com" ? "old" : "new",
+      // Block the current author through the session (the background holds the
+      // modhash and POSTs with the session cookie).
+      block: async (name) => {
+        try {
+          return await browser.runtime.sendMessage({
+            type: "slideshow.block",
+            payload: { name },
+          });
+        } catch (err) {
+          log.warn("block message failed", err);
+          return { ok: false };
+        }
+      },
+      // Friend (old.reddit) / follow (new reddit) the current author.
+      friend: async (name, frontend) => {
+        try {
+          return await browser.runtime.sendMessage({
+            type: "slideshow.friend",
+            payload: { name, frontend },
+          });
+        } catch (err) {
+          log.warn("friend message failed", err);
+          return { ok: false };
+        }
+      },
       createImage: () => new Image(),
       // A detached <video> used only to warm the cache for the next direct clip.
       createVideo: () => document.createElement("video"),
