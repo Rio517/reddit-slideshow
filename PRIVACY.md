@@ -1,6 +1,6 @@
 # Privacy Policy - Reddit Slideshow Spectacular!
 
-_Last updated: 2026-06-03_
+_Last updated: 2026-06-13_
 
 **Short version: Reddit Slideshow Spectacular! collects nothing, sends nothing to
 the developer, and has no analytics, tracking, ads, or accounts. Everything it
@@ -36,12 +36,19 @@ operated by the developer (there is none):
   stream, so the background fetches that clip's small DASH manifest from
   `v.redd.it` (**without cookies**) to find the audio track's URL, which your
   browser then plays alongside the silent video.
-- **Voting (only when you press a key).** Pressing **↑/↓** casts an
-  upvote/downvote on the current post through your logged-in session: the
-  background sends your Reddit session cookies to Reddit's `/api/vote` (and
-  `/api/me.json`, for the required CSRF token). This is the **only** action the
-  extension takes that writes to your Reddit account, and it happens **only** when
-  you press the key. Nothing is sent anywhere but Reddit.
+- **Account actions (only when you press a key).** A few keys write to your
+  Reddit account through your logged-in session, sending your Reddit session
+  cookies to Reddit (and `/api/me.json`, for the required CSRF token) - and to
+  Reddit only:
+  - **↑/↓** casts an upvote/downvote on the current post (`/api/vote`).
+  - **I** blocks the current post's author (`/api/block_user`), then skips past
+    their post.
+  - **A** adds the author as a friend, or follows them (`/api/friend`).
+
+  These are the **only** actions the extension takes that write to your Reddit
+  account, and each happens **only** when you press its key. Nothing is sent
+  anywhere but Reddit.
+
 - **Download.** The download control saves the current media to your computer with
   the browser's downloads API; the file is fetched from its host (without cookies)
   and saved locally - nothing is uploaded.

@@ -65,7 +65,7 @@ The queue is media-only: text/self posts, outbound article links, stickied annou
 
 CONTROLS
 
-- Keyboard: Left/Right to move (Shift+Right skips to the next post; Page Up/Page Down jump back/ahead 10), Up/Down to upvote/downvote the post, Space to play/pause, M to mute, F for fullscreen, Esc to close
+- Keyboard: Left/Right to move (Shift+Right skips to the next post; Page Up/Page Down jump back/ahead 10), Up/Down to upvote/downvote the post, Space to play/pause, M to mute, F for fullscreen, D to download, I to block the author (and skip their post), A to friend/follow the author, Esc to close
 - An on-screen control rail: previous, play/pause, next, mute, fullscreen, open in a window, and settings
 - Under each slide: a byline (who posted it, to which subreddit, the source and resolution), with buttons to open the original post or download the media
 - Click the position counter to jump straight to any post in the loaded queue
@@ -95,7 +95,7 @@ SETTINGS (apply live, no reload)
 
 PRIVACY
 
-No analytics, no tracking, no ads, no accounts, and no developer servers (there are none). The extension only fetches the media you're viewing: the feed and its media from Reddit, and provider clips from Imgur, Redgifs, Streamable, Giphy, and Catbox. The one thing that writes to your Reddit account is voting, and only when you press the up/down keys. Your settings are stored locally on your computer, and it ships no remote code. Full policy: see the privacy policy link.
+No analytics, no tracking, no ads, no accounts, and no developer servers (there are none). The extension only fetches the media you're viewing: the feed and its media from Reddit, and provider clips from Imgur, Redgifs, Streamable, Giphy, and Catbox. The only things that write to your Reddit account are voting (up/down keys), blocking an author (I), and friending/following an author (A) - each only when you press its key. Your settings are stored locally on your computer, and it ships no remote code. Full policy: see the privacy policy link.
 
 Open source, MIT licensed.
 
@@ -137,9 +137,10 @@ API permissions:
 Host permissions (install-time):
 
 - **https://old.reddit.com/\*** - Fetch the listing JSON for the old-Reddit page
-  the user is viewing, so the slideshow knows which media to show; also, when the
-  user presses the up/down keys, cast their vote on the current post (`/api/vote`
-  with the session cookie + modhash).
+  the user is viewing, so the slideshow knows which media to show; also, on a
+  keypress, write to the user's account with the session cookie + modhash:
+  up/down vote on the post (`/api/vote`), block its author (`/api/block_user`),
+  or friend/follow them (`/api/friend`).
 - **https://www.reddit.com/\*** - Same listing fetch, for new Reddit; the
   slideshow can be launched from either frontend.
 - **https://api.redgifs.com/\* , https://media.redgifs.com/\*** - Resolve a
@@ -256,7 +257,7 @@ Reddit Slideshow Spectacular! has one purpose: to turn the Reddit feed the user 
 
 **Host-permissions justification (Chrome's single field - max 1000 chars; paste the line below as-is. `downloads` is a separate per-permission field above):**
 
-All host access serves one purpose: turning the Reddit feed the user is viewing into a media slideshow. old.reddit.com / www.reddit.com - read the page's listing JSON to build and paginate the slide queue, and cast the user's up/down vote on the current post (only on the arrow keys). api.redgifs.com / media.redgifs.com / i.imgur.com / imgur.com, plus any streamable.com and giphy.com subdomain - resolve and fetch provider clips (Redgifs, Imgur .gifv, Streamable, Giphy) so they play as native video, and expand Imgur albums; all without cookies. v.redd.it - fetch a video's DASH manifest (without cookies) for its separate audio track so the clip plays with sound. i.redd.it / preview.redd.it / external-preview.redd.it - fetch Reddit images/previews (without cookies) to compute a local perceptual hash that skips re-uploaded duplicates (on by default); nothing leaves the device.
+All host access serves one purpose: turning the Reddit feed the user is viewing into a media slideshow. old.reddit.com / www.reddit.com - read the page's listing JSON to build and paginate the slide queue, and on a keypress write to the user's account: up/down vote (`/api/vote`), block an author (`/api/block_user`), or friend/follow them (`/api/friend`). api.redgifs.com / media.redgifs.com / i.imgur.com / imgur.com, plus any streamable.com and giphy.com subdomain - resolve and fetch provider clips (Redgifs, Imgur .gifv, Streamable, Giphy) so they play as native video, and expand Imgur albums; all without cookies. v.redd.it - fetch a video's DASH manifest (without cookies) for its separate audio track so the clip plays with sound. i.redd.it / preview.redd.it / external-preview.redd.it - fetch Reddit images/previews (without cookies) to compute a local perceptual hash that skips re-uploaded duplicates (on by default); nothing leaves the device.
 
 (Catbox files.catbox.moe loads directly in the page and needs no host permission, so it's not in the field above.)
 

@@ -34,7 +34,7 @@ The queue is media-only: text/self posts, outbound article links, stickied annou
 
 CONTROLS
 
-- Keyboard: Left/Right to move (Shift+Right skips to the next post; Page Up/Page Down jump back/ahead 10), Up/Down to upvote/downvote the post, Space to play/pause, M to mute, F for fullscreen, Esc to close
+- Keyboard: Left/Right to move (Shift+Right skips to the next post; Page Up/Page Down jump back/ahead 10), Up/Down to upvote/downvote the post, Space to play/pause, M to mute, F for fullscreen, D to download, I to block the author (and skip their post), A to friend/follow the author, Esc to close
 - An on-screen control rail: previous, play/pause, next, mute, fullscreen, open in a window, and settings
 - Under each slide: a byline (who posted it, to which subreddit, the source and resolution), with buttons to open the original post or download the media
 - Click the position counter to jump straight to any post in the loaded queue
@@ -64,6 +64,6 @@ SETTINGS (apply live, no reload)
 
 PRIVACY
 
-No analytics, no tracking, no ads, no accounts, and no developer servers (there are none). The extension only fetches the media you're viewing: the feed and its media from Reddit, and provider clips from Imgur, Redgifs, Streamable, Giphy, and Catbox. The one thing that writes to your Reddit account is voting, and only when you press the up/down keys. Your settings are stored locally on your computer, and it ships no remote code. Full policy: see the privacy policy link.
+No analytics, no tracking, no ads, no accounts, and no developer servers (there are none). The extension only fetches the media you're viewing: the feed and its media from Reddit, and provider clips from Imgur, Redgifs, Streamable, Giphy, and Catbox. The only things that write to your Reddit account are voting (up/down keys), blocking an author (I), and friending/following an author (A) - each only when you press its key. Your settings are stored locally on your computer, and it ships no remote code. Full policy: see the privacy policy link.
 
 Open source, MIT licensed.

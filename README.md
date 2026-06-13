@@ -36,6 +36,8 @@ AirPlay or Chromecast that window to your TV for a hands-off, lean-back feed.
 - **Upvote/downvote** the current post with the **↑/↓** keys, through your
   logged-in session.
 - **Download** the current media, or open the original post, from the overlay.
+- **Block** an author (**I**) or **friend / follow** them (**A**) - through your
+  logged-in session.
 - A byline under each slide: `/u/author to /r/subreddit from {domain} at {W×H}`.
 - Lots to tune from the overlay's gear, applied live with no reload - see
   [Settings](#settings).
@@ -119,8 +121,9 @@ startup that you can dismiss).
 - Open any `old.reddit.com` or `www.reddit.com` feed, then click the toolbar
   icon or press **Alt+Shift+S**.
 - Keys: **←/→** previous/next, **↑/↓** upvote/downvote, **Space** play/pause,
-  **M** mute, **F** fullscreen, **Esc** close. You can also click the dark
-  backdrop to close.
+  **M** mute, **F** fullscreen, **D** download, **I** block the author (and skip
+  their post), **A** friend/follow the author, **Esc** close. You can also click
+  the dark backdrop to close.
 - Open settings from the **gear** in the overlay's control rail (or the
   extension's options page); changes apply to the running slideshow immediately.
 
@@ -224,8 +227,9 @@ and [Firefox Add-ons](https://addons.mozilla.org/firefox/addon/reddit-slideshow-
 No analytics, no tracking, no developer servers - the extension fetches only the
 Reddit feed and the media you are viewing (including clips resolved from Redgifs,
 Imgur, Streamable, Giphy, and Catbox), plus, for re-upload detection, the image
-bytes it hashes locally on your computer. The one action that writes to your Reddit
-account is voting, and only when you press **↑/↓**. Your Reddit cookies go to
+bytes it hashes locally on your computer. The actions that write to your Reddit
+account are voting (**↑/↓**), blocking an author (**I**), and friending/following
+an author (**A**) - each only when you press the key. Your Reddit cookies go to
 Reddit only; every provider request is cookie-less. Settings are stored locally.
 See [PRIVACY.md](PRIVACY.md).
 

@@ -140,6 +140,8 @@ requested.
 - Space: pause/resume timer or video playback.
 - M: mute / unmute. F: fullscreen. ?: keyboard-shortcut help. Escape: close (or
   dismiss an open panel first).
+- D: download the current media. I: block the author (then skip their post). A:
+  friend / follow the author (all through the session).
 - Controls must be keyboard accessible; the modal traps focus and makes the page
   `inert` while open, with an obvious close path (top-right ×, backdrop, Escape).
 
