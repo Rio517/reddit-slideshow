@@ -80,6 +80,8 @@ export default defineBackground(() => {
       browser.downloads.download({ url, filename, saveAs: false }),
     // Up/down-key post voting through the session (cookie + modhash).
     vote: (id, dir) => voter.vote(id, dir),
+    block: (name) => voter.blockUser(name),
+    friend: (name, frontend) => voter.friendUser(name, frontend),
     openOptionsPage: () => browser.runtime.openOptionsPage(),
     // Minimal popup window (no tab strip / toolbar / URL bar) for AirPlay.
     openPopout: (url) =>
