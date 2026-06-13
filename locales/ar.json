@@ -91,6 +91,18 @@
     "message": "ملء الشاشة",
     "description": "Help-panel shortcut description: fullscreen."
   },
+  "helpShortcutDownload": {
+    "message": "تنزيل الصورة أو الفيديو الحالي",
+    "description": "Help-panel shortcut description: download."
+  },
+  "helpShortcutBlock": {
+    "message": "حظر صاحب المنشور وتخطّي منشوره",
+    "description": "Help-panel shortcut description: block author."
+  },
+  "helpShortcutFriend": {
+    "message": "إضافة صاحب المنشور كصديق أو متابعته",
+    "description": "Help-panel shortcut description: friend/follow author."
+  },
   "helpShortcutEscape": {
     "message": "الإغلاق، أو إخفاء لوحة مفتوحة",
     "description": "Help-panel shortcut description: escape/dismiss."

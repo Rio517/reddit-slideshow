@@ -91,6 +91,18 @@
     "message": "Plein écran",
     "description": "Help-panel shortcut description: fullscreen."
   },
+  "helpShortcutDownload": {
+    "message": "Télécharger l'image ou la vidéo actuelle",
+    "description": "Help-panel shortcut description: download."
+  },
+  "helpShortcutBlock": {
+    "message": "Bloquer l'auteur et passer sa publication",
+    "description": "Help-panel shortcut description: block author."
+  },
+  "helpShortcutFriend": {
+    "message": "Ajouter l'auteur en ami ou le suivre",
+    "description": "Help-panel shortcut description: friend/follow author."
+  },
   "helpShortcutEscape": {
     "message": "Fermer, ou masquer un panneau ouvert",
     "description": "Help-panel shortcut description: escape/dismiss."
