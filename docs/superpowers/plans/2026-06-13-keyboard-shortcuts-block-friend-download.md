@@ -9,6 +9,7 @@
 **Tech Stack:** WXT (MV3), framework-free JS with JSDoc types, Vitest (happy-dom), WebExtension `_locales` i18n.
 
 **Conventions for every commit in this plan:**
+
 - Commit **locally only — never `git push`** (the maintainer rations CI credits and pushes manually).
 - Work stays on `main` (no branches/worktrees).
 - End each commit message with the trailer shown in the commit steps.
@@ -21,9 +22,9 @@
 Two Reddit write endpoints are used from best-known docs and are **confirmed against a real logged-in Firefox session in Task 10** (a green offline gate does not prove a Reddit write works):
 
 - **`/api/block_user`** — params `name` (vs an account fullname `t2_…`).
-- **`/api/friend`** with `type=friend` — used for *both* frontends. Reddit folded "follow" into the friends relationship; old.reddit labels it "friend", new reddit "follow". The write is the same; only the flash wording differs (Task 6). Task 10 confirms whether new reddit needs a distinct follow endpoint; if it does, that is a localized change to `friendUser` + its unit test.
+- **`/api/friend`** with `type=friend` — used for _both_ frontends. Reddit folded "follow" into the friends relationship; old.reddit labels it "friend", new reddit "follow". The write is the same; only the flash wording differs (Task 6). Task 10 confirms whether new reddit needs a distinct follow endpoint; if it does, that is a localized change to `friendUser` + its unit test.
 
-The unit tests assert the request *we send* (URL + body), so they are valid regardless; Task 10 may produce a one-line endpoint/param correction.
+The unit tests assert the request _we send_ (URL + body), so they are valid regardless; Task 10 may produce a one-line endpoint/param correction.
 
 ---
 
@@ -32,6 +33,7 @@ The unit tests assert the request *we send* (URL + body), so they are valid rega
 Extract the shared "POST a form with modhash, refresh-and-retry once on 403" into a private `postForm` helper, then add the two new writes alongside `vote`.
 
 **Files:**
+
 - Modify: `lib/reddit-vote.js`
 - Test: `tests/unit/reddit-vote.test.js`
 
@@ -40,55 +42,67 @@ Extract the shared "POST a form with modhash, refresh-and-retry once on 403" int
 Append these tests inside the `describe("createVoter", …)` block in `tests/unit/reddit-vote.test.js` (the `jsonResponse` helper already exists at the top of the file):
 
 ```js
-  it("blocks a user: POSTs name + uh to /api/block_user", async () => {
-    /** @type {Array<{ url: string, opts: any }>} */
-    const calls = [];
-    const fetchImpl = vi.fn(async (/** @type {any} */ url, /** @type {any} */ opts) => {
+it("blocks a user: POSTs name + uh to /api/block_user", async () => {
+  /** @type {Array<{ url: string, opts: any }>} */
+  const calls = [];
+  const fetchImpl = vi.fn(
+    async (/** @type {any} */ url, /** @type {any} */ opts) => {
       calls.push({ url: String(url), opts });
       return String(url).includes("/api/me.json")
         ? jsonResponse({ data: { modhash: "MH" } })
         : jsonResponse({});
-    });
-    const { blockUser } = createVoter({ fetchImpl: /** @type {any} */ (fetchImpl) });
-    expect(await blockUser("spez")).toBe(true);
-    const req = calls.find((c) => c.url.includes("/api/block_user"));
-    expect(req?.opts?.method).toBe("POST");
-    expect(req?.opts?.credentials).toBe("include");
-    const params = new URLSearchParams(req?.opts?.body);
-    expect(params.get("name")).toBe("spez");
-    expect(params.get("uh")).toBe("MH");
+    },
+  );
+  const { blockUser } = createVoter({
+    fetchImpl: /** @type {any} */ (fetchImpl),
   });
+  expect(await blockUser("spez")).toBe(true);
+  const req = calls.find((c) => c.url.includes("/api/block_user"));
+  expect(req?.opts?.method).toBe("POST");
+  expect(req?.opts?.credentials).toBe("include");
+  const params = new URLSearchParams(req?.opts?.body);
+  expect(params.get("name")).toBe("spez");
+  expect(params.get("uh")).toBe("MH");
+});
 
-  it("friends a user: POSTs type=friend + name + uh to /api/friend", async () => {
-    /** @type {Array<{ url: string, opts: any }>} */
-    const calls = [];
-    const fetchImpl = vi.fn(async (/** @type {any} */ url, /** @type {any} */ opts) => {
+it("friends a user: POSTs type=friend + name + uh to /api/friend", async () => {
+  /** @type {Array<{ url: string, opts: any }>} */
+  const calls = [];
+  const fetchImpl = vi.fn(
+    async (/** @type {any} */ url, /** @type {any} */ opts) => {
       calls.push({ url: String(url), opts });
       return String(url).includes("/api/me.json")
         ? jsonResponse({ data: { modhash: "MH" } })
         : jsonResponse({});
-    });
-    const { friendUser } = createVoter({ fetchImpl: /** @type {any} */ (fetchImpl) });
-    expect(await friendUser("spez", "old")).toBe(true);
-    const req = calls.find((c) => c.url.includes("/api/friend"));
-    const params = new URLSearchParams(req?.opts?.body);
-    expect(params.get("type")).toBe("friend");
-    expect(params.get("name")).toBe("spez");
-    expect(params.get("uh")).toBe("MH");
+    },
+  );
+  const { friendUser } = createVoter({
+    fetchImpl: /** @type {any} */ (fetchImpl),
   });
+  expect(await friendUser("spez", "old")).toBe(true);
+  const req = calls.find((c) => c.url.includes("/api/friend"));
+  const params = new URLSearchParams(req?.opts?.body);
+  expect(params.get("type")).toBe("friend");
+  expect(params.get("name")).toBe("spez");
+  expect(params.get("uh")).toBe("MH");
+});
 
-  it("refreshes the modhash once on a 403 and retries a block", async () => {
-    let writeCalls = 0;
-    const fetchImpl = vi.fn(async (/** @type {any} */ url) => {
-      if (String(url).includes("/api/me.json"))
-        return jsonResponse({ data: { modhash: "MH" } });
-      writeCalls += 1;
-      return writeCalls === 1 ? jsonResponse({}, { status: 403 }) : jsonResponse({});
-    });
-    const { blockUser } = createVoter({ fetchImpl: /** @type {any} */ (fetchImpl) });
-    expect(await blockUser("spez")).toBe(true);
-    expect(writeCalls).toBe(2);
+it("refreshes the modhash once on a 403 and retries a block", async () => {
+  let writeCalls = 0;
+  const fetchImpl = vi.fn(async (/** @type {any} */ url) => {
+    if (String(url).includes("/api/me.json"))
+      return jsonResponse({ data: { modhash: "MH" } });
+    writeCalls += 1;
+    return writeCalls === 1
+      ? jsonResponse({}, { status: 403 })
+      : jsonResponse({});
   });
+  const { blockUser } = createVoter({
+    fetchImpl: /** @type {any} */ (fetchImpl),
+  });
+  expect(await blockUser("spez")).toBe(true);
+  expect(writeCalls).toBe(2);
+});
 ```
 
 - [ ] **Step 2: Run the tests to verify they fail**
@@ -101,69 +115,69 @@ Expected: FAIL — `blockUser is not a function` / `friendUser is not a function
 In `lib/reddit-vote.js`, replace the `vote` function (lines ~36–60, the JSDoc block plus `async function vote(...) { … }`) with:
 
 ```js
-  /**
-   * POST a form to an `/api` endpoint with the session cookie + modhash,
-   * refreshing the modhash once on a 403 and retrying. Throws on a non-OK
-   * response.
-   * @param {string} path e.g. `/api/vote`
-   * @param {Record<string, string>} fields
-   * @returns {Promise<boolean>}
-   */
-  async function postForm(path, fields) {
-    /** @param {string} uh */
-    const post = (uh) =>
-      fetchImpl(`${origin}${path}`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ ...fields, uh }).toString(),
-      });
+/**
+ * POST a form to an `/api` endpoint with the session cookie + modhash,
+ * refreshing the modhash once on a 403 and retrying. Throws on a non-OK
+ * response.
+ * @param {string} path e.g. `/api/vote`
+ * @param {Record<string, string>} fields
+ * @returns {Promise<boolean>}
+ */
+async function postForm(path, fields) {
+  /** @param {string} uh */
+  const post = (uh) =>
+    fetchImpl(`${origin}${path}`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ ...fields, uh }).toString(),
+    });
 
-    let res = await post(await getModhash());
-    // A stale modhash 403s; refresh it once and retry.
-    if (res.status === 403) res = await post(await getModhash(true));
-    if (!res.ok) throw new Error(`${path} HTTP ${res.status}`);
-    return true;
-  }
+  let res = await post(await getModhash());
+  // A stale modhash 403s; refresh it once and retry.
+  if (res.status === 403) res = await post(await getModhash(true));
+  if (!res.ok) throw new Error(`${path} HTTP ${res.status}`);
+  return true;
+}
 
-  /**
-   * @param {string} fullname Post fullname, e.g. `t3_abc`.
-   * @param {1 | 0 | -1} dir Up (1), clear (0), or down (-1).
-   * @returns {Promise<boolean>}
-   */
-  async function vote(fullname, dir) {
-    return postForm("/api/vote", { id: fullname, dir: String(dir) });
-  }
+/**
+ * @param {string} fullname Post fullname, e.g. `t3_abc`.
+ * @param {1 | 0 | -1} dir Up (1), clear (0), or down (-1).
+ * @returns {Promise<boolean>}
+ */
+async function vote(fullname, dir) {
+  return postForm("/api/vote", { id: fullname, dir: String(dir) });
+}
 
-  /**
-   * Block a user account (hides all their content). Reversible in Reddit
-   * settings.
-   * @param {string} name Reddit username (no `u/` prefix).
-   * @returns {Promise<boolean>}
-   */
-  async function blockUser(name) {
-    return postForm("/api/block_user", { name });
-  }
+/**
+ * Block a user account (hides all their content). Reversible in Reddit
+ * settings.
+ * @param {string} name Reddit username (no `u/` prefix).
+ * @returns {Promise<boolean>}
+ */
+async function blockUser(name) {
+  return postForm("/api/block_user", { name });
+}
 
-  /**
-   * Add the author to your friends list. Both frontends use the classic friends
-   * API — old.reddit calls it "friend", new reddit "follow"; the write is the
-   * same. `frontend` is accepted so a future new-reddit-specific follow endpoint
-   * can branch here without a signature change.
-   * @param {string} name Reddit username (no `u/` prefix).
-   * @param {"old" | "new"} frontend
-   * @returns {Promise<boolean>}
-   */
-  // eslint-disable-next-line no-unused-vars
-  async function friendUser(name, frontend) {
-    return postForm("/api/friend", { type: "friend", name });
-  }
+/**
+ * Add the author to your friends list. Both frontends use the classic friends
+ * API — old.reddit calls it "friend", new reddit "follow"; the write is the
+ * same. `frontend` is accepted so a future new-reddit-specific follow endpoint
+ * can branch here without a signature change.
+ * @param {string} name Reddit username (no `u/` prefix).
+ * @param {"old" | "new"} frontend
+ * @returns {Promise<boolean>}
+ */
+// eslint-disable-next-line no-unused-vars
+async function friendUser(name, frontend) {
+  return postForm("/api/friend", { type: "friend", name });
+}
 ```
 
 Then change the final `return { vote };` to:
 
 ```js
-  return { vote, blockUser, friendUser };
+return { vote, blockUser, friendUser };
 ```
 
 - [ ] **Step 4: Run the tests to verify they pass**
@@ -186,6 +200,7 @@ git commit -m "feat(reddit): add blockUser and friendUser session writes" \
 Add two content-script-only message types with payload validation mirroring `handleVote`.
 
 **Files:**
+
 - Modify: `lib/background-router.js`
 - Test: `tests/unit/background-router.test.js`
 
@@ -215,7 +230,9 @@ describe("createMessageRouter - block", () => {
 
   it("rejects a block from a non-content-script sender (no tab)", async () => {
     const router = makeRouter({ block: async () => true });
-    expect(await router(blockMsg("spez"), { id: RUNTIME_ID })).toEqual({ ok: false });
+    expect(await router(blockMsg("spez"), { id: RUNTIME_ID })).toEqual({
+      ok: false,
+    });
   });
 
   it("rejects an invalid username", async () => {
@@ -244,7 +261,10 @@ describe("createMessageRouter - friend", () => {
     /** @type {Array<[string, string]>} */
     const friended = [];
     const router = makeRouter({
-      friend: async (/** @type {string} */ name, /** @type {string} */ frontend) => {
+      friend: async (
+        /** @type {string} */ name,
+        /** @type {string} */ frontend,
+      ) => {
         friended.push([name, frontend]);
         return true;
       },
@@ -255,13 +275,19 @@ describe("createMessageRouter - friend", () => {
 
   it("rejects a friend from a non-content-script sender (no tab)", async () => {
     const router = makeRouter({ friend: async () => true });
-    expect(await router(friendMsg("spez", "old"), { id: RUNTIME_ID })).toEqual({ ok: false });
+    expect(await router(friendMsg("spez", "old"), { id: RUNTIME_ID })).toEqual({
+      ok: false,
+    });
   });
 
   it("rejects an invalid username or frontend", async () => {
     const router = makeRouter({ friend: async () => true });
-    expect(await router(friendMsg("bad name!", "old"), OWN)).toEqual({ ok: false });
-    expect(await router(friendMsg("spez", "mobile"), OWN)).toEqual({ ok: false });
+    expect(await router(friendMsg("bad name!", "old"), OWN)).toEqual({
+      ok: false,
+    });
+    expect(await router(friendMsg("spez", "mobile"), OWN)).toEqual({
+      ok: false,
+    });
   });
 
   it("fails closed when the friend throws", async () => {
@@ -292,18 +318,18 @@ In `lib/background-router.js`, add to the `deps` typedef (after the `vote?: …`
 Add these routes right after the existing `slideshow.vote` block (after ~line 76):
 
 ```js
-    if (message?.type === "slideshow.block") {
-      // A user-initiated account block through the logged-in session;
-      // content-script-only so a page script can't block as the user.
-      if (!fromContentScript) return Promise.resolve({ ok: false });
-      return handleBlock(message, deps.block);
-    }
-    if (message?.type === "slideshow.friend") {
-      // A user-initiated friend/follow through the logged-in session;
-      // content-script-only so a page script can't friend as the user.
-      if (!fromContentScript) return Promise.resolve({ ok: false });
-      return handleFriend(message, deps.friend);
-    }
+if (message?.type === "slideshow.block") {
+  // A user-initiated account block through the logged-in session;
+  // content-script-only so a page script can't block as the user.
+  if (!fromContentScript) return Promise.resolve({ ok: false });
+  return handleBlock(message, deps.block);
+}
+if (message?.type === "slideshow.friend") {
+  // A user-initiated friend/follow through the logged-in session;
+  // content-script-only so a page script can't friend as the user.
+  if (!fromContentScript) return Promise.resolve({ ok: false });
+  return handleFriend(message, deps.friend);
+}
 ```
 
 Add the handlers and the shared username pattern near `handleVote` (after the `handleVote` function, ~line 277):
@@ -321,7 +347,11 @@ const USERNAME_RE = /^[A-Za-z0-9_-]{1,20}$/;
  */
 function handleBlock(message, block) {
   const name = message.payload?.name;
-  if (typeof block !== "function" || typeof name !== "string" || !USERNAME_RE.test(name)) {
+  if (
+    typeof block !== "function" ||
+    typeof name !== "string" ||
+    !USERNAME_RE.test(name)
+  ) {
     return Promise.resolve({ ok: false });
   }
   return Promise.resolve(block(name))
@@ -378,6 +408,7 @@ git commit -m "feat(router): route slideshow.block and slideshow.friend" \
 Thin glue (WXT entrypoint, no unit test); covered by typecheck + build.
 
 **Files:**
+
 - Modify: `entrypoints/background.js`
 
 - [ ] **Step 1: Wire `blockUser` / `friendUser` into the router**
@@ -409,6 +440,7 @@ git commit -m "feat(background): expose block/friend writes to the router" \
 Thin glue; covered by typecheck + build, and exercised end-to-end in Task 10.
 
 **Files:**
+
 - Modify: `entrypoints/content.js`
 
 - [ ] **Step 1: Add the `frontend`, `block`, and `friend` deps**
@@ -466,6 +498,7 @@ git commit -m "feat(content): send block/friend messages with frontend" \
 Add `flashMessage(text, variant)` reusing the vote-flash element, so block/friend/download can show a transient confirmation. Refactor `flashVote` onto a shared `showFlashToast`.
 
 **Files:**
+
 - Modify: `lib/overlay-ui.js`
 - Test: `tests/unit/overlay-ui.test.js`
 
@@ -474,26 +507,26 @@ Add `flashMessage(text, variant)` reusing the vote-flash element, so block/frien
 Add to `tests/unit/overlay-ui.test.js` inside `describe("createOverlay", …)` (the suite uses `vi.useFakeTimers()` in `beforeEach`):
 
 ```js
-  it("flashMessage shows a transient toast with the given text", () => {
-    const overlay = createOverlay(noopHandlers());
-    overlay.flashMessage("Blocked u/spez");
-    const flash = /** @type {HTMLElement} */ (
-      overlay.root.querySelector(".rs-vote-flash")
-    );
-    expect(flash.textContent).toBe("Blocked u/spez");
-    expect(flash.hidden).toBe(false);
-    vi.advanceTimersByTime(1300);
-    expect(flash.hidden).toBe(true);
-  });
+it("flashMessage shows a transient toast with the given text", () => {
+  const overlay = createOverlay(noopHandlers());
+  overlay.flashMessage("Blocked u/spez");
+  const flash = /** @type {HTMLElement} */ (
+    overlay.root.querySelector(".rs-vote-flash")
+  );
+  expect(flash.textContent).toBe("Blocked u/spez");
+  expect(flash.hidden).toBe(false);
+  vi.advanceTimersByTime(1300);
+  expect(flash.hidden).toBe(true);
+});
 
-  it("flashMessage error variant uses the error class", () => {
-    const overlay = createOverlay(noopHandlers());
-    overlay.flashMessage("Couldn't do that", "error");
-    const flash = /** @type {HTMLElement} */ (
-      overlay.root.querySelector(".rs-vote-flash")
-    );
-    expect(flash.className).toContain("rs-vote-flash--error");
-  });
+it("flashMessage error variant uses the error class", () => {
+  const overlay = createOverlay(noopHandlers());
+  overlay.flashMessage("Couldn't do that", "error");
+  const flash = /** @type {HTMLElement} */ (
+    overlay.root.querySelector(".rs-vote-flash")
+  );
+  expect(flash.className).toContain("rs-vote-flash--error");
+});
 ```
 
 - [ ] **Step 2: Run the tests to verify they fail**
@@ -506,36 +539,36 @@ Expected: FAIL — `overlay.flashMessage is not a function`.
 In `lib/overlay-ui.js`, replace the `flashVote` function (lines ~416–430) with:
 
 ```js
-  /** @param {string} text @param {string} cls */
-  function showFlashToast(text, cls) {
-    voteFlash.textContent = text;
+/** @param {string} text @param {string} cls */
+function showFlashToast(text, cls) {
+  voteFlash.textContent = text;
+  voteFlash.classList.remove("rs-vote-flash--on");
+  void voteFlash.offsetWidth; // restart the animation on a rapid re-press
+  voteFlash.className = `rs-vote-flash ${cls} rs-vote-flash--on`;
+  voteFlash.hidden = false;
+  announce(text);
+  if (voteFlashTimer != null) clearTimeout(voteFlashTimer);
+  voteFlashTimer = setTimeout(() => {
     voteFlash.classList.remove("rs-vote-flash--on");
-    void voteFlash.offsetWidth; // restart the animation on a rapid re-press
-    voteFlash.className = `rs-vote-flash ${cls} rs-vote-flash--on`;
-    voteFlash.hidden = false;
-    announce(text);
-    if (voteFlashTimer != null) clearTimeout(voteFlashTimer);
-    voteFlashTimer = setTimeout(() => {
-      voteFlash.classList.remove("rs-vote-flash--on");
-      voteFlash.hidden = true;
-    }, 1200);
-  }
-  /** @param {1 | 0 | -1 | "error"} state */
-  function flashVote(state) {
-    const def = VOTE_FLASH[String(state)] ?? VOTE_FLASH.error;
-    showFlashToast(def.text, def.cls);
-  }
-  /**
-   * Transient confirmation toast for keys-only actions (block/friend/download).
-   * @param {string} text
-   * @param {"info" | "error"} [variant]
-   */
-  function flashMessage(text, variant = "info") {
-    showFlashToast(
-      text,
-      variant === "error" ? "rs-vote-flash--error" : "rs-vote-flash--none",
-    );
-  }
+    voteFlash.hidden = true;
+  }, 1200);
+}
+/** @param {1 | 0 | -1 | "error"} state */
+function flashVote(state) {
+  const def = VOTE_FLASH[String(state)] ?? VOTE_FLASH.error;
+  showFlashToast(def.text, def.cls);
+}
+/**
+ * Transient confirmation toast for keys-only actions (block/friend/download).
+ * @param {string} text
+ * @param {"info" | "error"} [variant]
+ */
+function flashMessage(text, variant = "info") {
+  showFlashToast(
+    text,
+    variant === "error" ? "rs-vote-flash--error" : "rs-vote-flash--none",
+  );
+}
 ```
 
 Then add `flashMessage` to the returned overlay API — change the `flashVote,` line (~1515) to:
@@ -565,6 +598,7 @@ git commit -m "feat(overlay): generalize the flash toast into flashMessage" \
 Add `downloadCurrent`, `blockAuthor`, `friendAuthor`; route the new keys; reuse `downloadCurrent` for the existing overlay download button. Uses i18n keys added in Task 8 — they fall back to English in the unit tests.
 
 **Files:**
+
 - Modify: `lib/session.js`
 - Test: `tests/unit/session.test.js`
 
@@ -589,97 +623,97 @@ and pass them into `createSlideshowSession({ … })` (after `vote,` at ~line 177
 Then add these tests inside `describe("createSlideshowSession", …)`:
 
 ```js
-  it("downloads the current slide's media with the D key", async () => {
-    /** @type {Array<{ url: string, filename: string }>} */
-    const calls = [];
-    const { session } = makeSession({
-      downloadMedia: (url, filename) => calls.push({ url, filename }),
-    });
-    await session.start();
-    session.handleKeydown(key("d"));
-    await flush();
-    expect(calls).toEqual([
-      { url: "https://i.redd.it/a.jpg", filename: "a.jpg" },
-    ]);
+it("downloads the current slide's media with the D key", async () => {
+  /** @type {Array<{ url: string, filename: string }>} */
+  const calls = [];
+  const { session } = makeSession({
+    downloadMedia: (url, filename) => calls.push({ url, filename }),
   });
+  await session.start();
+  session.handleKeydown(key("d"));
+  await flush();
+  expect(calls).toEqual([
+    { url: "https://i.redd.it/a.jpg", filename: "a.jpg" },
+  ]);
+});
 
-  it("blocks the author and skips to the next post with the I key", async () => {
-    /** @type {string[]} */
-    const blocked = [];
-    const { session } = makeSession({
-      block: async (name) => {
-        blocked.push(name);
-        return { ok: true };
+it("blocks the author and skips to the next post with the I key", async () => {
+  /** @type {string[]} */
+  const blocked = [];
+  const { session } = makeSession({
+    block: async (name) => {
+      blocked.push(name);
+      return { ok: true };
+    },
+    pages: [
+      {
+        slides: [
+          imageSlide("p1", { postId: "p1", author: "spez" }),
+          imageSlide("p2", { postId: "p2", author: "other" }),
+        ],
+        after: null,
+        exhausted: true,
+        postsScanned: 2,
       },
-      pages: [
-        {
-          slides: [
-            imageSlide("p1", { postId: "p1", author: "spez" }),
-            imageSlide("p2", { postId: "p2", author: "other" }),
-          ],
-          after: null,
-          exhausted: true,
-          postsScanned: 2,
-        },
-      ],
-    });
-    await session.start();
-    session.handleKeydown(key("i"));
-    await flush();
-    expect(blocked).toEqual(["spez"]);
-    // Advanced past the blocked author's post to the next post.
-    expect(mediaSrc()).toBe("https://i.redd.it/p2.jpg");
-    // A confirmation flash naming the user appeared.
-    expect(text(".rs-vote-flash")).toContain("spez");
+    ],
   });
+  await session.start();
+  session.handleKeydown(key("i"));
+  await flush();
+  expect(blocked).toEqual(["spez"]);
+  // Advanced past the blocked author's post to the next post.
+  expect(mediaSrc()).toBe("https://i.redd.it/p2.jpg");
+  // A confirmation flash naming the user appeared.
+  expect(text(".rs-vote-flash")).toContain("spez");
+});
 
-  it("does nothing for the I key when the author is unknown", async () => {
-    /** @type {string[]} */
-    const blocked = [];
-    const { session } = makeSession({
-      block: async (name) => {
-        blocked.push(name);
-        return { ok: true };
+it("does nothing for the I key when the author is unknown", async () => {
+  /** @type {string[]} */
+  const blocked = [];
+  const { session } = makeSession({
+    block: async (name) => {
+      blocked.push(name);
+      return { ok: true };
+    },
+    pages: [
+      {
+        slides: [imageSlide("a", { author: undefined })],
+        after: null,
+        exhausted: true,
+        postsScanned: 1,
       },
-      pages: [
-        {
-          slides: [imageSlide("a", { author: undefined })],
-          after: null,
-          exhausted: true,
-          postsScanned: 1,
-        },
-      ],
-    });
-    await session.start();
-    session.handleKeydown(key("i"));
-    await flush();
-    expect(blocked).toEqual([]);
+    ],
   });
+  await session.start();
+  session.handleKeydown(key("i"));
+  await flush();
+  expect(blocked).toEqual([]);
+});
 
-  it("friends the author with the A key, passing the frontend", async () => {
-    /** @type {Array<[string, string]>} */
-    const friended = [];
-    const { session } = makeSession({
-      frontend: "new",
-      friend: async (name, fe) => {
-        friended.push([name, fe]);
-        return { ok: true };
+it("friends the author with the A key, passing the frontend", async () => {
+  /** @type {Array<[string, string]>} */
+  const friended = [];
+  const { session } = makeSession({
+    frontend: "new",
+    friend: async (name, fe) => {
+      friended.push([name, fe]);
+      return { ok: true };
+    },
+    pages: [
+      {
+        slides: [imageSlide("a", { author: "spez" })],
+        after: null,
+        exhausted: true,
+        postsScanned: 1,
       },
-      pages: [
-        {
-          slides: [imageSlide("a", { author: "spez" })],
-          after: null,
-          exhausted: true,
-          postsScanned: 1,
-        },
-      ],
-    });
-    await session.start();
-    session.handleKeydown(key("a"));
-    await flush();
-    expect(friended).toEqual([["spez", "new"]]);
-    expect(text(".rs-vote-flash")).toContain("spez");
+    ],
   });
+  await session.start();
+  session.handleKeydown(key("a"));
+  await flush();
+  expect(friended).toEqual([["spez", "new"]]);
+  expect(text(".rs-vote-flash")).toContain("spez");
+});
 ```
 
 - [ ] **Step 2: Run the tests to verify they fail**
@@ -708,50 +742,50 @@ In `lib/session.js`, replace the inline `onDownload` handler (lines ~174–185) 
 Then add these three functions next to `castVote` (after the `castVote` function, ~line 306). `downloadCurrent` carries the same logic and HTTPS guard the old `onDownload` had:
 
 ```js
-  // Save the displayed media via the background downloads API. Only image/video
-  // slides have a concrete file; unresolved embeds have none. Used by both the
-  // overlay download button and the D key.
-  function downloadCurrent() {
-    const slide = controller?.current;
-    if (!slide || !(slide.kind === "image" || slide.kind === "video")) return;
-    if (slide.mediaUrl && isHttpUrl(slide.mediaUrl)) {
-      deps.downloadMedia?.(slide.mediaUrl, slide.filenameHint ?? "");
-      overlay?.flashMessage?.(t("uiDownloadStarted"));
-    }
+// Save the displayed media via the background downloads API. Only image/video
+// slides have a concrete file; unresolved embeds have none. Used by both the
+// overlay download button and the D key.
+function downloadCurrent() {
+  const slide = controller?.current;
+  if (!slide || !(slide.kind === "image" || slide.kind === "video")) return;
+  if (slide.mediaUrl && isHttpUrl(slide.mediaUrl)) {
+    deps.downloadMedia?.(slide.mediaUrl, slide.filenameHint ?? "");
+    overlay?.flashMessage?.(t("uiDownloadStarted"));
   }
+}
 
-  // Block the current author through the session, then skip past their post.
-  // Optimistic: flash + advance at once, correcting to an error flash if the
-  // write fails. The block itself is reversible in Reddit settings.
-  function blockAuthor() {
-    const slide = controller?.current;
-    const name = slide?.author;
-    if (!slide || !name || name === "[deleted]" || !deps.block) return;
-    overlay?.flashMessage?.(t("uiBlocked", [name]));
-    controller?.skipPostGroup();
-    void Promise.resolve(deps.block(name))
-      .then((res) => {
-        if (res && res.ok === false) throw new Error("block rejected");
-      })
-      .catch(() => overlay?.flashMessage?.(t("uiActionError"), "error"));
-  }
+// Block the current author through the session, then skip past their post.
+// Optimistic: flash + advance at once, correcting to an error flash if the
+// write fails. The block itself is reversible in Reddit settings.
+function blockAuthor() {
+  const slide = controller?.current;
+  const name = slide?.author;
+  if (!slide || !name || name === "[deleted]" || !deps.block) return;
+  overlay?.flashMessage?.(t("uiBlocked", [name]));
+  controller?.skipPostGroup();
+  void Promise.resolve(deps.block(name))
+    .then((res) => {
+      if (res && res.ok === false) throw new Error("block rejected");
+    })
+    .catch(() => overlay?.flashMessage?.(t("uiActionError"), "error"));
+}
 
-  // Friend (old.reddit) / follow (new reddit) the current author. Optimistic
-  // flash; the wording follows the launching frontend.
-  function friendAuthor() {
-    const slide = controller?.current;
-    const name = slide?.author;
-    if (!slide || !name || name === "[deleted]" || !deps.friend) return;
-    const frontend = deps.frontend === "old" ? "old" : "new";
-    overlay?.flashMessage?.(
-      t(frontend === "old" ? "uiFriended" : "uiFollowing", [name]),
-    );
-    void Promise.resolve(deps.friend(name, frontend))
-      .then((res) => {
-        if (res && res.ok === false) throw new Error("friend rejected");
-      })
-      .catch(() => overlay?.flashMessage?.(t("uiActionError"), "error"));
-  }
+// Friend (old.reddit) / follow (new reddit) the current author. Optimistic
+// flash; the wording follows the launching frontend.
+function friendAuthor() {
+  const slide = controller?.current;
+  const name = slide?.author;
+  if (!slide || !name || name === "[deleted]" || !deps.friend) return;
+  const frontend = deps.frontend === "old" ? "old" : "new";
+  overlay?.flashMessage?.(
+    t(frontend === "old" ? "uiFriended" : "uiFollowing", [name]),
+  );
+  void Promise.resolve(deps.friend(name, frontend))
+    .then((res) => {
+      if (res && res.ok === false) throw new Error("friend rejected");
+    })
+    .catch(() => overlay?.flashMessage?.(t("uiActionError"), "error"));
+}
 ```
 
 - [ ] **Step 5: Register the keys**
@@ -802,6 +836,7 @@ git commit -m "feat(session): bind D/I/A to download, block+skip, friend/follow"
 ## Task 7: `overlay-help.js` — document the new shortcuts
 
 **Files:**
+
 - Modify: `lib/overlay-help.js`
 - Test: `tests/unit/overlay-help.test.js`
 
@@ -810,7 +845,7 @@ git commit -m "feat(session): bind D/I/A to download, block+skip, friend/follow"
 In `tests/unit/overlay-help.test.js`, in the "lists one row per shortcut" test, change `expect(rows.length).toBe(9);` to:
 
 ```js
-    expect(rows.length).toBe(12);
+expect(rows.length).toBe(12);
 ```
 
 - [ ] **Step 2: Run it to verify it fails**
@@ -850,6 +885,7 @@ git commit -m "feat(help): list the download, block, and friend shortcuts" \
 Add 8 keys to **all six** source catalogs (the catalog test requires identical key sets and matching placeholders), then regenerate `public/_locales`.
 
 **Files:**
+
 - Modify: `locales/en.json`, `locales/es.json`, `locales/fr.json`, `locales/de.json`, `locales/it.json`, `locales/ar.json`
 - Regenerated: `public/_locales/**` (via `npm run locales`)
 - Test: `tests/unit/i18n-catalog.test.js` (already exists)
@@ -901,6 +937,7 @@ Add these entries (place the three `helpShortcut*` near the other `helpShortcut*
 Add the identical key set (same `placeholders`, English `description`) with translated `message` values:
 
 `locales/es.json`:
+
 ```json
   "helpShortcutDownload": { "message": "Descargar la imagen o el vídeo actual", "description": "Help-panel shortcut description: download." },
   "helpShortcutBlock": { "message": "Bloquear al autor y omitir su publicación", "description": "Help-panel shortcut description: block author." },
@@ -913,6 +950,7 @@ Add the identical key set (same `placeholders`, English `description`) with tran
 ```
 
 `locales/fr.json`:
+
 ```json
   "helpShortcutDownload": { "message": "Télécharger l'image ou la vidéo actuelle", "description": "Help-panel shortcut description: download." },
   "helpShortcutBlock": { "message": "Bloquer l'auteur et passer sa publication", "description": "Help-panel shortcut description: block author." },
@@ -925,6 +963,7 @@ Add the identical key set (same `placeholders`, English `description`) with tran
 ```
 
 `locales/de.json`:
+
 ```json
   "helpShortcutDownload": { "message": "Aktuelles Bild oder Video herunterladen", "description": "Help-panel shortcut description: download." },
   "helpShortcutBlock": { "message": "Autor blockieren und seinen Beitrag überspringen", "description": "Help-panel shortcut description: block author." },
@@ -937,6 +976,7 @@ Add the identical key set (same `placeholders`, English `description`) with tran
 ```
 
 `locales/it.json`:
+
 ```json
   "helpShortcutDownload": { "message": "Scarica l'immagine o il video corrente", "description": "Help-panel shortcut description: download." },
   "helpShortcutBlock": { "message": "Blocca l'autore e salta il suo post", "description": "Help-panel shortcut description: block author." },
@@ -949,6 +989,7 @@ Add the identical key set (same `placeholders`, English `description`) with tran
 ```
 
 `locales/ar.json`:
+
 ```json
   "helpShortcutDownload": { "message": "تنزيل الصورة أو الفيديو الحالي", "description": "Help-panel shortcut description: download." },
   "helpShortcutBlock": { "message": "حظر صاحب المنشور وتخطّي منشوره", "description": "Help-panel shortcut description: block author." },
@@ -985,6 +1026,7 @@ git commit -m "i18n: add download/block/friend shortcut and toast strings" \
 Blocking and friending/following are new writes to the user's Reddit account; the privacy copy currently names voting as the only one.
 
 **Files:**
+
 - Modify: `README.md`, `PRIVACY.md`, and the store-listing source(s) under `docs/` that describe account actions
 
 - [ ] **Step 1: Update the README keys line**
@@ -1048,6 +1090,7 @@ The offline gate proves the code sends what we think; it does **not** prove Redd
 - [ ] **Step 1: Run the full offline gate**
 
 Run, in order, and confirm each passes:
+
 ```bash
 npm run typecheck
 npm run lint
@@ -1056,6 +1099,7 @@ npm test
 npm run build
 npm run webext:lint
 ```
+
 Expected: all PASS. (This mirrors the verify-gate skill.)
 
 - [ ] **Step 2: Build the e2e and smoke the key handling over the mocked listing**
@@ -1066,6 +1110,7 @@ Expected: PASS — the loaded extension drives the slideshow; the new keys dispa
 - [ ] **Step 3: Live-verify the writes (local, logged-in Firefox)**
 
 Load the built Firefox add-on into a logged-in profile (README "Build from source → Firefox"). On a test post, confirm in turn:
+
 - **D** downloads the media.
 - **A** on `old.reddit.com` adds the author to your friends list (check `https://old.reddit.com/prefs/friends/`); **A** on `www.reddit.com` follows them.
 - **I** blocks the author (check blocked users in Reddit settings) and the show skips to the next post.

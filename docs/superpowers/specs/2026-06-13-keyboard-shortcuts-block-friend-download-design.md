@@ -22,16 +22,17 @@ no-servers promise, or fragile P2P).
 
 ## Key map
 
-| Key | Action | Status |
-|---|---|---|
-| ←/→, Shift+→, ↑/↓, Space, M, F, ?, Esc, PgUp/PgDn | existing | unchanged |
-| **D** | Download current media | new key, existing action |
-| **I** | Block author, then skip to next post | new |
-| **A** | Friend / follow author | new |
+| Key                                               | Action                               | Status                   |
+| ------------------------------------------------- | ------------------------------------ | ------------------------ |
+| ←/→, Shift+→, ↑/↓, Space, M, F, ?, Esc, PgUp/PgDn | existing                             | unchanged                |
+| **D**                                             | Download current media               | new key, existing action |
+| **I**                                             | Block author, then skip to next post | new                      |
+| **A**                                             | Friend / follow author               | new                      |
 
 ## Behaviors
 
 ### D — Download
+
 The action already exists: `session.js` `onDownload` (currently inline in the
 overlay deps, ~`session.js:177`) saves `slide.mediaUrl` via the background
 downloads API, and is a no-op for non-image/video slides (unresolved embeds).
@@ -39,6 +40,7 @@ Extract it to a `downloadCurrent()` function called by both the overlay button
 and the `D` key. Show a "Saved" confirmation flash.
 
 ### I — Block + next
+
 1. Read `slide.author` (Reddit username, no `u/` prefix; `slides.js:22`).
 2. No-op if absent or `[deleted]`.
 3. `POST /api/block_user` through the session (modhash, `credentials: include`),
@@ -54,7 +56,9 @@ next"). Block is reversible only via Reddit settings, so the flash names the
 user clearly. Revisit an undo only if it proves too easy to mis-fire.
 
 ### A — Friend / follow
+
 Frontend-aware, keyed off the launching tab's host:
+
 - `old.reddit.com` → `POST /api/friend` with `type=friend`, `name`, `uh=modhash`.
 - `www.reddit.com` → the follow endpoint.
 
@@ -63,7 +67,7 @@ The content script already knows its host (`window.location` in
 `"new"`) with the action. Flash "Friended u/{name}" or "Following u/{name}".
 No-op when the author is unknown.
 
-**Verification dependency:** the exact new-Reddit *follow* endpoint must be
+**Verification dependency:** the exact new-Reddit _follow_ endpoint must be
 confirmed against a real logged-in session before shipping (per the
 "provider/account changes need a real browser" rule). If it cannot be
 confirmed, `A` falls back to add-friend on both frontends.
@@ -74,6 +78,7 @@ All three are the vote shape (session-authenticated modhash POST), so they slot
 into the existing layers.
 
 ### 1. `lib/reddit-vote.js` — broaden
+
 The module already owns the modhash cache and 403-refresh-retry
 (`getModhash`). Add two methods to the `createVoter` factory's return, sharing
 `getModhash` and the same `post`-then-retry-on-403 helper:
@@ -87,8 +92,10 @@ Keep the file name and `createVoter` export to minimize churn (an optional
 rename of healthy, tested code).
 
 ### 2. `lib/background-router.js` — new message types
+
 Add `slideshow.block` and `slideshow.friend`, **content-script-only** (the
 `fromContentScript` gate), with payload validation mirroring `handleVote`:
+
 - `name` matches `^[A-Za-z0-9_-]{1,20}$` (Reddit username charset).
 - `frontend` ∈ `{"old","new"}` (friend only).
 - Fail closed (`{ ok: false }`) on any mismatch; `log.warn` on thrown errors.
@@ -96,6 +103,7 @@ Add `slideshow.block` and `slideshow.friend`, **content-script-only** (the
 Wire `blockUser` / `friendUser` into the router deps.
 
 ### 3. `entrypoints/background.js` / `entrypoints/content.js`
+
 - `background.js`: pass `block: (name) => voter.blockUser(name)` and
   `friend: (name, frontend) => voter.friendUser(name, frontend)` into
   `createMessageRouter`.
@@ -104,6 +112,7 @@ Wire `blockUser` / `friendUser` into the router deps.
   `frontend` from `window.location.hostname`.
 
 ### 4. `lib/session.js`
+
 - `downloadCurrent()` (extracted from `onDownload`).
 - `blockAuthor()` and `friendAuthor()` (optimistic flash, error revert like
   `castVote`).
@@ -112,6 +121,7 @@ Wire `blockUser` / `friendUser` into the router deps.
 - Guards: author-less slides → no-op (no flash, or a brief "No author").
 
 ### 5. `lib/overlay-ui.js` — generalize the flash
+
 Generalize the vote-flash toast (`flashVote`, `overlay-ui.js:417`; `rs-vote-flash`)
 into a reusable `flashAction(text, variant)` that also calls `announce()` for
 screen readers. Block/friend/download are keys-only with a flash — exactly how
@@ -119,6 +129,7 @@ vote works today (no new buttons). Expose via the overlay API so `session.js`
 can call it. Keep `flashVote` as a thin wrapper (or fold its callers over).
 
 ### 6. `lib/overlay-help.js`
+
 Add three rows to the shortcuts panel: `D` Download, `I` Block author, `A`
 Friend / follow.
 
@@ -128,6 +139,7 @@ WebExtension `_locales` format (`{ message, description }`), added across
 **en + ar, de, es, fr, it** (Arabic is RTL). No jargon in user-facing copy.
 
 New keys:
+
 - `helpShortcutDownload`, `helpShortcutBlock`, `helpShortcutFriend` — help-panel rows.
 - Flash text: `uiBlocked` ("Blocked u/{name}"), `uiFriended`, `uiFollowing`,
   `uiSaved` (download), and reuse/extend an error variant.
@@ -159,7 +171,7 @@ interpolation; otherwise compose the flash text in code.)
 - **e2e** (`npm run test:prod`): keypress → flash + dep call over the mocked
   listing. **No real account in CI.**
 - **Live (local, FF session):** confirm block / friend / follow actually take.
-  Gate the *follow* endpoint on this; fall back to add-friend if unconfirmed.
+  Gate the _follow_ endpoint on this; fall back to add-friend if unconfirmed.
 
 ## Out of scope
 
